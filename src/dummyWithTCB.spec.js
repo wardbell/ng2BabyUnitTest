@@ -1,6 +1,6 @@
 var test_1 = require('angular2/test');
 console.log('Before dummyWithTCB describe');
-test_1.describe('dummy tests:', function () {
+test_1.describe('dummy TCB tests:', function () {
     console.log('Inside dummyWithTCB describe');
     test_1.it('sync test works', function () { return test_1.expect(true).toBe(true); });
     // Doesn't actually work because Ng Test framework  overwrites Jasmine methods

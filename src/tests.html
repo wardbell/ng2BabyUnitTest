@@ -22,7 +22,8 @@
     <script >
       var imports = [
         'dummy.spec',
-        'dummyWithTCB.spec'
+        'dummyWithTCB.spec',
+        '@empty' // placeholder makes it easier to comment-out specs above
       ].map(System.import.bind(System));
 
       Promise.all(imports)

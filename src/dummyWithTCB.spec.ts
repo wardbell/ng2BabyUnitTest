@@ -14,7 +14,7 @@ type TCB = typeof TestComponentBuilder;
 type ATC = typeof AsyncTestCompleter;
 
 console.log('Before dummyWithTCB describe');
-describe('dummy tests:', () => {
+describe('dummy TCB tests:', () => {
     console.log('Inside dummyWithTCB describe');
 
     it('sync test works', () => expect(true).toBe(true) );

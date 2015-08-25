@@ -1,12 +1,27 @@
 import {Hero}  from 'hero';
 
+const _heros: Hero[] = [
+	new Hero('Naomi'),
+	new Hero('Brad'),
+	new Hero('Mahatma Ghandhi'),
+	new Hero('Julie'),
+];
+
 export class HeroDataService {
 
 	private _heros: Hero[] = [];
 
+	getAllHeros() {
+		return _heros.slice();
+	}
+
   getOrCreateHero(name: string) {
 
-		let matches = this._heros.filter(hero => {
+		if (!name) {
+			return Hero.nullo;
+		}
+
+		let matches = _heros.filter(hero => {
 			return hero.name === name;
 		});
 
@@ -14,8 +29,9 @@ export class HeroDataService {
 			return matches[0];
 		} else {
 			let hero = new Hero(name);
-			this._heros.push(hero);
+			_heros.push(hero);
       return hero;
 		}
 	}
+
 }
