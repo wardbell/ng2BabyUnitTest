@@ -21,7 +21,7 @@ describe('dummy tests:', () => {
 
     // Doesn't actually work because Ng Test framework  overwrites Jasmine methods
     // althought test passes synchronously
-    it('async test works', (done:Function) => {
+    it('async test seems to work', (done:Function) => {
         // done is undefined at this point
         setTimeout(() => {
             expect(false).toBe(false); // this assertion passes
