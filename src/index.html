@@ -12,7 +12,14 @@
   <body>
     <my-app></my-app>
     <script>
-      System.import('app');
+      System.import('app')
+        .then(function() {
+            console.log('onload');
+            window.onload();}
+        )
+        .finally(function() {
+            console.log('finally')
+        });
     </script>
   </body>
 </html>

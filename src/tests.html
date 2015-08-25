@@ -4,40 +4,29 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title>ng2BabyUnitTests</title>
     <link rel="stylesheet" href="../node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
+
     <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
     <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
     <script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
 
     <script src="../node_modules/traceur/bin/traceur-runtime.js"></script>
-    <!--
     <script src="../node_modules/es6-module-loader/dist/es6-module-loader.js"></script>
     <script src="../node_modules/systemjs/dist/system.src.js"></script>
-    -->
-    <script src="https://jspm.io/system@0.16.js"></script>
     <script src="../node_modules/angular2/bundles/angular2.dev.js"></script>
-
-    <!-- Ng2 test framework -->
     <script src="../node_modules/angular2/bundles/test_lib.dev.js"></script>
-    <!-- Need to patch Jasmine for Ng2/Zone async tests -->
+    <script src="../node_modules/zone.js/dist/long-stack-trace-zone.js"></script>
     <script src="../node_modules/zone.js/dist/jasmine-patch.js"></script>
-
 
   </head>
   <body>
-    <script>
-      describe('dummy tests', function(){
+    <script >
+      var imports = [
+        'dummy.spec'
+      ].map(System.import.bind(System));
 
-        it('works!', function(){
-            expect(true).toBe(true);
-        });
-
-        it('async works!', function(done){
-          setTimeout(function() {
-            expect(false).toBe(false);
-            done();
-          }, 10);
-        });
-      });
+      Promise.all(imports)
+        .then(  function()    { window.onload();} ) // re-execute Jasmine's buildup
+        .catch( function(err) { console.log(err);} );
     </script>
   </body>
 </html>
