@@ -1,9 +1,11 @@
-
 import {Hero}  from 'hero';
 
 export class HeroDataService {
+
 	private _heros: Hero[] = [];
-    getHeroByName(name: string) {
+
+  getOrCreateHero(name: string) {
+
 		let matches = this._heros.filter(hero => {
 			return hero.name === name;
 		});
@@ -13,7 +15,7 @@ export class HeroDataService {
 		} else {
 			let hero = new Hero(name);
 			this._heros.push(hero);
-            return hero;
+      return hero;
 		}
 	}
 }

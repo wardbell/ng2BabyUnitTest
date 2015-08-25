@@ -21,7 +21,8 @@
   <body>
     <script >
       var imports = [
-        'dummy.spec'
+        'dummy.spec',
+        'dummyWithTCB.spec'
       ].map(System.import.bind(System));
 
       Promise.all(imports)

@@ -14,15 +14,11 @@ var heroDataService_1 = require('heroDataService');
 var AppComponent = (function () {
     function AppComponent(_heroDataService) {
         this._heroDataService = _heroDataService;
-        // private _heroDataService: HeroDataService;
-        // constructor(){
-        //     this._heroDataService = new HeroDataService();
-        // }
         this.currentHeroName = 'Igor';
     }
     Object.defineProperty(AppComponent.prototype, "currentHero", {
         get: function () {
-            return this._heroDataService.getHeroByName(this.currentHeroName);
+            return this._heroDataService.getOrCreateHero(this.currentHeroName);
         },
         enumerable: true,
         configurable: true
@@ -32,12 +28,12 @@ var AppComponent = (function () {
             selector: 'my-app'
         }),
         angular2_1.View({
-            template: '<h1 id="output">{{currentHero.name}} is my hero!</h1>'
+            template: "<h1 id=\"output\">{{currentHero.name}} is my current hero!</h1>\n     <ul>\n       <li>id: {{currentHero.id}}</li>\n       <li>name: {{currentHero.name}}</li>\n     </ul>\n    "
         }), 
         __metadata('design:paramtypes', [heroDataService_1.HeroDataService])
     ], AppComponent);
     return AppComponent;
 })();
-// bootstrap(AppComponent);
-angular2_1.bootstrap(AppComponent, [heroDataService_1.HeroDataService]);
+// bootstrap(AppComponent); // works if using component DI registration
+angular2_1.bootstrap(AppComponent, [heroDataService_1.HeroDataService]); // global DI registration
 //# sourceMappingURL=app.js.map

@@ -3,7 +3,7 @@ var HeroDataService = (function () {
     function HeroDataService() {
         this._heros = [];
     }
-    HeroDataService.prototype.getHeroByName = function (name) {
+    HeroDataService.prototype.getOrCreateHero = function (name) {
         var matches = this._heros.filter(function (hero) {
             return hero.name === name;
         });
