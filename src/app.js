@@ -16,7 +16,7 @@ var goAsync = true;
 var diBinding = goAsync ?
     angular2_1.bind(heroDataService_1.HeroDataService).toClass(heroDataServiceAsync_1.HeroDataServiceAsync) :
     heroDataService_1.HeroDataService;
-var initialHeroName = 'Igor';
+var initialHeroName = goAsync ? 'Igor' : 'Misko';
 var AppComponent = (function () {
     function AppComponent(_heroDataService) {
         this._heroDataService = _heroDataService;
@@ -44,7 +44,7 @@ var AppComponent = (function () {
     });
     Object.defineProperty(AppComponent.prototype, "asyncLabel", {
         get: function () {
-            return goAsync ? '(async)' : '';
+            return goAsync ? '(async)' : '(sync)';
         },
         enumerable: true,
         configurable: true

@@ -8,7 +8,7 @@ const diBinding = goAsync ?
   bind(HeroDataService).toClass(HeroDataServiceAsync) :
   HeroDataService;
 
-const initialHeroName = 'Igor';
+const initialHeroName = goAsync ? 'Igor' : 'Misko';
 
 @Component({
   selector: 'my-app'
@@ -53,7 +53,7 @@ class AppComponent {
   }
 
   get asyncLabel() {
-    return goAsync ? '(async)' : '';
+    return goAsync ? '(async)' : '(sync)';
   }
 
   onHeroSelected(hero:Hero) {
