@@ -1,18 +1,20 @@
 import {bind, bootstrap, Component, NgFor, View } from 'angular2/angular2';
-import {Hero, HeroDataService} from 'heroDataService';
+import {Backend} from 'backend';
+import {Hero} from 'hero';
+import {HeroDataService} from 'heroDataService';
 import {HeroDataServiceAsync} from 'heroDataServiceAsync';
 
 const goAsync = true;
 
-const diBinding = goAsync ?
-  bind(HeroDataService).toClass(HeroDataServiceAsync) :
-  HeroDataService;
+const diBindings = goAsync ?
+  [bind(HeroDataService).toClass(HeroDataServiceAsync), Backend] :
+  [HeroDataService];
 
 const initialHeroName = goAsync ? 'Igor' : 'Misko';
 
 @Component({
   selector: 'my-app'
-  //, viewBindings:[diBinding] // component DI registration
+  //, viewBindings: diBinding // component DI registration
 })
 @View({
     template:
@@ -34,18 +36,18 @@ const initialHeroName = goAsync ? 'Igor' : 'Misko';
     styles: ['.heros {list-style-type: none; margin-left: 1em; padding: 0}']
 })
 class AppComponent {
-  private _currentHeroHolder = {haveHero: false, hero: Hero.nullo};
+  private _currentHero =  Hero.nullo;
 
   constructor(private _heroDataService: HeroDataService) {  }
 
 	get currentHero() {
-    if (!this._currentHeroHolder.haveHero) {
-      this._currentHeroHolder = this._heroDataService.getOrCreateHero(initialHeroName);
+    if (this._currentHero.isNullo) {
+      this._currentHero = this._heroDataService.getOrCreateHero(initialHeroName);
     }
-		return this._currentHeroHolder.hero;
+		return this._currentHero;
 	}
 	set currentHero(value) {
-    this._currentHeroHolder = {haveHero: true, hero: value};
+    this._currentHero = value;
 	}
 
   get heros() {
@@ -67,4 +69,4 @@ class AppComponent {
 // global DI registration ... either sync or async
 
 
-bootstrap(AppComponent, [diBinding]);
+bootstrap(AppComponent, diBindings);

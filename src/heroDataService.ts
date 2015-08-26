@@ -1,23 +1,11 @@
 import {Hero} from 'hero';
-export {Hero};
-
-export const HEROS =	 [
-						new Hero('Naomi'),
-						new Hero('Brad'),
-						new Hero('Mahatma Ghandhi'),
-						new Hero('Julie'),
-						new Hero('Brian'),
-						new Hero('Jeff'),
-						new Hero('Kathy'),
-					];
+import {HEROS} from 'mockHeros';
 
 interface Heros extends Array<Hero>{
 	fetched: boolean;
 }
 
 export class HeroDataService {
-
-  protected _heros = <Heros>[];
 
 	getAllHeros(force:boolean = false) {
 		// fetch if haven't fetched or fetch is forced
@@ -30,8 +18,11 @@ export class HeroDataService {
 
   getOrCreateHero(name?: string)  {
 		this.getAllHeros(); // make sure we have heros before we add one
-		return {haveHero: true, hero: this._getOrCreateHeroImpl(name)};
+		return this._getOrCreateHeroImpl(name);
 	}
+
+	///////////////////
+  protected _heros = <Heros>[];
 
   protected _getOrCreateHeroImpl(name?: string) {
 

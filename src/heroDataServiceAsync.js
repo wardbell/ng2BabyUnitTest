@@ -4,35 +4,49 @@ var __extends = (this && this.__extends) || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
+    switch (arguments.length) {
+        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
+        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
+        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
+    }
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var angular2_1 = require('angular2/angular2');
+var hero_1 = require('hero');
 var heroDataService_1 = require('heroDataService');
-exports.Hero = heroDataService_1.Hero;
-exports.HEROS = heroDataService_1.HEROS;
+var backend_1 = require('backend');
 var HeroDataServiceAsync = (function (_super) {
     __extends(HeroDataServiceAsync, _super);
-    function HeroDataServiceAsync() {
-        _super.apply(this, arguments);
+    function HeroDataServiceAsync(_backend) {
+        _super.call(this);
+        this._backend = _backend;
+        ///////////////////
         this._heros = [];
-        // Test support: can be replaced w/ mocks in tests
-        this._getAllHerosAsyncImpl = function () {
-            return new Promise(function (resolve, reject) {
-                setTimeout(function () {
-                    resolve(heroDataService_1.HEROS.slice());
-                }, 500);
-            });
-        };
     }
     HeroDataServiceAsync.prototype.getAllHeros = function (force) {
         if (force === void 0) { force = false; }
-        this._getAllHerosAsync();
+        this._getAllHerosAsync(force);
         return this._heros;
     };
     HeroDataServiceAsync.prototype.getOrCreateHero = function (name) {
-        var result = { haveHero: false, hero: heroDataService_1.Hero.nullo };
-        this._getOrCreateHeroAsync(name)
-            .then(function (h) { result.haveHero = true; result.hero = h; });
-        return result;
+        var _this = this;
+        var hero = hero_1.Hero.nullo;
+        if (this._heros.fetched) {
+            hero = this._getOrCreateHeroImpl(name);
+        }
+        else if (!this._heros.fetching) {
+            this._getAllHerosAsync()
+                .then(function (_) { return hero = _this._getOrCreateHeroImpl(name); });
+        }
+        return hero;
     };
-    // ASYNC IMPLEMENTATION
     HeroDataServiceAsync.prototype._getAllHerosAsync = function (force) {
         var _this = this;
         if (force) {
@@ -49,42 +63,29 @@ var HeroDataServiceAsync = (function (_super) {
             return this._heros.ready;
         }
         // clear heros and initiate new fetch, returning its promise
+        this._heros.fetching = true;
         this._heros.fetched = false;
         this._heros.length = 0;
-        this._heros.ready = this._getAllHerosAsyncImpl()
+        this._heros.ready = this._backend.fetchAllHerosAsync()
             .then(function (heros) {
+            _this._heros.fetching = false;
             _this._heros.fetched = true;
             heros.forEach(function (h) { return _this._heros.push(h); });
             return _this._heros;
         })
             .catch(function (err) {
-            _this._heros.fetched = true;
+            _this._heros.fetching = false;
+            _this._heros.fetched = false;
+            _this._heros.ready = null;
             console.log("getAllHerosAsync failed w/ message:\"" + err + "\"");
             return Promise.reject(err);
         });
         return this._heros.ready;
     };
-    HeroDataServiceAsync.prototype._getOrCreateHeroAsync = function (name) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var hero;
-            if (_this._heros.fetched) {
-                hero = _this._getOrCreateHeroImpl(name);
-                resolve(hero);
-            }
-            else {
-                _this._getAllHerosAsync()
-                    .then(function (heros) {
-                    hero = _this._getOrCreateHeroImpl(name);
-                    resolve(hero);
-                })
-                    .catch(function (err) {
-                    console.log("getOrCreateHeroAsync failed w/ message:\"" + err + "\"");
-                    resolve(heroDataService_1.Hero.nullo);
-                });
-            }
-        });
-    };
+    HeroDataServiceAsync = __decorate([
+        __param(0, angular2_1.Inject(backend_1.Backend)), 
+        __metadata('design:paramtypes', [backend_1.Backend])
+    ], HeroDataServiceAsync);
     return HeroDataServiceAsync;
 })(heroDataService_1.HeroDataService);
 exports.HeroDataServiceAsync = HeroDataServiceAsync;

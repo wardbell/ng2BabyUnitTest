@@ -1,4 +1,7 @@
-import {Hero, HeroDataServiceAsync, HEROS} from 'heroDataServiceAsync';
+import {Hero} from 'hero';
+import {HeroDataServiceAsync} from 'heroDataServiceAsync';
+import {HEROS} from 'mockHeros';
+import {Backend} from 'backend';
 
 // TODO: I don't think I need angular2/test when testing this service
 //       because no real interaction w/ Angular.
@@ -17,32 +20,88 @@ import {
 type ATC = typeof AsyncTestCompleter;
 
 describe('heroDataServiceAsync', () => {
-    let num_heros:number = HEROS.length;
-    let service: HeroDataServiceAsync;
-    let heroNullo = Hero.nullo;
+  let service: HeroDataServiceAsync;
+  let heroNullo = Hero.nullo;
+  let mockBackend:Backend = <Backend>{};
+  let heroData: Hero[];
+  let testError ='fetchAllHerosAsync failed on purpose';
 
-    function mockGetAllHerosHappyPath(){
-      return new Promise<Hero[]>((resolve, reject) =>{
-                resolve(HEROS.slice());
-      });
-    }
-
-    beforeEach(()=>{
-      service = new HeroDataServiceAsync();
-      service._getAllHerosAsyncImpl = mockGetAllHerosHappyPath;
+  function fetchAllHerosAsyncHappyPath () {
+    return new Promise<Hero[]>((resolve, reject) =>{
+      resolve(heroData);
     });
+  }
 
-    it('service.getAllHeros returns expected # of heros after resolution', inject( [AsyncTestCompleter], (async:ATC) =>{
+  function fetchAllHerosAsyncFail () {
+    return new Promise<Hero[]>((resolve, reject) =>{
+      reject(testError);
+    });
+  }
+
+  beforeEach(() => {
+    heroData = HEROS.slice();
+    mockBackend.fetchAllHerosAsync = fetchAllHerosAsyncHappyPath;
+    service = new HeroDataServiceAsync(mockBackend);
+  });
+
+  describe('#getAllHeros', () => {
+
+    it('returns no heros before ready', inject( [AsyncTestCompleter], (async:ATC) =>{
+        let heros = service.getAllHeros();
+        expect(heros.length).toEqual(0);
+        async.done();
+    }));
+
+    it('returns expected # of heros when ready', inject( [AsyncTestCompleter], (async:ATC) =>{
         var done = async.done.bind(async);
 
         let heros = service.getAllHeros();
 
         heros.ready
           .then( _ => {
-              expect(heros.length).toEqual(num_heros);
+              expect(heros.length).toEqual(heroData.length);
           })
+          .catch(fail)
           .then(done, done);
     }));
+
+    it('returns no heros when source data are empty', inject( [AsyncTestCompleter], (async:ATC) =>{
+        var done = async.done.bind(async);
+        heroData = [];
+
+        let heros = service.getAllHeros();
+
+        heros.ready
+          .then( _ => {
+              expect(heros.length).toEqual(0);
+          })
+          .catch(fail)
+          .then(done, done);
+    }));
+
+    it('the nullo is not among the heros', inject( [AsyncTestCompleter], (async:ATC) =>{
+        var done = async.done.bind(async);
+
+        let heros = service.getAllHeros();
+        heros.ready
+          .then( _ => {
+              expect(heros).not.toContain(Hero.nullo);
+          })
+          .catch(fail)
+          .then(done, done);
+    }));
+
+    it('fails with expected error when backend fails', inject( [AsyncTestCompleter], (async:ATC) =>{
+        var done = async.done.bind(async);
+        mockBackend.fetchAllHerosAsync =  fetchAllHerosAsyncFail;
+        let heros = service.getAllHeros();
+
+        heros.ready
+          .then( _ => fail('getAllHeros should have failed') )
+          .catch(err => expect(err).toBe(testError) )
+          .then(done, done);
+    }));
+  });
 /*
     it('a cleared service has no heros', inject( [AsyncTestCompleter], (async:ATC) =>{
         HeroDataServiceAsync._clear();

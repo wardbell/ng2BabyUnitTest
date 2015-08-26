@@ -10,27 +10,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var angular2_1 = require('angular2/angular2');
+var backend_1 = require('backend');
+var hero_1 = require('hero');
 var heroDataService_1 = require('heroDataService');
 var heroDataServiceAsync_1 = require('heroDataServiceAsync');
 var goAsync = true;
-var diBinding = goAsync ?
-    angular2_1.bind(heroDataService_1.HeroDataService).toClass(heroDataServiceAsync_1.HeroDataServiceAsync) :
-    heroDataService_1.HeroDataService;
+var diBindings = goAsync ?
+    [angular2_1.bind(heroDataService_1.HeroDataService).toClass(heroDataServiceAsync_1.HeroDataServiceAsync), backend_1.Backend] :
+    [heroDataService_1.HeroDataService];
 var initialHeroName = goAsync ? 'Igor' : 'Misko';
 var AppComponent = (function () {
     function AppComponent(_heroDataService) {
         this._heroDataService = _heroDataService;
-        this._currentHeroHolder = { haveHero: false, hero: heroDataService_1.Hero.nullo };
+        this._currentHero = hero_1.Hero.nullo;
     }
     Object.defineProperty(AppComponent.prototype, "currentHero", {
         get: function () {
-            if (!this._currentHeroHolder.haveHero) {
-                this._currentHeroHolder = this._heroDataService.getOrCreateHero(initialHeroName);
+            if (this._currentHero.isNullo) {
+                this._currentHero = this._heroDataService.getOrCreateHero(initialHeroName);
             }
-            return this._currentHeroHolder.hero;
+            return this._currentHero;
         },
         set: function (value) {
-            this._currentHeroHolder = { haveHero: true, hero: value };
+            this._currentHero = value;
         },
         enumerable: true,
         configurable: true
@@ -68,5 +70,5 @@ var AppComponent = (function () {
 })();
 // bootstrap(AppComponent); // works if using component DI registration
 // global DI registration ... either sync or async
-angular2_1.bootstrap(AppComponent, [diBinding]);
+angular2_1.bootstrap(AppComponent, diBindings);
 //# sourceMappingURL=app.js.map
