@@ -1,18 +1,33 @@
 var hero_1 = require('hero');
 exports.Hero = hero_1.Hero;
-var _heros = [];
+exports.HEROS = [
+    new hero_1.Hero('Naomi'),
+    new hero_1.Hero('Brad'),
+    new hero_1.Hero('Mahatma Ghandhi'),
+    new hero_1.Hero('Julie')
+];
 var HeroDataService = (function () {
     function HeroDataService() {
         this._heros = [];
     }
-    HeroDataService.prototype.getAllHeros = function () {
-        return _heros.slice();
+    HeroDataService.prototype.getAllHeros = function (force) {
+        if (force === void 0) { force = false; }
+        // fetch if haven't fetched or fetch is forced
+        if (!this._heros.fetched || force) {
+            this._heros = exports.HEROS.slice();
+            this._heros.fetched = true;
+        }
+        return this._heros;
     };
     HeroDataService.prototype.getOrCreateHero = function (name) {
+        this.getAllHeros(); // make sure we have heros before we add one
+        return { haveHero: true, hero: this._getOrCreateHeroImpl(name) };
+    };
+    HeroDataService.prototype._getOrCreateHeroImpl = function (name) {
         if (!name) {
             return hero_1.Hero.nullo;
         }
-        var matches = _heros.filter(function (hero) {
+        var matches = this._heros.filter(function (hero) {
             return hero.name === name;
         });
         if (matches.length) {
@@ -20,20 +35,11 @@ var HeroDataService = (function () {
         }
         else {
             var hero = new hero_1.Hero(name);
-            _heros.push(hero);
+            this._heros.push(hero);
             return hero;
         }
-    };
-    /* Test support methods */
-    HeroDataService.clear = function () {
-        _heros.splice(0, _heros.length);
-    };
-    HeroDataService.reset = function () {
-        _heros.splice(0, _heros.length, new hero_1.Hero('Naomi'), new hero_1.Hero('Brad'), new hero_1.Hero('Mahatma Ghandhi'), new hero_1.Hero('Julie'));
-        return _heros.length;
     };
     return HeroDataService;
 })();
 exports.HeroDataService = HeroDataService;
-HeroDataService.reset();
 //# sourceMappingURL=heroDataService.js.map
