@@ -1,10 +1,6 @@
 var hero_1 = require('hero');
-var _heros = [
-    new hero_1.Hero('Naomi'),
-    new hero_1.Hero('Brad'),
-    new hero_1.Hero('Mahatma Ghandhi'),
-    new hero_1.Hero('Julie'),
-];
+exports.Hero = hero_1.Hero;
+var _heros = [];
 var HeroDataService = (function () {
     function HeroDataService() {
         this._heros = [];
@@ -28,7 +24,16 @@ var HeroDataService = (function () {
             return hero;
         }
     };
+    /* Test support methods */
+    HeroDataService.clear = function () {
+        _heros.splice(0, _heros.length);
+    };
+    HeroDataService.reset = function () {
+        _heros.splice(0, _heros.length, new hero_1.Hero('Naomi'), new hero_1.Hero('Brad'), new hero_1.Hero('Mahatma Ghandhi'), new hero_1.Hero('Julie'));
+        return _heros.length;
+    };
     return HeroDataService;
 })();
 exports.HeroDataService = HeroDataService;
+HeroDataService.reset();
 //# sourceMappingURL=heroDataService.js.map

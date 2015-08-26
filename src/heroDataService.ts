@@ -1,11 +1,7 @@
 import {Hero}  from 'hero';
+export {Hero};
 
-const _heros: Hero[] = [
-	new Hero('Naomi'),
-	new Hero('Brad'),
-	new Hero('Mahatma Ghandhi'),
-	new Hero('Julie'),
-];
+const _heros: Hero[] = [];
 
 export class HeroDataService {
 
@@ -15,7 +11,7 @@ export class HeroDataService {
 		return _heros.slice();
 	}
 
-  getOrCreateHero(name: string) {
+  getOrCreateHero(name?: string) {
 
 		if (!name) {
 			return Hero.nullo;
@@ -34,4 +30,22 @@ export class HeroDataService {
 		}
 	}
 
+
+  /* Test support methods */
+
+	static clear() {
+		_heros.splice(0, _heros.length);
+	}
+
+	static reset() {
+		_heros.splice(0, _heros.length,
+			new Hero('Naomi'),
+			new Hero('Brad'),
+			new Hero('Mahatma Ghandhi'),
+			new Hero('Julie')
+		);
+		return _heros.length;
+	}
 }
+
+HeroDataService.reset();

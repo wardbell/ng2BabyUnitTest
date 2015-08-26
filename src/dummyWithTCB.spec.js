@@ -5,7 +5,7 @@ test_1.describe('dummy TCB tests:', function () {
     test_1.it('sync test works', function () { return test_1.expect(true).toBe(true); });
     // Doesn't actually work because Ng Test framework  overwrites Jasmine methods
     // althought test passes synchronously
-    test_1.it('async test seems to work (but actually does not)', function (done) {
+    test_1.xit('async test seems to work (but actually does not)', function (done) {
         // done is undefined at this point
         setTimeout(function () {
             test_1.expect(false).toBe(true); // this assertion should fail
