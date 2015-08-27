@@ -6,9 +6,12 @@ export class HeroDataService {
 	get serviceName() {return 'sync';}
 
 	getAllHeroes(force:boolean = false) {
-		// (re)set if not set or forced
-		if (!this._heroes || force){
-		  this._heroes = HEROES.slice();
+		// (re)set the heroes array if not set or forced
+		if (!this._heroes) {
+			this._heroes = HEROES.slice();
+		} else if (force) {
+			this._heroes.length = 0;
+			HEROES.map(h => this._heroes.push(h));
 		}
 		return this._heroes;
 	}

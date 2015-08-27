@@ -8,10 +8,15 @@ var HeroDataService = (function () {
         configurable: true
     });
     HeroDataService.prototype.getAllHeroes = function (force) {
+        var _this = this;
         if (force === void 0) { force = false; }
-        // (re)set if not set or forced
-        if (!this._heroes || force) {
+        // (re)set the heroes array if not set or forced
+        if (!this._heroes) {
             this._heroes = mockHeroes_1.HEROES.slice();
+        }
+        else if (force) {
+            this._heroes.length = 0;
+            mockHeroes_1.HEROES.map(function (h) { return _this._heroes.push(h); });
         }
         return this._heroes;
     };

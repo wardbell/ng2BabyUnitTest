@@ -27,7 +27,7 @@ describe('heroDataService', () => {
       let heroes = service.getAllHeroes();
       heroes.push(new Hero('Perseus'));
       service.getAllHeroes(true); // re-execution with force
-      expect(heroes.length).toEqual(HEROES.length + 1);
+      expect(heroes.length).toEqual(HEROES.length);
     });
 
   });

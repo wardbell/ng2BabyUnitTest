@@ -21,7 +21,7 @@ describe('heroDataService', function () {
             var heroes = service.getAllHeroes();
             heroes.push(new hero_1.Hero('Perseus'));
             service.getAllHeroes(true); // re-execution with force
-            expect(heroes.length).toEqual(mockHeroes_1.HEROES.length + 1);
+            expect(heroes.length).toEqual(mockHeroes_1.HEROES.length);
         });
     });
     describe('#getHero(name)', function () {
