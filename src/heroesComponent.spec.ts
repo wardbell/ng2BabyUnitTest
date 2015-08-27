@@ -13,7 +13,7 @@ import {
   xdescribe,
   describe,
   el,
-  expect,
+  //expect,
   iit,
   it,
   xit
@@ -29,18 +29,9 @@ import {HEROES} from 'mockHeroes';
 
 import {HeroesComponent as CUT} from 'heroesComponent'; // cut = Component Under Test
 
-function detectChangesAndCheck(rootTC: RTC, classes: string, elIndex: number = 0) {
-  rootTC.detectChanges();
-  expect(rootTC.componentViewChildren[elIndex].nativeElement.className).toEqual(classes);
-}
-
-function injectIt(testFn: (tcb: TCB, done: ()=>void) => void) {
-  return inject([TestComponentBuilder, AsyncTestCompleter], function injectWrapper(tcb: TCB, async: ATC) {
-    testFn(tcb, async.done.bind(async));
-  });
-}
 bootstrap(null); // else `tcb.createAsync` bombs because `DOM` is undefined (a bug)
-describe('HeroesComponent', () => {
+
+describe('HeroesComponent (w/ sync dataservice)', () => {
 
   // Set up DI bindings required by component (and its nested components?)
   // else hangs silently forever
@@ -56,15 +47,39 @@ describe('HeroesComponent', () => {
        })
   }));
 
-  it('can trigger binding', injectIt((tcb, done) => {
-    let template = '<h1>Heroes</h1>';
+  it('binds view to serviceName', injectIt((tcb, done) => {
+    let template = '<h1>Heroes ({{serviceName}})</h1>';
     tcb.overrideTemplate(CUT, template)
        .createAsync(CUT)
        .then((rootTC:RTC) => {
           let cut:CUT = rootTC.componentInstance;
-          rootTC.detectChanges();
-          expect(true).toBe(true);
+          rootTC.detectChanges(); // trigger component property binding
+          expectViewChildHtmlToMatch(rootTC, cut.serviceName);
           done();
        })
   }));
 });
+
+////// Helpers //////
+
+function injectIt(testFn: (tcb: TCB, done: ()=>void) => void) {
+  return inject([TestComponentBuilder, AsyncTestCompleter], function injectWrapper(tcb: TCB, async: ATC) {
+    testFn(tcb, async.done.bind(async));
+  });
+}
+
+function getViewChildHtml(rootTC: RTC, elIndex: number = 0){
+  return rootTC.componentViewChildren[elIndex].nativeElement.innerHTML
+}
+
+function expectViewChildHtmlToMatch(rootTC: RTC, value: string | RegExp, elIndex: number = 0){
+  let elHtml = getViewChildHtml(rootTC, elIndex);
+  let rx = typeof value === 'string' ? new RegExp(value) : value;
+  (rx.test(elHtml)) ? expect(true).toBeTruthy : fail(`"${elHtml}" doesn't match ${rx}`)
+}
+
+// borrowed for instructional value from
+function detectChangesAndCheckClassName(rootTC: RTC, classes: string, elIndex: number = 0) {
+  rootTC.detectChanges();
+  expect(rootTC.componentViewChildren[elIndex].nativeElement.className).toEqual(classes);
+}
