@@ -12,7 +12,7 @@ interface Heroes extends Array<Hero>{
 @Injectable()
 export class HeroDataServiceAsync extends HeroDataService {
 
-	constructor( private _backend: Backend){
+	constructor(private _backend: Backend){
 		super();
 	}
 
