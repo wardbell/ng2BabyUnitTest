@@ -1,78 +1,74 @@
-import {Inject} from 'angular2/angular2';
+import {Inject, Injectable} from 'angular2/angular2';
 import {Hero} from 'hero';
 import {HeroDataService} from 'heroDataService';
 import {Backend} from 'backend';
 
-interface Heros extends Array<Hero>{
-	ready: Promise<Hero[]>;
-	fetching: boolean;
-	fetched: boolean;
+interface Heroes extends Array<Hero>{
+	ready: Promise<Hero[]>; // promise that did or will fill the array
+	fetching: boolean;      // in the process of fetching
+	fetched: boolean;       // previously fetched
 }
 
+@Injectable()
 export class HeroDataServiceAsync extends HeroDataService {
 
-	constructor(@Inject(Backend) private _backend: Backend){
+	constructor( private _backend: Backend){
 		super();
 	}
 
-	getAllHeros(force : boolean = false) {
-		this._getAllHerosAsync(force);
-		return this._heros;
+	get serviceName() {return 'async';}
+
+	getAllHeroes(force : boolean = false) {
+		this._fetchAllHeroesAsync(force);
+		return this._heroes;
 	}
 
-  getOrCreateHero(name?: string)  {
-		let hero = Hero.nullo;
+  getHero(name?: string)  {
+	  let hero:Hero;
 
-		if (this._heros.fetched) {
-			hero = this._getOrCreateHeroImpl(name);
-		} else if (!this._heros.fetching) {
-			this._getAllHerosAsync()
-				.then(_ => 	hero = this._getOrCreateHeroImpl(name))
+		if (this._heroes.fetching){
+			return hero;
 		}
+
+		if (this._heroes.fetched) {
+			return this._getHeroInCache(name);
+		}
+
+		this._fetchAllHeroesAsync();
 		return hero;
+
 	}
 
 	///////////////////
-  protected _heros = <Heros>[];
+  protected _heroes = <Heroes>[];
 
-	private _getAllHerosAsync(force?: boolean) {
-		if (force) {
-			this._heros.fetched = false;
-			this._heros.ready = null;
+	private _fetchAllHeroesAsync(force?: boolean) {
+
+		// quit if still fetching OR fetched already and not forcing new fetch
+		if (this._heroes.fetching || (this._heroes.fetched && !force)) {
+			return;
 		}
 
-		// if already fetched (or not forcing fetch)
-		// return existing heros via promise
-		if (this._heros.fetched){
-			this._heros.ready = Promise.resolve(this._heros);
-		}
+		// clear heroes and initiate new fetch
+		// stash fetch-promise in heroes.ready
+		this._heroes.length = 0;
+		this._heroes.fetching = true;
+		this._heroes.fetched = false;
 
-		// if getAll in progress or completed (indicated by existence of promise)
-		if (this._heros.ready) {
-			return this._heros.ready
-		}
+		this._heroes.ready = this._backend.fetchAllHeroesAsync()
 
-    // clear heros and initiate new fetch, returning its promise
-		this._heros.fetching = true;
-		this._heros.fetched = false;
-		this._heros.length = 0;
-
-		this._heros.ready = this._backend.fetchAllHerosAsync()
-			.then(heros => {
-				this._heros.fetching = false;
-				this._heros.fetched = true;
-				heros.forEach(h => this._heros.push(h));
-				return this._heros;
+			.then(heroes => {
+				this._heroes.fetching = false;
+				this._heroes.fetched = true;
+				heroes.forEach(h => this._heroes.push(h));
+				return this._heroes;
 			})
+
 			.catch(err => {
-				this._heros.fetching = false;
-				this._heros.fetched = false;
-				this._heros.ready = null;
-				console.log(`getAllHerosAsync failed w/ message:"${err}"`);
+				this._heroes.fetching = false;
+				this._heroes.fetched = false;
+				console.log(`getAllHeroesAsync failed w/ message:"${err}"`);
 				return Promise.reject(err);
 			});
-
-	  return this._heros.ready;
 	}
-
 }

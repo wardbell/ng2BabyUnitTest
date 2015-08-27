@@ -1,38 +1,30 @@
-var hero_1 = require('hero');
-var mockHeros_1 = require('mockHeros');
+var mockHeroes_1 = require('mockHeroes');
 var HeroDataService = (function () {
     function HeroDataService() {
-        ///////////////////
-        this._heros = [];
     }
-    HeroDataService.prototype.getAllHeros = function (force) {
+    Object.defineProperty(HeroDataService.prototype, "serviceName", {
+        get: function () { return 'sync'; },
+        enumerable: true,
+        configurable: true
+    });
+    HeroDataService.prototype.getAllHeroes = function (force) {
         if (force === void 0) { force = false; }
-        // fetch if haven't fetched or fetch is forced
-        if (!this._heros.fetched || force) {
-            this._heros = mockHeros_1.HEROS.slice();
-            this._heros.fetched = true;
+        // (re)set if not set or forced
+        if (!this._heroes || force) {
+            this._heroes = mockHeroes_1.HEROES.slice();
         }
-        return this._heros;
+        return this._heroes;
     };
-    HeroDataService.prototype.getOrCreateHero = function (name) {
-        this.getAllHeros(); // make sure we have heros before we add one
-        return this._getOrCreateHeroImpl(name);
+    HeroDataService.prototype.getHero = function (name) {
+        this.getAllHeroes(); // make sure we have heroes before we add one
+        return this._getHeroInCache(name);
     };
-    HeroDataService.prototype._getOrCreateHeroImpl = function (name) {
+    HeroDataService.prototype._getHeroInCache = function (name) {
         if (!name) {
-            return hero_1.Hero.nullo;
+            return null;
         }
-        var matches = this._heros.filter(function (hero) {
-            return hero.name === name;
-        });
-        if (matches.length) {
-            return matches[0];
-        }
-        else {
-            var hero = new hero_1.Hero(name);
-            this._heros.push(hero);
-            return hero;
-        }
+        var matches = this._heroes.filter(function (hero) { return hero.name === name; });
+        return matches[0];
     };
     return HeroDataService;
 })();

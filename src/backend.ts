@@ -1,12 +1,12 @@
 import {Hero} from 'hero';
-import {HEROS} from 'mockHeros';
+import {HEROES} from 'mockHeroes';
 
 export class Backend {
-	fetchAllHerosAsync() {
+	fetchAllHeroesAsync() {
 		return new Promise<Hero[]>((resolve, reject) =>{
 			setTimeout(() => {
-				resolve(HEROS.slice());
-			}, 500);
+				resolve(HEROES.slice());
+			}, 1000);
 		});
 	}
 }

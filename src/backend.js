@@ -1,12 +1,12 @@
-var mockHeros_1 = require('mockHeros');
+var mockHeroes_1 = require('mockHeroes');
 var Backend = (function () {
     function Backend() {
     }
-    Backend.prototype.fetchAllHerosAsync = function () {
+    Backend.prototype.fetchAllHeroesAsync = function () {
         return new Promise(function (resolve, reject) {
             setTimeout(function () {
-                resolve(mockHeros_1.HEROS.slice());
-            }, 500);
+                resolve(mockHeroes_1.HEROES.slice());
+            }, 1000);
         });
     };
     return Backend;

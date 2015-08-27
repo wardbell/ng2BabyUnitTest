@@ -9,7 +9,8 @@
   <body>
     <my-app></my-app>
     <script>
-      System.import('app');
+      var goAsync = true;
+      System.import(goAsync? 'appAsync': 'app');
     </script>
   </body>
 </html>

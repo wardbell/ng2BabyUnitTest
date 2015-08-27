@@ -1,45 +1,29 @@
 import {Hero} from 'hero';
-import {HEROS} from 'mockHeros';
-
-interface Heros extends Array<Hero>{
-	fetched: boolean;
-}
+import {HEROES} from 'mockHeroes';
 
 export class HeroDataService {
 
-	getAllHeros(force:boolean = false) {
-		// fetch if haven't fetched or fetch is forced
-		if (!this._heros.fetched || force){
-		  this._heros = <Heros>HEROS.slice();
-			this._heros.fetched = true;
+	get serviceName() {return 'sync';}
+
+	getAllHeroes(force:boolean = false) {
+		// (re)set if not set or forced
+		if (!this._heroes || force){
+		  this._heroes = HEROES.slice();
 		}
-		return this._heros;
+		return this._heroes;
 	}
 
-  getOrCreateHero(name?: string)  {
-		this.getAllHeros(); // make sure we have heros before we add one
-		return this._getOrCreateHeroImpl(name);
+  getHero(name?: string)  {
+		this.getAllHeroes(); // make sure we have heroes before we add one
+		return this._getHeroInCache(name);
 	}
 
 	///////////////////
-  protected _heros = <Heros>[];
+  protected _heroes:Hero[];
 
-  protected _getOrCreateHeroImpl(name?: string) {
-
-		if (!name) {
-			return Hero.nullo;
-		}
-
-		let matches = this._heros.filter(hero => {
-			return hero.name === name;
-		});
-
-		if (matches.length) {
-			return matches[0];
-		} else {
-			let hero = new Hero(name);
-			this._heros.push(hero);
-      return hero;
-		}
+  protected _getHeroInCache(name?: string) {
+		if (!name) { return null; }
+		let matches = this._heroes.filter(hero => hero.name === name);
+		return matches[0];
 	}
 }

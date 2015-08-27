@@ -15,11 +15,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 var angular2_1 = require('angular2/angular2');
-var hero_1 = require('hero');
 var heroDataService_1 = require('heroDataService');
 var backend_1 = require('backend');
 var HeroDataServiceAsync = (function (_super) {
@@ -28,62 +24,56 @@ var HeroDataServiceAsync = (function (_super) {
         _super.call(this);
         this._backend = _backend;
         ///////////////////
-        this._heros = [];
+        this._heroes = [];
     }
-    HeroDataServiceAsync.prototype.getAllHeros = function (force) {
+    Object.defineProperty(HeroDataServiceAsync.prototype, "serviceName", {
+        get: function () { return 'async'; },
+        enumerable: true,
+        configurable: true
+    });
+    HeroDataServiceAsync.prototype.getAllHeroes = function (force) {
         if (force === void 0) { force = false; }
-        this._getAllHerosAsync(force);
-        return this._heros;
+        this._fetchAllHeroesAsync(force);
+        return this._heroes;
     };
-    HeroDataServiceAsync.prototype.getOrCreateHero = function (name) {
-        var _this = this;
-        var hero = hero_1.Hero.nullo;
-        if (this._heros.fetched) {
-            hero = this._getOrCreateHeroImpl(name);
+    HeroDataServiceAsync.prototype.getHero = function (name) {
+        var hero;
+        if (this._heroes.fetching) {
+            return hero;
         }
-        else if (!this._heros.fetching) {
-            this._getAllHerosAsync()
-                .then(function (_) { return hero = _this._getOrCreateHeroImpl(name); });
+        if (this._heroes.fetched) {
+            return this._getHeroInCache(name);
         }
+        this._fetchAllHeroesAsync();
         return hero;
     };
-    HeroDataServiceAsync.prototype._getAllHerosAsync = function (force) {
+    HeroDataServiceAsync.prototype._fetchAllHeroesAsync = function (force) {
         var _this = this;
-        if (force) {
-            this._heros.fetched = false;
-            this._heros.ready = null;
+        // quit if still fetching OR fetched already and not forcing new fetch
+        if (this._heroes.fetching || (this._heroes.fetched && !force)) {
+            return;
         }
-        // if already fetched (or not forcing fetch)
-        // return existing heros via promise
-        if (this._heros.fetched) {
-            this._heros.ready = Promise.resolve(this._heros);
-        }
-        // if getAll in progress or completed (indicated by existence of promise)
-        if (this._heros.ready) {
-            return this._heros.ready;
-        }
-        // clear heros and initiate new fetch, returning its promise
-        this._heros.fetching = true;
-        this._heros.fetched = false;
-        this._heros.length = 0;
-        this._heros.ready = this._backend.fetchAllHerosAsync()
-            .then(function (heros) {
-            _this._heros.fetching = false;
-            _this._heros.fetched = true;
-            heros.forEach(function (h) { return _this._heros.push(h); });
-            return _this._heros;
+        // clear heroes and initiate new fetch
+        // stash fetch-promise in heroes.ready
+        this._heroes.length = 0;
+        this._heroes.fetching = true;
+        this._heroes.fetched = false;
+        this._heroes.ready = this._backend.fetchAllHeroesAsync()
+            .then(function (heroes) {
+            _this._heroes.fetching = false;
+            _this._heroes.fetched = true;
+            heroes.forEach(function (h) { return _this._heroes.push(h); });
+            return _this._heroes;
         })
             .catch(function (err) {
-            _this._heros.fetching = false;
-            _this._heros.fetched = false;
-            _this._heros.ready = null;
-            console.log("getAllHerosAsync failed w/ message:\"" + err + "\"");
+            _this._heroes.fetching = false;
+            _this._heroes.fetched = false;
+            console.log("getAllHeroesAsync failed w/ message:\"" + err + "\"");
             return Promise.reject(err);
         });
-        return this._heros.ready;
     };
     HeroDataServiceAsync = __decorate([
-        __param(0, angular2_1.Inject(backend_1.Backend)), 
+        angular2_1.Injectable(), 
         __metadata('design:paramtypes', [backend_1.Backend])
     ], HeroDataServiceAsync);
     return HeroDataServiceAsync;

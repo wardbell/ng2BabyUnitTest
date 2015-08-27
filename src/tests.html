@@ -21,10 +21,11 @@
   <body>
     <script >
       var imports = [
-        'dummy.spec',
-        'dummyWithTCB.spec',
+        'dummy-tests/dummy.spec',
+        'dummy-tests/dummyWithTCB.spec',
         'heroDataService.spec',
         'heroDataServiceAsync.spec',
+        'heroesComponent.spec',
         '@empty' // placeholder makes it easier to comment-out specs above
       ].map(System.import.bind(System));
 

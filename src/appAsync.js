@@ -10,24 +10,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var angular2_1 = require('angular2/angular2');
+var backend_1 = require('backend');
 var heroDataService_1 = require('heroDataService');
+var heroDataServiceAsync_1 = require('heroDataServiceAsync');
 var heroesComponent_1 = require('heroesComponent');
-var AppComponent = (function () {
-    function AppComponent() {
+var AppAsyncComponent = (function () {
+    function AppAsyncComponent() {
     }
-    AppComponent = __decorate([
+    AppAsyncComponent = __decorate([
         angular2_1.Component({
             selector: 'my-app',
-            bindings: [heroDataService_1.HeroDataService]
+            bindings: [angular2_1.bind(heroDataService_1.HeroDataService).toClass(heroDataServiceAsync_1.HeroDataServiceAsync), backend_1.Backend]
         }),
         angular2_1.View({
             template: '<heroes></heroes>',
             directives: [heroesComponent_1.HeroesComponent]
         }), 
         __metadata('design:paramtypes', [])
-    ], AppComponent);
-    return AppComponent;
+    ], AppAsyncComponent);
+    return AppAsyncComponent;
 })();
-exports.AppComponent = AppComponent;
-angular2_1.bootstrap(AppComponent);
-//# sourceMappingURL=app.js.map
+exports.AppAsyncComponent = AppAsyncComponent;
+angular2_1.bootstrap(AppAsyncComponent);
+//# sourceMappingURL=appAsync.js.map
