@@ -1,3 +1,4 @@
+var hero_1 = require('hero');
 var heroDataService_1 = require('heroDataService');
 var mockHeroes_1 = require('mockHeroes');
 describe('heroDataService', function () {
@@ -10,6 +11,18 @@ describe('heroDataService', function () {
             var heroes = service.getAllHeroes();
             expect(heroes.length).toEqual(mockHeroes_1.HEROES.length);
         });
+        it('re-execution preserves existing cache', function () {
+            var heroes = service.getAllHeroes();
+            heroes.push(new hero_1.Hero('Perseus'));
+            service.getAllHeroes(); // re-execution
+            expect(heroes.length).toEqual(mockHeroes_1.HEROES.length + 1);
+        });
+        it('re-execution w/ force=true restores cache', function () {
+            var heroes = service.getAllHeroes();
+            heroes.push(new hero_1.Hero('Perseus'));
+            service.getAllHeroes(true); // re-execution with force
+            expect(heroes.length).toEqual(mockHeroes_1.HEROES.length + 1);
+        });
     });
     describe('#getHero(name)', function () {
         it('returns an existing hero when a hero with that name exists', function () {
@@ -17,21 +30,21 @@ describe('heroDataService', function () {
             var hero2 = service.getHero(hero.name);
             expect(hero).toBe(hero2);
         });
-        it('returns undefined if name not found', function () {
+        it('returns null if name not found', function () {
             var hero = service.getHero('Foo');
-            expect(hero).not.toBeDefined;
+            expect(hero).toEqual(null);
         });
-        it('returns undefined when name is empty string', function () {
+        it('returns null when name is empty string', function () {
             var hero = service.getHero('');
-            expect(hero).not.toBeDefined;
+            expect(hero).toEqual(null);
         });
-        it('returns undefined  when name is null', function () {
+        it('returns null  when name is null', function () {
             var hero = service.getHero(null);
-            expect(hero).toBe(null);
+            expect(hero).toEqual(null);
         });
-        it('returns undefined when name is undefined', function () {
+        it('returns null when name is undefined', function () {
             var hero = service.getHero();
-            expect(hero).not.toBeDefined;
+            expect(hero).toEqual(null);
         });
     });
     it('#getAllHeroes returns expected # of heroes (x-test pollution guard)', function () {

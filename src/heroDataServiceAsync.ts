@@ -23,20 +23,13 @@ export class HeroDataServiceAsync extends HeroDataService {
 		return this._heroes;
 	}
 
+  // if cache is ready, return hero with that name or null if not found
+	// if cache not ready, fetch it and return undefined
   getHero(name?: string)  {
-	  let hero:Hero;
-
-		if (this._heroes.fetching){
-			return hero;
-		}
-
 		if (this._heroes.fetched) {
 			return this._getHeroInCache(name);
 		}
-
 		this._fetchAllHeroesAsync();
-		return hero;
-
 	}
 
 	///////////////////

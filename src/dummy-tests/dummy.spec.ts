@@ -4,6 +4,8 @@ describe('dummy tests:', () => {
 
     it('sync test works', () => expect(true).toBe(true) );
 
+    it('null is not the same thing as undefined', () => expect(null).not.toEqual(undefined) );
+
     it('async test works', (done:Function) => {
         setTimeout(() => {
             expect(false).toBe(false);

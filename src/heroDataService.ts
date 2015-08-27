@@ -14,16 +14,17 @@ export class HeroDataService {
 	}
 
   getHero(name?: string)  {
-		this.getAllHeroes(); // make sure we have heroes before we add one
+		this.getAllHeroes(); // ensure we have heroes before we add one
 		return this._getHeroInCache(name);
 	}
 
 	///////////////////
   protected _heroes:Hero[];
 
+  // get hero from cache or return null if not found
   protected _getHeroInCache(name?: string) {
 		if (!name) { return null; }
 		let matches = this._heroes.filter(hero => hero.name === name);
-		return matches[0];
+		return matches[0] || null;
 	}
 }

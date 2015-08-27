@@ -36,16 +36,13 @@ var HeroDataServiceAsync = (function (_super) {
         this._fetchAllHeroesAsync(force);
         return this._heroes;
     };
+    // if cache is ready, return hero with that name or null if not found
+    // if cache not ready, fetch it and return undefined
     HeroDataServiceAsync.prototype.getHero = function (name) {
-        var hero;
-        if (this._heroes.fetching) {
-            return hero;
-        }
         if (this._heroes.fetched) {
             return this._getHeroInCache(name);
         }
         this._fetchAllHeroesAsync();
-        return hero;
     };
     HeroDataServiceAsync.prototype._fetchAllHeroesAsync = function (force) {
         var _this = this;
