@@ -1,9 +1,4 @@
 var test_1 = require('angular2/test');
-// Recommended by Igor based on
-// https://github.com/angular/angular/blob/master/test-main.js
-// TODO: BrowserDomAdapter should be exposed through 'angular2/test' instead
-var browser_adapter_1 = require('angular2/src/dom/browser_adapter');
-browser_adapter_1.BrowserDomAdapter.makeCurrent(); // or else `tcb.createAsync` bombs because `DOM` is undefined
 var heroDataService_1 = require('heroDataService');
 var heroesComponent_1 = require('heroesComponent');
 test_1.describe('HeroesComponent (w/ sync dataservice)', function () {

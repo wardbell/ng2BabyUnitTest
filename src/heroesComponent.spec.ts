@@ -22,12 +22,6 @@ import {
 
 type RTC = typeof RootTestComponent; // convenience type
 
-// Recommended by Igor based on
-// https://github.com/angular/angular/blob/master/test-main.js
-// TODO: BrowserDomAdapter should be exposed through 'angular2/test' instead
-import { BrowserDomAdapter } from 'angular2/src/dom/browser_adapter';
-BrowserDomAdapter.makeCurrent(); // or else `tcb.createAsync` bombs because `DOM` is undefined
-
 ///// Testing this particular component ////
 
 import {Hero} from 'hero';
