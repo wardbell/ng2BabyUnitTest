@@ -24,8 +24,13 @@ export function getViewChildHtml(rootTC: RootTestComponent, elIndex: number = 0)
   return child && child.nativeElement.innerHTML
 }
 
-export function expectViewChildToMatch(rootTC: RootTestComponent, value: string | RegExp, elIndex: number = 0){
+export function expectViewChildHtmlToMatch(rootTC: RootTestComponent, value: string | RegExp, elIndex: number = 0){
   let elHtml = getViewChildHtml(rootTC, elIndex);
-  let rx = typeof value === 'string' ? new RegExp(value) : value;
-  (rx.test(elHtml)) ? expect(true).toBeTruthy : fail(`"${elHtml}" doesn't match ${rx}`)
+  expect(elHtml).toMatch(value);
+}
+
+export function expectViewChildClassToMatch(rootTC: RootTestComponent, value: string | RegExp, elIndex: number = 0){
+  let child = rootTC.componentViewChildren[elIndex];
+  let classes = child && child.nativeElement.className;
+  expect(classes).toMatch(value);
 }
