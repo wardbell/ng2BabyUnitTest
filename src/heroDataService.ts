@@ -19,15 +19,7 @@ export class HeroDataService {
 		}
 
 		this._getAllHeroesPromise =  this._backend.fetchAllHeroesAsync()
-			.then( heroes => {
-				this._heroes.length = 0;
-				heroes.forEach( h => this._heroes.push(h))
-				return this._heroes;
-			})
-			.catch(err => {
-				console.log(`getAllHeroes failed w/ message:"${err}"`);
-				return Promise.reject(err);
-			});
+			.then( heroes =>  this._heroes = heroes);
 
 		return this._getAllHeroesPromise;
 	}

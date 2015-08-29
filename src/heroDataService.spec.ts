@@ -21,7 +21,7 @@ describe('heroDataService', () => {
   // fetchAllHeroes mock variations
   function fetchAllHeroesAsyncHappyPath () {
     return new Promise<Hero[]>((resolve, reject) => {
-      resolve(heroData);
+      resolve(heroData.slice());
     });
   }
 
@@ -62,33 +62,36 @@ describe('heroDataService', () => {
         .then(done, done);
     });
 
-    it('re-execution preserves existing cache', done => {
-      let cachedHeroes:Hero[];
+    it('re-execution preserves existing data in same cached array', done => {
+      let firstHeroes:Hero[];
 
       service.getAllHeroes()
         .then( heroes => {
-          cachedHeroes = heroes;
-          cachedHeroes.push(new Hero('Perseus'));
+          firstHeroes = heroes;
+          firstHeroes.push(new Hero('Perseus'));
           return service.getAllHeroes();
         })
-        .then(_ => {
-          expect(cachedHeroes.length).toEqual(heroData.length + 1);
+        .then(secondHeroes => {
+          expect(firstHeroes).toBe(secondHeroes);
+          expect (secondHeroes.length).toEqual(heroData.length + 1);
         })
         .catch(fail)
         .then(done, done);
     });
 
-    it('re-execution w/ force=true restores cache w/ original data', done => {
-      let cachedHeroes:Hero[];
+    it('re-execution w/ force=true returns new array w/ original data', done => {
+      let firstHeroes:Hero[];
 
       service.getAllHeroes()
         .then( heroes => {
-          cachedHeroes = heroes;
-          cachedHeroes.push(new Hero('Hercules'));
+          firstHeroes = heroes;
+          firstHeroes.push(new Hero('Hercules'));
           return service.getAllHeroes(true /*force*/)
         })
-        .then(_ => {
-          expect(cachedHeroes.length).toEqual(heroData.length);
+        .then( secondHeroes => {
+          expect(firstHeroes).not.toBe(secondHeroes);
+          expect(firstHeroes.length).toEqual(heroData.length + 1);
+          expect(secondHeroes.length).toEqual(heroData.length);
         })
         .catch(fail)
         .then(done, done);
