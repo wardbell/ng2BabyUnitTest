@@ -86,8 +86,9 @@ describe('heroDataService', () => {
           cachedHeroes = heroes;
           cachedHeroes.push(new Hero('Hercules'));
           return service.getAllHeroes(true /*force*/)
+        })
         .then(_ => {
-          expect(heroes.length).toEqual(heroData.length);
+          expect(cachedHeroes.length).toEqual(heroData.length);
         })
         .catch(fail)
         .then(done, done);
@@ -100,9 +101,10 @@ describe('heroDataService', () => {
       service.getHero(existingHero.name).then(
         hero => expect(hero).toBe(existingHero)
       ).catch(fail).then(done,done);
+    });
 
     it('returns null if name not found', done => {
-      service.getHero(existingHero.name).then(
+      service.getHero(nonHeroName).then(
         hero => expect(hero).toEqual(null)
       ).catch(fail).then(done,done);
     });
@@ -151,4 +153,3 @@ describe('heroDataService', () => {
 
   });
 });
-

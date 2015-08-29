@@ -68,7 +68,7 @@ describe('HeroesComponent', () => {
         expect(typeof heroes).toBe('undefined');  // not filled yet
       });
 
-      it('has heroes after a while', inject([AsyncTestCompleter],  (async:ATC) => {
+      it('has heroes after cache loaded', inject([AsyncTestCompleter],  (async:ATC) => {
         var done = async.done.bind(async);
         let hc = new HeroesComponent(mockService, mockUser)
         let heroes = hc.heroes; // trigger service
