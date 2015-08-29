@@ -2,29 +2,22 @@
 import {bind, bootstrap, Directive, Component, Injectable, View, ViewMetadata} from 'angular2/angular2';
 
 import {
-  AsyncTestCompleter,
   beforeEachBindings,
   DebugElement,
-  inject,
-  RootTestComponent,
-  SpyObject,
-  TestComponentBuilder,
+  RootTestComponent as RTC,
+
   // Jasmine overrides
   beforeEach,
   ddescribe,
   xdescribe,
   describe,
-  el,
   //expect,
   iit,
   it,
   xit
 } from 'angular2/test';
 
-// convenience types
-type ATC = {done: ()=>void};
-type TCB = typeof TestComponentBuilder;
-type RTC = typeof RootTestComponent; // convenience type
+import {injectAsync, injectTcb, expectViewChildToMatch} from 'testHelpers';
 
 ///// Testing this particular component ////
 
@@ -70,8 +63,7 @@ describe('HeroesComponent', () => {
         expect(typeof heroes).toBe('undefined');  // not filled yet
       });
 
-      it('has heroes after cache loaded', inject([AsyncTestCompleter],  (async:ATC) => {
-        var done = async.done.bind(async);
+      it('has heroes after cache loaded', injectAsync (done => {
         let hc = new HeroesComponent(mockService, mockUser)
         let heroes = hc.heroes; // trigger service
         expect(typeof heroes).toBe('undefined'); // not filled yet
@@ -101,7 +93,7 @@ describe('HeroesComponent', () => {
       bind(User).toValue(mockUser)
     ]);
 
-    it('can be created', injectIt((tcb, done) => {
+    it('can be created', injectTcb((tcb, done) => {
       let template = '<h1>Nuts</h1>';
       tcb
         .overrideTemplate(HeroesComponent, template)
@@ -110,7 +102,7 @@ describe('HeroesComponent', () => {
         .catch(fail).then(done,done);
     }));
 
-    it('binds view to userName', injectIt((tcb, done) => {
+    it('binds view to userName', injectTcb((tcb, done) => {
       let template = `<h1>{{userName}}'s Heroes</h1>`;
       tcb
         .overrideTemplate(HeroesComponent, template)
@@ -118,7 +110,7 @@ describe('HeroesComponent', () => {
         .then((rootTC:RTC) => {
           let hc:HeroesComponent = rootTC.componentInstance;
           rootTC.detectChanges(); // trigger component property binding
-          expectViewChildHtmlToMatch(rootTC, hc.userName);
+          expectViewChildToMatch(rootTC, hc.userName);
         })
         .catch(fail).then(done,done);
     }));
@@ -126,7 +118,7 @@ describe('HeroesComponent', () => {
 
     describe('#heroes', () => {
 
-      it('binds view to heroes', injectIt((tcb, done) => {
+      it('binds view to heroes', injectTcb((tcb, done) => {
         mockHeroData.length = 3; // only need a few
 
         // focus on the part of the template that displays heroes
@@ -170,23 +162,6 @@ describe('HeroesComponent', () => {
 });
 
 ////// Helpers //////
-
-function injectIt(testFn: (tcb: TCB, done: ()=>void) => void) {
-  return inject([TestComponentBuilder, AsyncTestCompleter], function injectWrapper(tcb: TCB, async: ATC) {
-    testFn(tcb, async.done.bind(async));
-  });
-}
-
-function getViewChildHtml(rootTC: RTC, elIndex: number = 0){
-  let child = rootTC.componentViewChildren[elIndex];
-  return child && child.nativeElement.innerHTML
-}
-
-function expectViewChildHtmlToMatch(rootTC: RTC, value: string | RegExp, elIndex: number = 0){
-  let elHtml = getViewChildHtml(rootTC, elIndex);
-  let rx = typeof value === 'string' ? new RegExp(value) : value;
-  (rx.test(elHtml)) ? expect(true).toBeTruthy : fail(`"${elHtml}" doesn't match ${rx}`)
-}
 
 function MockDataServiceFactory() {
 
