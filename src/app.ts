@@ -7,10 +7,7 @@ import {User} from 'user';
 @Component({
   selector: 'my-app',
   // Injectables needed by this component or its children
-  bindings: [
-    Backend, HeroDataService,
-    bind(User).toValue(new User('Ward'))
-  ]
+  bindings: [Backend, HeroDataService, User]
 })
 @View({
     template:'<heroes></heroes>',

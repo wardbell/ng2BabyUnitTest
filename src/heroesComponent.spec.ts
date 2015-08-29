@@ -38,18 +38,19 @@ import {HeroesComponent} from 'heroesComponent';
 let mockHeroData:Hero[];
 let mockHero:Hero;
 let mockService:any; // too hard to maintain type safety on this mock
-let mockUser = new User('Johnny');
+let mockUser:User;
 
 describe('HeroesComponent', () => {
 
+  beforeEach(() => {
+    mockHeroData = HEROES.slice();
+    mockHero = mockHeroData[0];
+    mockService = MockDataServiceFactory();
+    mockUser = new User();
+  });
+
   /////////// Component Tests without DOM interaction /////////////
   describe('(No DOM)', () => {
-
-    beforeEach(() => {
-      mockHeroData = HEROES.slice();
-      mockHero = mockHeroData[0];
-      mockService = MockDataServiceFactory();
-    });
 
     it('can be created', () => {
       let hc = new HeroesComponent(mockService, mockUser)
@@ -58,7 +59,7 @@ describe('HeroesComponent', () => {
 
     it('has expected userName', () => {
       let hc = new HeroesComponent(mockService, mockUser)
-      expect(hc instanceof HeroesComponent).toEqual(true); // proof of life
+      expect(hc.userName).toEqual(mockUser.name);
     });
 
     describe('#heroes', () => {
@@ -90,8 +91,7 @@ describe('HeroesComponent', () => {
   describe('(DOM)', () => {
 
     beforeEach(() => {
-      mockHeroData = HEROES.slice();
-      mockHero = mockHeroData[0];
+      mockUser.name = 'Johnny'; // for fun
     });
 
     // Set up DI bindings required by component (and its nested components?)
