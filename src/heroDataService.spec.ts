@@ -1,69 +1,154 @@
 import {Hero} from 'hero';
 import {HeroDataService} from 'heroDataService';
 import {HEROES} from 'mockHeroes';
+import {Backend} from 'backend';
 
 describe('heroDataService', () => {
   let service: HeroDataService;
+  let mockBackend:Backend = <Backend>{};
+  let heroData: Hero[];
+  let testError ='fetchAllHeroesAsync failed on purpose';
 
-  beforeEach(()=>{
-    service = new HeroDataService();
+  let existingHero = HEROES[0];
+  let nonHeroName = 'Not ' + existingHero.name;
+
+  beforeEach(() => {
+    heroData = HEROES.slice();
+    mockBackend.fetchAllHeroesAsync = fetchAllHeroesAsyncHappyPath;
+    service = new HeroDataService(mockBackend);
   });
 
+  // fetchAllHeroes mock variations
+  function fetchAllHeroesAsyncHappyPath () {
+    return new Promise<Hero[]>((resolve, reject) => {
+      resolve(heroData);
+    });
+  }
+
+  function fetchAllHeroesAsyncFail () {
+    return new Promise<Hero[]>((resolve, reject) => {
+      reject(testError);
+    });
+  }
 
   describe('#getAllHeroes', () => {
-    it('returns expected # of heroes', () =>{
-      let heroes = service.getAllHeroes();
-      expect(heroes.length).toEqual(HEROES.length);
+
+    it('returns expected # of heroes when ready', done => {
+      service.getAllHeroes()
+        .then( heroes => {
+          expect(heroes.length).toEqual(heroData.length);
+        })
+        .catch(fail)
+        .then(done, done);
     });
 
-    it('re-execution preserves existing cache', () =>{
-      let heroes = service.getAllHeroes();
-      heroes.push(new Hero('Perseus'));
-      service.getAllHeroes(); // re-execution
-      expect(heroes.length).toEqual(HEROES.length + 1);
+    it('returns no heroes when source data are empty', done => {
+      heroData = []; // simulate no heroes from the backend
+
+      service.getAllHeroes()
+        .then( heroes => {
+          expect(heroes.length).toEqual(0);
+        })
+        .catch(fail)
+        .then(done, done);
     });
 
-    it('re-execution w/ force=true restores cache', () =>{
-      let heroes = service.getAllHeroes();
-      heroes.push(new Hero('Perseus'));
-      service.getAllHeroes(true); // re-execution with force
-      expect(heroes.length).toEqual(HEROES.length);
+    it('fails with expected error when backend fails', done => {
+      mockBackend.fetchAllHeroesAsync =  fetchAllHeroesAsyncFail;
+
+      service.getAllHeroes()
+        .then( _ => fail('getAllHeroes should have failed') )
+        .catch(err => expect(err).toBe(testError) )
+        .then(done, done);
     });
 
+    it('re-execution preserves existing cache', done => {
+      let cachedHeroes:Hero[];
+
+      service.getAllHeroes()
+        .then( heroes => {
+          cachedHeroes = heroes;
+          cachedHeroes.push(new Hero('Perseus'));
+          return service.getAllHeroes();
+        })
+        .then(_ => {
+          expect(cachedHeroes.length).toEqual(heroData.length + 1);
+        })
+        .catch(fail)
+        .then(done, done);
+    });
+
+    it('re-execution w/ force=true restores cache w/ original data', done => {
+      let cachedHeroes:Hero[];
+
+      service.getAllHeroes()
+        .then( heroes => {
+          cachedHeroes = heroes;
+          cachedHeroes.push(new Hero('Hercules'));
+          return service.getAllHeroes(true /*force*/)
+        .then(_ => {
+          expect(heroes.length).toEqual(heroData.length);
+        })
+        .catch(fail)
+        .then(done, done);
+    });
   });
 
   describe('#getHero(name)', () => {
 
-    it('returns an existing hero when a hero with that name exists', () =>{
-      var hero = HEROES[0];
-      var hero2 = service.getHero(hero.name);
-      expect(hero).toBe(hero2);
+    it('returns an existing hero when a hero with that name exists', done => {
+      service.getHero(existingHero.name).then(
+        hero => expect(hero).toBe(existingHero)
+      ).catch(fail).then(done,done);
+
+    it('returns null if name not found', done => {
+      service.getHero(existingHero.name).then(
+        hero => expect(hero).toEqual(null)
+      ).catch(fail).then(done,done);
     });
 
-    it('returns null if name not found', () =>{
-      var hero = service.getHero('Foo');
-      expect(hero).toEqual(null);
+    it('returns null when name is empty string', done => {
+      service.getHero('').then(
+        hero => expect(hero).toEqual(null)
+      ).catch(fail).then(done,done);
     });
 
-    it('returns null when name is empty string', () =>{
-      var hero = service.getHero('');
-      expect(hero).toEqual(null);
+    it('returns null  when name is null', done => {
+      service.getHero(null).then(
+        hero => expect(hero).toEqual(null)
+      ).catch(fail).then(done,done);
     });
 
-    it('returns null  when name is null', () =>{
-      var hero = service.getHero(null);
-      expect(hero).toEqual(null);
-    });
-
-    it('returns null when name is undefined', () =>{
-      var hero = service.getHero();
-      expect(hero).toEqual(null);
+    it('returns null when name is undefined', done => {
+      service.getHero().then(
+        hero => expect(hero).toEqual(null)
+      ).catch(fail).then(done,done);
     });
 
   });
 
-  it('#getAllHeroes returns expected # of heroes (x-test pollution guard)', () =>{
-    expect(service.getAllHeroes().length).toEqual(HEROES.length);
+  describe('#removeHero(hero)', () => {
+
+    let cachedHeroes:Hero[];
+
+    // prime the HeroDataService's cache asynchronously
+    beforeEach(done => {
+       service.getAllHeroes()
+        .then(heroes => cachedHeroes = heroes)
+        .catch(fail).then(done,done);
+    })
+
+    // these tests can be synchronous because the method is synchronous
+
+    it('returns "true" after removing an existing hero from the cache', () => {
+      expect(service.removeHero(existingHero)).toBe(true);
+    });
+
+    it('actually removed an existing hero from the cache', () => {
+      service.removeHero(existingHero);
+      expect(cachedHeroes).not.toContain(existingHero);
+    });
+
   });
 });
 

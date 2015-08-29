@@ -1,33 +1,50 @@
+import {Inject, Injectable} from 'angular2/angular2';
 import {Hero} from 'hero';
-import {HEROES} from 'mockHeroes';
+import {Backend} from 'backend';
 
+@Injectable()
 export class HeroDataService {
 
-	get serviceName() {return 'sync';}
+	constructor(private _backend: Backend){ }
+  private _heroes: Hero[] = []; // cache of heroes
+	private _getAllHeroesPromise: Promise<Hero[]>;
 
-	getAllHeroes(force:boolean = false) {
-		// (re)set the heroes array if not set or forced
-		if (!this._heroes) {
-			this._heroes = HEROES.slice();
-		} else if (force) {
-			this._heroes.length = 0;
-			HEROES.map(h => this._heroes.push(h));
+	get serviceName() {return 'async';}
+
+	getAllHeroes(force : boolean = false) {
+		// getAll if force==true OR this is the first time through
+		force = force || !this._getAllHeroesPromise
+		if (!force) {
+			return this._getAllHeroesPromise;
 		}
-		return this._heroes;
+
+		this._getAllHeroesPromise =  this._backend.fetchAllHeroesAsync()
+			.then( heroes => {
+				this._heroes.length = 0;
+				heroes.forEach( h => this._heroes.push(h))
+				return this._heroes;
+			})
+			.catch(err => {
+				console.log(`getAllHeroes failed w/ message:"${err}"`);
+				return Promise.reject(err);
+			});
+
+		return this._getAllHeroesPromise;
 	}
 
+  // when cache is ready, return hero with that name or null if not found
   getHero(name?: string)  {
-		this.getAllHeroes(); // ensure we have heroes before we add one
-		return this._getHeroInCache(name);
+	  return this.getAllHeroes()
+			.then(heroes => heroes.filter(h => h.name === name)[0] || null);
 	}
 
-	///////////////////
-  protected _heroes:Hero[];
-
-  // get hero from cache or return null if not found
-  protected _getHeroInCache(name?: string) {
-		if (!name) { return null; }
-		let matches = this._heroes.filter(hero => hero.name === name);
-		return matches[0] || null;
+	removeHero(hero:Hero) {
+    let ix = this._heroes.indexOf(hero);
+		if (ix > -1) {
+			this._heroes.splice(ix, 1);
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
