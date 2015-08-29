@@ -11,47 +11,62 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var angular2_1 = require('angular2/angular2');
 var heroDataService_1 = require('heroDataService');
+var user_1 = require('user');
 var HeroesComponent = (function () {
-    function HeroesComponent(_heroDataService) {
+    function HeroesComponent(_heroDataService, _user) {
         this._heroDataService = _heroDataService;
+        this._user = _user;
     }
-    Object.defineProperty(HeroesComponent.prototype, "currentHero", {
-        get: function () {
-            return this._currentHero ||
-                (this._currentHero = this._heroDataService.getHero('Misko'));
-        },
-        set: function (value) {
-            this._currentHero = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(HeroesComponent.prototype, "heroes", {
         get: function () {
-            return this._heroDataService.getAllHeroes();
+            if (!this._heroes) {
+                this._getAllHeroes();
+            }
+            return this._heroes;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(HeroesComponent.prototype, "serviceName", {
-        get: function () { return this._heroDataService.serviceName; },
+    HeroesComponent.prototype.heroSelected = function (hero) {
+        this.currentHero = hero;
+        console.log("Hero selected: " + hero.name);
+    };
+    HeroesComponent.prototype.removeHero = function (hero) {
+        hero = hero || this.currentHero;
+        var ix = this._heroes.indexOf(hero);
+        this._heroDataService.removeHero(hero);
+        this.currentHero = this._heroes[ix] || this._heroes[ix - 1];
+    };
+    HeroesComponent.prototype.refresh = function () {
+        this._getAllHeroes(true /*force*/);
+        console.log('refreshed heroes');
+    };
+    Object.defineProperty(HeroesComponent.prototype, "userName", {
+        get: function () { return this._user.name || 'someone'; },
         enumerable: true,
         configurable: true
     });
-    HeroesComponent.prototype.onHeroSelected = function (hero) {
-        this.currentHero = hero;
-        console.log("Hero selected: " + hero.name);
+    /////////////
+    HeroesComponent.prototype._getAllHeroes = function (force) {
+        var _this = this;
+        if (force === void 0) { force = false; }
+        this._heroDataService.getAllHeroes(force).then(function (heroes) {
+            _this._heroes = heroes;
+            if (!_this.currentHero) {
+                _this.currentHero = heroes[0];
+            }
+        });
     };
     HeroesComponent = __decorate([
         angular2_1.Component({
             selector: 'heroes'
         }),
         angular2_1.View({
-            template: "\n      <div id=\"output\">\n        <h1>Heroes ({{serviceName}})</h1>\n        <ul class=\"heroes\">\n          <li *ng-for=\"#h of heroes\" (click)=\"onHeroSelected(h)\">({{h.id}}) {{h.name}}</li>\n        </ul>\n        <div *ng-if=\"currentHero\">\n          <hr/>\n          <h2 >{{currentHero.name}} is my current hero!</h2>\n          <ul class=\"heroes\">\n            <li>id: {{currentHero.id}}</li>\n            <li>name: {{currentHero.name}}</li>\n          </ul>\n        </div>\n      </div>\n    ",
+            template: "\n      <div id=\"output\">\n        <h1>{{userName}}'s Heroes</h1>\n        <button (click)=\"refresh(h)\">refresh</button>\n        <ul class=\"heroes\">\n          <li *ng-for=\"#h of heroes\" (click)=\"heroSelected(h)\">\n            ({{h.id}}) {{h.name}}\n          </li>\n        </ul>\n        <div *ng-if=\"currentHero\">\n          <hr/>\n          <h2 >{{currentHero.name}} is {{userName}}'s current hero!</h2>\n          <button (click)=\"removeHero()\"\n                  [disabled]=\"!currentHero\">Remove</button>\n          <ul class=\"heroes\">\n            <li>id: {{currentHero.id}}</li>\n            <li>name: {{currentHero.name}}</li>\n          </ul>\n        </div>\n      </div>\n    ",
             directives: [angular2_1.NgFor, angular2_1.NgIf],
             styles: ['.heroes {list-style-type: none; margin-left: 1em; padding: 0}']
         }), 
-        __metadata('design:paramtypes', [heroDataService_1.HeroDataService])
+        __metadata('design:paramtypes', [heroDataService_1.HeroDataService, user_1.User])
     ], HeroesComponent);
     return HeroesComponent;
 })();

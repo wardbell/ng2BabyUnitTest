@@ -10,15 +10,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var angular2_1 = require('angular2/angular2');
+var backend_1 = require('backend');
 var heroDataService_1 = require('heroDataService');
 var heroesComponent_1 = require('heroesComponent');
+var user_1 = require('user');
 var AppComponent = (function () {
     function AppComponent() {
     }
     AppComponent = __decorate([
         angular2_1.Component({
             selector: 'my-app',
-            bindings: [heroDataService_1.HeroDataService]
+            // Injectables needed by this component or its children
+            bindings: [
+                backend_1.Backend, heroDataService_1.HeroDataService,
+                angular2_1.bind(user_1.User).toValue(new user_1.User('Ward'))
+            ]
         }),
         angular2_1.View({
             template: '<heroes></heroes>',
