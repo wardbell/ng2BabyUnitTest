@@ -4,6 +4,7 @@ import {bind, bootstrap, Directive, Component, Injectable, View, ViewMetadata} f
 import {
   AsyncTestCompleter,
   beforeEachBindings,
+  DebugElement,
   inject,
   RootTestComponent,
   SpyObject,
@@ -36,13 +37,13 @@ import {HeroesComponent} from 'heroesComponent';
 
 let mockHeroData:Hero[];
 let mockHero:Hero;
+let mockService:any; // too hard to maintain type safety on this mock
 let mockUser = new User('Johnny');
 
 describe('HeroesComponent', () => {
 
+  /////////// Component Tests without DOM interaction /////////////
   describe('(No DOM)', () => {
-
-    let mockService:any; // too hard to maintain type safety on this mock
 
     beforeEach(() => {
       mockHeroData = HEROES.slice();
@@ -85,7 +86,14 @@ describe('HeroesComponent', () => {
     });
   });
 
+  /////////// Component tests that check the DOM /////////////
   describe('(DOM)', () => {
+
+    beforeEach(() => {
+      mockHeroData = HEROES.slice();
+      mockHero = mockHeroData[0];
+    });
+
     // Set up DI bindings required by component (and its nested components?)
     // else hangs silently forever
     beforeEachBindings( () => [
@@ -95,7 +103,8 @@ describe('HeroesComponent', () => {
 
     it('can be created', injectIt((tcb, done) => {
       let template = '<h1>Nuts</h1>';
-      tcb.overrideTemplate(HeroesComponent, template)
+      tcb
+        .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
         .then((rootTC:RTC) => expect(true).toBe(true)) // proof of life
         .catch(fail).then(done,done);
@@ -103,15 +112,60 @@ describe('HeroesComponent', () => {
 
     it('binds view to userName', injectIt((tcb, done) => {
       let template = `<h1>{{userName}}'s Heroes</h1>`;
-      tcb.overrideTemplate(HeroesComponent, template)
+      tcb
+        .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
         .then((rootTC:RTC) => {
-            let hc:HeroesComponent = rootTC.componentInstance;
-            rootTC.detectChanges(); // trigger component property binding
-            expectViewChildHtmlToMatch(rootTC, hc.userName);
+          let hc:HeroesComponent = rootTC.componentInstance;
+          rootTC.detectChanges(); // trigger component property binding
+          expectViewChildHtmlToMatch(rootTC, hc.userName);
         })
         .catch(fail).then(done,done);
     }));
+
+
+    describe('#heroes', () => {
+
+      it('binds view to heroes', injectIt((tcb, done) => {
+        mockHeroData.length = 3; // only need a few
+
+        // focus on the part of the template that displays heroes
+        let template =
+          `<ul>
+            <li *ng-for="#h of heroes">({{h.id}}) {{h.name}}</li>
+          </ul>`;
+        tcb
+          .overrideTemplate(HeroesComponent, template)
+          .createAsync(HeroesComponent)
+          .then((rootTC:RTC) => {
+            // trigger {{heroes}} binding which triggers async getAllHeroes
+            rootTC.detectChanges();
+
+            // hc.heroes is still undefined; need a JS cycle to get the data
+            return rootTC;
+          })
+          .then((rootTC:RTC) => {
+            let hc:HeroesComponent = rootTC.componentInstance;
+            // now heroes are available for binding
+            expect(hc.heroes.length).toEqual(mockHeroData.length);
+            rootTC.detectChanges(); // trigger component property binding
+
+            // confirm hero list is displayed by looking for a hero
+            let rx = RegExp(mockHero.name);
+            expect(rx.test(rootTC.nativeElement.innerHTML)).toBe(true);
+
+            // If we lacked confidence in the above
+            // we can loop through the component children like this:
+            // let wasFound = rootTC.componentViewChildren.some((child:DebugElement) =>{
+            //     return rx.test(child.nativeElement.innerHTML);
+            // })
+            // expect(wasFound).toBe(true);
+          })
+          .catch(fail).then(done,done);
+      }));
+
+    });
+
   });
 });
 
@@ -132,13 +186,6 @@ function expectViewChildHtmlToMatch(rootTC: RTC, value: string | RegExp, elIndex
   let elHtml = getViewChildHtml(rootTC, elIndex);
   let rx = typeof value === 'string' ? new RegExp(value) : value;
   (rx.test(elHtml)) ? expect(true).toBeTruthy : fail(`"${elHtml}" doesn't match ${rx}`)
-}
-
-// borrowed for instructional value from
-// https://github.com/angular/angular/blob/master/modules/angular2/test/core/directives/ng_class_spec.ts
-function detectChangesAndCheckClassName(rootTC: RTC, classes: string, elIndex: number = 0) {
-  rootTC.detectChanges();
-  expect(rootTC.componentViewChildren[elIndex].nativeElement.className).toEqual(classes);
 }
 
 function MockDataServiceFactory() {
