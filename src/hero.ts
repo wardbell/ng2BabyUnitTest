@@ -9,4 +9,8 @@ export class Hero {
 	get id() { return this._id; }
 	get name() { return this._name; }
 	set name(value:string) { this._name = value; }
+
+	clone(){
+		return new Hero(this.name, this.id);
+	}
 }

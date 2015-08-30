@@ -5,7 +5,7 @@ export class Backend {
 	fetchAllHeroesAsync() {
 		return new Promise<Hero[]>((resolve, reject) =>{
 			setTimeout(() => {
-				resolve(HEROES.slice());
+				resolve(HEROES.map(h => h.clone()));
 			}, 1000);
 		});
 	}

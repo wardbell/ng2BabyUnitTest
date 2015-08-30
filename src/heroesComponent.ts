@@ -1,10 +1,10 @@
-import {Component, Inject, NgFor, NgIf, View} from 'angular2/angular2';
+import {Component, Inject, NgFor, NgIf, FORM_DIRECTIVES, View} from 'angular2/angular2';
 import {HeroDataService} from 'heroDataService';
 import {Hero} from 'hero';
 import {User} from 'user';
 
 @Component({
-  selector: 'heroes'
+  selector: 'heroes', properies: ['currentHero']
 })
 @View({
     template: `
@@ -18,17 +18,19 @@ import {User} from 'user';
         </ul>
         <div *ng-if="currentHero">
           <hr/>
-          <h2 >{{currentHero.name}} is {{userName}}'s current hero!</h2>
+          <h2>{{currentHero.name}} is {{userName}}'s current hero!</h2>
           <button (click)="removeHero()"
                   [disabled]="!currentHero">Remove</button>
+          <button (click)="updateHero()"
+                  [disabled]="!currentHero">Update</button>
           <ul class="heroes">
-            <li>id: {{currentHero.id}}</li>
-            <li>name: {{currentHero.name}}</li>
+            <li><label>id: </label>{{currentHero.id}}</li>
+            <li><label>name: </label><input [(ng-model)]="currentHero.name" placeholder="name"></input></li>
           </ul>
         </div>
       </div>
     `,
-    directives: [NgFor, NgIf],
+    directives: [FORM_DIRECTIVES, NgFor, NgIf],
     styles: ['.heroes {list-style-type: none; margin-left: 1em; padding: 0}']
 })
 export class HeroesComponent {
@@ -55,7 +57,14 @@ export class HeroesComponent {
     this.currentHero = this._heroes[ix] || this._heroes[ix-1];
   }
 
+  updateHero(){
+    if (this.currentHero) {
+      this.currentHero.name += 'x';
+    }
+  }
+  
   refresh() {
+    this.currentHero = undefined;
     this._getAllHeroes(true /*force*/);
     console.log('refreshed heroes');
   }

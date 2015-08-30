@@ -17,7 +17,7 @@ import {
   xit
 } from 'angular2/test';
 
-import {injectAsync, injectTcb, expectViewChildToMatch} from 'testHelpers';
+import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
 
 ///// Testing this particular component ////
 
@@ -36,7 +36,7 @@ let mockUser:User;
 describe('HeroesComponent', () => {
 
   beforeEach(() => {
-    mockHeroData = HEROES.slice();
+    mockHeroData = HEROES.map(h => h.clone());
     mockHero = mockHeroData[0];
     mockService = MockDataServiceFactory();
     mockUser = new User();
@@ -110,7 +110,7 @@ describe('HeroesComponent', () => {
         .then((rootTC:RTC) => {
           let hc:HeroesComponent = rootTC.componentInstance;
           rootTC.detectChanges(); // trigger component property binding
-          expectViewChildToMatch(rootTC, hc.userName);
+          expectViewChildHtmlToMatch(rootTC, hc.userName);
         })
         .catch(fail).then(done,done);
     }));
@@ -170,7 +170,7 @@ function MockDataServiceFactory() {
     ['getAllHeroes', 'getHero', 'removeHero']);
 
   mock.getAllHeroes.and.callFake((force:boolean) => {
-    return Promise.resolve<Hero[]>(mockHeroData);
+    return Promise.resolve<Hero[]>(mockHeroData.map(h => h.clone()));
   });
 
   mock.getHero.and.callFake(() => {

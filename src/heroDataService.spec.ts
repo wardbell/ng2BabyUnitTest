@@ -9,11 +9,11 @@ describe('heroDataService', () => {
   let heroData: Hero[];
   let testError ='fetchAllHeroesAsync failed on purpose';
 
-  let existingHero = HEROES[0];
-  let nonHeroName = 'Not ' + existingHero.name;
+  let existingHero:Hero;
 
   beforeEach(() => {
-    heroData = HEROES.slice();
+    heroData = HEROES.map(h => h.clone());
+    existingHero = heroData[0];
     mockBackend.fetchAllHeroesAsync = fetchAllHeroesAsyncHappyPath;
     service = new HeroDataService(mockBackend);
   });
@@ -107,7 +107,7 @@ describe('heroDataService', () => {
     });
 
     it('returns null if name not found', done => {
-      service.getHero(nonHeroName).then(
+      service.getHero('Not ' + existingHero.name).then(
         hero => expect(hero).toEqual(null)
       ).catch(fail).then(done,done);
     });

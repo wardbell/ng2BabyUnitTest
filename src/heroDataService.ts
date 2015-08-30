@@ -9,8 +9,6 @@ export class HeroDataService {
   private _heroes: Hero[] = []; // cache of heroes
 	private _getAllHeroesPromise: Promise<Hero[]>;
 
-	get serviceName() {return 'async';}
-
 	getAllHeroes(force : boolean = false) {
 		// getAll if force==true OR this is the first time through
 		force = force || !this._getAllHeroesPromise
