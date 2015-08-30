@@ -1,5 +1,5 @@
 ///// Boiler Plate ////
-import {bind, bootstrap, Directive, Component, Injectable, View, ViewMetadata} from 'angular2/angular2';
+import {bind} from 'angular2/angular2';
 
 import {
   beforeEachBindings,
