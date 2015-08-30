@@ -11,15 +11,15 @@ import {User} from 'user';
     template: `
       <div id="output">
         <h1>{{userName}}'s Heroes</h1>
-        <button (click)="refresh(h)">refresh</button>
+        <button (click)="onRefresh(h)">Refresh</button>
         <ul class="heroes">
-          <li *ng-for="#hero of heroes" (click)="heroSelected(h)">
+          <li *ng-for="#hero of heroes" (click)="onSelect(hero)">
             ({{hero.id}}) {{hero.name}}
           </li>
         </ul>
         <div *ng-if="currentHero">
           <hr/>
-          <hero [hero]="currentHero" [usernm]="userName" (delete)="deleteHero()"></hero>
+          <hero [hero]="currentHero" [usernm]="userName" (delete)="onDelete()"></hero>
         </div>
       </div>
     `,
@@ -38,29 +38,29 @@ export class HeroesComponent {
     return this._heroes;
   }
 
-  heroSelected(hero:Hero) {
+  onSelect(hero:Hero) {
     this.currentHero = hero;
     console.log(`Hero selected: ${hero.name}`);
   }
 
-  deleteHero(hero:Hero){
+  onDelete(hero:Hero){
     hero = hero || this.currentHero;
     let ix = this._heroes.indexOf(hero);
     this._heroDataService.removeHero(hero);
     this.currentHero = this._heroes[ix] || this._heroes[ix-1];
   }
 
-  refresh() {
+  onRefresh() {
     this.currentHero = undefined;
+    this._heroes = undefined;
     this._getAllHeroes(true /*force*/);
-    console.log('refreshed heroes');
+    console.log('onRefreshed heroes');
   }
 
   get userName() { return this._user.name || 'someone'; }
 
   /////////////
   private _getAllHeroes(force:boolean = false) {
-    this._heroes = [];
     this._heroDataService.getAllHeroes(force).then(heroes => {
       this._heroes = heroes;
       if (!this.currentHero) { this.currentHero = heroes[0]; }
