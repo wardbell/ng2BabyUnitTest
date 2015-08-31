@@ -1,19 +1,16 @@
-import {bind, bootstrap, Component, View} from 'angular2/angular2';
-import {Backend} from 'backend';
-import {HeroDataService} from 'heroDataService';
+import {bootstrap, Component, View} from 'angular2/angular2';
 import {HeroesComponent} from 'heroesComponent';
-import {User} from 'user';
+import {CORE_BINDINGS} from 'core'
 
 @Component({
-  selector: 'my-app',
+  selector: 'app',
   // Injectables needed by this component or its children
-  bindings: [Backend, HeroDataService, User]
+  bindings: [CORE_BINDINGS]
 })
 @View({
-    template:'<heroes></heroes>',
-    directives: [HeroesComponent]
+  template: '<heroes></heroes>',
+  directives: [HeroesComponent]
 })
 export class AppComponent { }
-
 
 bootstrap(AppComponent);
