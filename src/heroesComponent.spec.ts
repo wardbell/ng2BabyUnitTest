@@ -2,38 +2,26 @@
 import {bind} from 'angular2/angular2';
 
 import {
-  beforeEachBindings,
-  DebugElement,
-  RootTestComponent as RTC,
-
+  beforeEachBindings, DebugElement, RootTestComponent as RTC,
   // Jasmine overrides
-  beforeEach,
-  ddescribe,
-  xdescribe,
-  describe,
-  //expect,
-  iit,
-  it,
-  xit
+  beforeEach, ddescribe,xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
 import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
 
-///// Testing this particular component ////
-
+///// Testing this component ////
+import {HeroesComponent} from 'heroesComponent';
 import {Hero} from 'hero';
 import {HeroDataService} from 'heroDataService';
 import {HEROES} from 'mockHeroes';
 import {User} from 'user';
 
-import {HeroesComponent} from 'heroesComponent';
-
-let mockHeroData:Hero[];
-let mockHero:Hero;
-let mockService:any; // too hard to maintain type safety on this mock
-let mockUser:User;
-
 describe('HeroesComponent', () => {
+
+  let mockHeroData:Hero[];
+  let mockHero:Hero;
+  let mockService:any; // too hard to maintain type safety on this mock
+  let mockUser:User;
 
   beforeEach(() => {
     mockHeroData = HEROES.map(h => h.clone());
@@ -159,45 +147,46 @@ describe('HeroesComponent', () => {
     });
 
   });
-});
 
-////// Helpers //////
-
-function MockDataServiceFactory() {
-
-  // Mock the HeroDataService members we think will matter
-  let mock = jasmine.createSpyObj('HeroDataService',
-    ['getAllHeroes', 'getHero', 'removeHero']);
-
-  mock.getAllHeroes.and.callFake((force:boolean) => {
-    return Promise.resolve<Hero[]>(mockHeroData.map(h => h.clone()));
-  });
-
-  mock.getHero.and.callFake(() => {
-    return Promise.resolve<Hero>(mockHero);
-  });
-
-  mock.removeHero.and.callFake((hero:Hero) => {
-    let ix = mockHeroData.indexOf(hero);
-    if (ix > -1) {
-      mockHeroData.splice(ix, 1);
-      return true;
-    } else {
-      return false;
+  ////// Helpers //////
+  
+  function MockDataServiceFactory() {
+  
+    // Mock the HeroDataService members we think will matter
+    let mock = jasmine.createSpyObj('HeroDataService',
+      ['getAllHeroes', 'getHero', 'removeHero']);
+  
+    mock.getAllHeroes.and.callFake((force:boolean) => {
+      return Promise.resolve<Hero[]>(mockHeroData.map(h => h.clone()));
+    });
+  
+    mock.getHero.and.callFake(() => {
+      return Promise.resolve<Hero>(mockHero);
+    });
+  
+    mock.removeHero.and.callFake((hero:Hero) => {
+      let ix = mockHeroData.indexOf(hero);
+      if (ix > -1) {
+        mockHeroData.splice(ix, 1);
+        return true;
+      } else {
+        return false;
+      }
+    });
+  
+    // make it easy to wait on a promise from any of these calls
+  
+    mock.getAllHeroesPromise = (callNum = 0) => {
+      var call = mock.getAllHeroes.calls.all()[callNum];
+      return <Promise<Hero[]>>call && call.returnValue;
     }
-  });
-
-  // make it easy to wait on a promise from any of these calls
-
-  mock.getAllHeroesPromise = (callNum = 0) => {
-    var call = mock.getAllHeroes.calls.all()[callNum];
-    return <Promise<Hero[]>>call && call.returnValue;
+  
+    mock.getHeroPromise = (callNum = 0) => {
+      var call = mock.getHero.calls.all()[callNum];
+      return <Promise<Hero>>call && call.returnValue;
+    }
+  
+    return mock;
   }
 
-  mock.getHeroPromise = (callNum = 0) => {
-    var call = mock.getHero.calls.all()[callNum];
-    return <Promise<Hero>>call && call.returnValue;
-  }
-
-  return mock;
-}
+});

@@ -2,30 +2,16 @@
 import {bind, Component, Directive, EventEmitter, View} from 'angular2/angular2';
 
 import {
-  beforeEachBindings,
-  DebugElement,
-  RootTestComponent as RTC,
-ObservableWrapper,
+  beforeEachBindings, DebugElement, RootTestComponent as RTC,
   // Jasmine overrides
-  beforeEach,
-  ddescribe,
-  xdescribe,
-  describe,
-  //expect,
-  iit,
-  it,
-  xit
+  beforeEach, ddescribe,xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
 import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
 
-///// Testing this particular component ////
-
-import {Hero} from 'hero';
-
+///// Testing this component ////
 import {HeroComponent} from 'heroComponent';
-
-let mockHero:Hero;
+import {Hero} from 'hero';
 
 // HeroWrapper is a convenient way to communicate w/ HeroComponent in a test
 @Component({selector: 'hero-wrapper'})
@@ -42,22 +28,16 @@ class HeroWrapper {
 
 describe('HeroComponent', () => {
 
-  beforeEach(() => {
-    mockHero = new Hero('Cat Woman', 42);
-  });
-
   it('can be created', () => {
     let hc = new HeroComponent()
     expect(hc instanceof HeroComponent).toEqual(true); // proof of life
   });
-
-
+  
   it('parent "currentHero" flows down to HeroComponent', injectTcb( (tcb, done) => {
     tcb
       .createAsync(HeroWrapper)
       .then((rootTC:RTC) => {
 
-        rootTC.detectChanges();
         let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
         let hw:HeroWrapper = rootTC.componentInstance;
 
@@ -66,25 +46,27 @@ describe('HeroComponent', () => {
       });
   }));
 
-  // FRAGILE because assumes precise knowledge of HeroComponent template
   it('delete button should raise delete event for parent component', injectTcb( (tcb, done) => {
     tcb
       .createAsync(HeroWrapper)
       .then((rootTC:RTC) => {
 
-        rootTC.detectChanges();
         let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
         let hw:HeroWrapper = rootTC.componentInstance;
+ 
+        rootTC.detectChanges(); // trigger view binding
 
         // Watch the HeroComponent.delete EventEmitter's event
         let subscription = hc.delete.toRx().subscribe(() => {
           // console.log('HeroComponent.delete event raised');
           subscription.dispose();})
 
-        // We can invoke HeroComponent delete button handler OR
+        // We can EITHER invoke HeroComponent delete button handler OR
         // trigger the 'click' event on the delete HeroComponent button
         // BUT DON'T DO BOTH
-        // hc.onDelete();
+        
+        // Trigger event
+        // FRAGILE because assumes precise knowledge of HeroComponent template
         rootTC.componentViewChildren[0]
           .componentViewChildren[1]
           .triggerEventHandler('click', {});
@@ -95,28 +77,34 @@ describe('HeroComponent', () => {
           expect(true).toEqual(true);
           done();
         }
+        // hc.onDelete();
+        // done();
       });
-  }), 500); // needs some time to complete; 100ms is not long enough
+  }), 500); // needs some time for event to complete; 100ms is not long enough
 
-  // FRAGILE because assumes precise knowledge of HeroComponent template
   it('update button should modify hero', injectTcb( (tcb, done) => {
-     let origNameLength = mockHero.name.length;
+
      tcb
       .createAsync(HeroWrapper)
       .then((rootTC:RTC) => {
 
-        rootTC.detectChanges();
         let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
         let hw:HeroWrapper = rootTC.componentInstance;
-
-        // We can invoke HeroComponent update button handler OR
+        let origNameLength = hw.currentHero.name.length;
+ 
+        rootTC.detectChanges(); // trigger view binding
+        
+        // We can EITHER invoke HeroComponent update button handler OR
         // trigger the 'click' event on the HeroComponent update button
         // BUT DON'T DO BOTH
-        // hc.onUpdate();
+
+        // Trigger event
+        // FRAGILE because assumes precise knowledge of HeroComponent template
         rootTC.componentViewChildren[0]
           .componentViewChildren[2]
           .triggerEventHandler('click', {});
-
+          
+        // hc.onUpdate(); // Invoke button handler
         expect(hw.currentHero.name.length).toBeGreaterThan(origNameLength);
         done();
       });
