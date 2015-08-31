@@ -19,16 +19,16 @@ import {Hero} from 'hero';
   directives: [FORM_DIRECTIVES]
 })
 export class HeroComponent {
-  hero:Hero;
+  hero: Hero;
 
   delete = new EventEmitter();
 
-  onDelete() {this.delete.next(this.hero)}
+  onDelete() { this.delete.next(this.hero) }
 
-  onUpdate(){
+  onUpdate() {
     if (this.hero) {
       this.hero.name += 'x';
     }
   }
-  userName:string;
+  userName: string;
 }

@@ -1,4 +1,4 @@
-import {Component, NgFor, NgIf, FORM_DIRECTIVES, View} from 'angular2/angular2';
+import {Component, NgFor, NgIf, View} from 'angular2/angular2';
 import {HeroComponent} from 'heroComponent';
 import {HeroDataService} from 'heroDataService';
 import {Hero} from 'hero';
@@ -23,7 +23,7 @@ import {User} from 'user';
         </div>
       </div>
     `,
-    directives: [FORM_DIRECTIVES, HeroComponent, NgFor, NgIf],
+    directives: [HeroComponent, NgFor, NgIf],
     styles: ['.heroes {list-style-type: none; margin-left: 1em; padding: 0}']
 })
 export class HeroesComponent {
