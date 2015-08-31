@@ -14,7 +14,7 @@
     }
   ],
   "scripts": {
-      "postinstall": "cd src && tsd reinstall -r -o"
+      "postinstall": "cd src && tsd reinstall -r -o && cd .."
   },
   "bugs": {
     "url": ""
