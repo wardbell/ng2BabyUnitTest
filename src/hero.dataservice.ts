@@ -1,4 +1,4 @@
-import {Inject, Injectable} from 'angular2/angular2';
+import {Injectable} from 'angular2/angular2';
 import {Hero} from 'hero';
 import {Backend} from 'backend';
 
