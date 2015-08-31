@@ -13,6 +13,9 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   ],
+  "scripts": {
+      "postinstall": "cd src && tsd reinstall -r -o"
+  },
   "bugs": {
     "url": ""
   },
