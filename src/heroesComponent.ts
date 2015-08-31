@@ -19,7 +19,7 @@ import {User} from 'user';
         </ul>
         <div *ng-if="currentHero">
           <hr/>
-          <hero [hero]="currentHero" [usernm]="userName" (delete)="onDelete()"></hero>
+          <hero [hero]="currentHero" [user-name]="userName" (delete)="onDelete()"></hero>
         </div>
       </div>
     `,
