@@ -2,12 +2,12 @@ import {Component, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2'
 import {Hero} from 'hero';
 
 @Component({
-  selector: 'hero', properties: ['hero', 'usernm'], events: ['delete']
+  selector: 'hero', properties: ['hero', 'userName'], events: ['delete']
 })
 @View({
   template: `
     <div>
-      <h2>{{hero.name}} is {{usernm}}'s current hero!</h2>
+      <h2>{{hero.name}} is {{userName}}'s current hero!</h2>
       <div>
         <button (click)="onDelete()" [disabled]="!hero">Delete</button>
         <button (click)="onUpdate()" [disabled]="!hero">Update</button>
@@ -30,5 +30,5 @@ export class HeroComponent {
       this.hero.name += 'x';
     }
   }
-  usernm:string;
+  userName:string;
 }

@@ -16,7 +16,7 @@ import {Hero} from 'hero';
 // HeroWrapper is a convenient way to communicate w/ HeroComponent in a test
 @Component({selector: 'hero-wrapper'})
 @View({
-  template: `<hero [hero]="currentHero" [usernm]="userName" (delete)="onDelete()"></hero>`,
+  template: `<hero [hero]="currentHero" [user-name]="userName" (delete)="onDelete()"></hero>`,
   directives: [HeroComponent]
 })
 class HeroWrapper {
@@ -40,6 +40,8 @@ describe('HeroComponent', () => {
 
         let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
         let hw:HeroWrapper = rootTC.componentInstance;
+
+        rootTC.detectChanges(); // trigger view binding
 
         expect(hw.currentHero).toBe(hc.hero);
         done();
