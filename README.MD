@@ -1,4 +1,4 @@
-# README FOR WARD
+# Getting Started
 
 1. Must install pre-requisites
 
@@ -11,3 +11,7 @@ npm install -g tsd typescript live-server
 ```bash
 npm install
 ```
+
+3. Run the TypeScript compiler and watch for changes `npm run tsc`
+
+4. Open 2nd terminal and launch the app in the browser `npm run serve`

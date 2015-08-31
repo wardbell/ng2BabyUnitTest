@@ -14,7 +14,9 @@
     }
   ],
   "scripts": {
-      "postinstall": "cd src && tsd reinstall -r -o && cd .."
+      "postinstall": "cd src && tsd reinstall -r -o && cd ..",
+      "tsc": "tsc -p src -w",
+      "serve": "live-server --open=src"
   },
   "bugs": {
     "url": ""
