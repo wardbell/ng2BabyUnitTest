@@ -1,6 +1,6 @@
 import {bootstrap, Component, View} from 'angular2/angular2';
-import {HeroesComponent} from 'heroesComponent';
 import {CORE_BINDINGS} from 'core'
+import {HeroesComponent} from 'heroesComponent';
 
 @Component({
   selector: 'app',
