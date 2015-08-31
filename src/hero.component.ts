@@ -5,17 +5,7 @@ import {Hero} from 'hero';
   selector: 'hero', properties: ['hero', 'userName'], events: ['delete']
 })
 @View({
-  template: `
-    <div>
-      <h2>{{hero.name}} is {{userName}}'s current hero!</h2>
-      <div>
-        <button (click)="onDelete()" [disabled]="!hero">Delete</button>
-        <button (click)="onUpdate()" [disabled]="!hero">Update</button>
-      </div>
-      <div><label>id: </label>{{hero.id}}</div>
-      <div><label>name: </label><input [(ng-model)]="hero.name" placeholder="name"></input></div>
-    </div>
-  `,
+  templateUrl: 'hero.component.html',
   directives: [FORM_DIRECTIVES]
 })
 export class HeroComponent {
