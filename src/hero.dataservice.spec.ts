@@ -1,10 +1,10 @@
 import {Hero} from 'hero';
-import {HeroDataService} from 'heroDataService';
+import {HeroDataservice} from 'hero.dataservice';
 import {HEROES} from 'mockHeroes';
 import {Backend} from 'backend';
 
-describe('heroDataService', () => {
-  let service: HeroDataService;
+describe('heroDataservice', () => {
+  let service: HeroDataservice;
   let mockBackend:Backend = <Backend>{};
   let heroData: Hero[];
   let testError ='fetchAllHeroesAsync failed on purpose';
@@ -15,7 +15,7 @@ describe('heroDataService', () => {
     heroData = HEROES.map(h => h.clone());
     existingHero = heroData[0];
     mockBackend.fetchAllHeroesAsync = fetchAllHeroesAsyncHappyPath;
-    service = new HeroDataService(mockBackend);
+    service = new HeroDataservice(mockBackend);
   });
 
   // fetchAllHeroes mock variations
@@ -136,7 +136,7 @@ describe('heroDataService', () => {
 
     let cachedHeroes:Hero[];
 
-    // prime the HeroDataService's cache asynchronously
+    // prime the HeroDataservice's cache asynchronously
     beforeEach(done => {
        service.getAllHeroes()
         .then(heroes => cachedHeroes = heroes)

@@ -3,7 +3,7 @@ import {Hero} from 'hero';
 import {Backend} from 'backend';
 
 @Injectable()
-export class HeroDataService {
+export class HeroDataservice {
 
 	constructor(private _backend: Backend) { }
 

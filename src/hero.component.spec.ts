@@ -10,7 +10,7 @@ import {
 import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
 
 ///// Testing this component ////
-import {HeroComponent} from 'heroComponent';
+import {HeroComponent} from 'hero.component';
 import {Hero} from 'hero';
 
 // HeroWrapper is a convenient way to communicate w/ HeroComponent in a test
@@ -32,7 +32,7 @@ describe('HeroComponent', () => {
     let hc = new HeroComponent()
     expect(hc instanceof HeroComponent).toEqual(true); // proof of life
   });
-  
+
   it('parent "currentHero" flows down to HeroComponent', injectTcb( (tcb, done) => {
     tcb
       .createAsync(HeroWrapper)
@@ -55,7 +55,7 @@ describe('HeroComponent', () => {
 
         let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
         let hw:HeroWrapper = rootTC.componentInstance;
- 
+
         rootTC.detectChanges(); // trigger view binding
 
         // Watch the HeroComponent.delete EventEmitter's event
@@ -66,7 +66,7 @@ describe('HeroComponent', () => {
         // We can EITHER invoke HeroComponent delete button handler OR
         // trigger the 'click' event on the delete HeroComponent button
         // BUT DON'T DO BOTH
-        
+
         // Trigger event
         // FRAGILE because assumes precise knowledge of HeroComponent template
         rootTC.componentViewChildren[0]
@@ -93,9 +93,9 @@ describe('HeroComponent', () => {
         let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
         let hw:HeroWrapper = rootTC.componentInstance;
         let origNameLength = hw.currentHero.name.length;
- 
+
         rootTC.detectChanges(); // trigger view binding
-        
+
         // We can EITHER invoke HeroComponent update button handler OR
         // trigger the 'click' event on the HeroComponent update button
         // BUT DON'T DO BOTH
@@ -105,7 +105,7 @@ describe('HeroComponent', () => {
         rootTC.componentViewChildren[0]
           .componentViewChildren[2]
           .triggerEventHandler('click', {});
-          
+
         // hc.onUpdate(); // Invoke button handler
         expect(hw.currentHero.name.length).toBeGreaterThan(origNameLength);
         done();
