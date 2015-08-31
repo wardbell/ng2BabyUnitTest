@@ -13,15 +13,20 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   ],
+  "scripts": {
+      "postinstall": "cd src && tsd reinstall -r -o && cd ..",
+      "tsc": "tsc -p src -w",
+      "start": "live-server --open=src",
+      "test": "live-server --open=src/tests.html"
+  },
   "bugs": {
     "url": ""
   },
   "dependencies": {
-    "angular2": "^2.0.0-alpha.35",
+    "angular2": "2.0.0-alpha.35",
     "es6-module-loader": "^0.16",
     "systemjs": "^0.16",
-    "traceur": "0.0.91",
-    "zone.js": "^0.5.3"
+    "traceur": "0.0.91"
   },
   "devDependencies": {
     "canonical-path": "0.0.2",
@@ -35,7 +40,8 @@
     "karma-jasmine": "^0.3.6",
     "lodash": "^3.10.1",
     "path": "^0.11.14",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "zone.js": "^0.5.3"
   },
   "contributors": [
     "Ward Bell <wardb@ideablade.com>"

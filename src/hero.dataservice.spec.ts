@@ -1,10 +1,10 @@
 import {Hero} from 'hero';
-import {HeroDataService} from 'heroDataService';
+import {HeroDataservice} from 'hero.dataservice';
 import {HEROES} from 'mockHeroes';
 import {Backend} from 'backend';
 
-describe('heroDataService', () => {
-  let service: HeroDataService;
+describe('heroDataservice', () => {
+  let service: HeroDataservice;
   let mockBackend:Backend = <Backend>{};
   let heroData: Hero[];
   let testError ='fetchAllHeroesAsync failed on purpose';
@@ -15,7 +15,7 @@ describe('heroDataService', () => {
     heroData = HEROES.map(h => h.clone());
     existingHero = heroData[0];
     mockBackend.fetchAllHeroesAsync = fetchAllHeroesAsyncHappyPath;
-    service = new HeroDataService(mockBackend);
+    service = new HeroDataservice(mockBackend);
   });
 
   // fetchAllHeroes mock variations
@@ -98,45 +98,11 @@ describe('heroDataService', () => {
     });
   });
 
-  describe('#getHero(name)', () => {
-
-    it('returns an existing hero when a hero with that name exists', done => {
-      service.getHero(existingHero.name).then(
-        hero => expect(hero).toBe(existingHero)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null if name not found', done => {
-      service.getHero('Not ' + existingHero.name).then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null when name is empty string', done => {
-      service.getHero('').then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null  when name is null', done => {
-      service.getHero(null).then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null when name is undefined', done => {
-      service.getHero().then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-  });
-
   describe('#removeHero(hero)', () => {
 
     let cachedHeroes:Hero[];
 
-    // prime the HeroDataService's cache asynchronously
+    // prime the HeroDataservice's cache asynchronously
     beforeEach(done => {
        service.getAllHeroes()
         .then(heroes => cachedHeroes = heroes)

@@ -4,15 +4,15 @@ import {bind} from 'angular2/angular2';
 import {
   beforeEachBindings, DebugElement, RootTestComponent as RTC,
   // Jasmine overrides
-  beforeEach, ddescribe,xdescribe, describe, iit, it, xit //expect,
+  beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
 import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
 
 ///// Testing this component ////
-import {HeroesComponent} from 'heroesComponent';
+import {HeroesComponent} from 'heroes.component';
 import {Hero} from 'hero';
-import {HeroDataService} from 'heroDataService';
+import {HeroDataservice} from 'hero.dataservice';
 import {HEROES} from 'mockHeroes';
 import {User} from 'user';
 
@@ -26,7 +26,7 @@ describe('HeroesComponent', () => {
   beforeEach(() => {
     mockHeroData = HEROES.map(h => h.clone());
     mockHero = mockHeroData[0];
-    mockService = MockDataServiceFactory();
+    mockService = MockDataserviceFactory();
     mockUser = new User();
   });
 
@@ -77,7 +77,7 @@ describe('HeroesComponent', () => {
     // Set up DI bindings required by component (and its nested components?)
     // else hangs silently forever
     beforeEachBindings( () => [
-      bind(HeroDataService).toFactory(MockDataServiceFactory),
+      bind(HeroDataservice).toFactory(MockDataserviceFactory),
       bind(User).toValue(mockUser)
     ]);
 
@@ -149,21 +149,17 @@ describe('HeroesComponent', () => {
   });
 
   ////// Helpers //////
-  
-  function MockDataServiceFactory() {
-  
-    // Mock the HeroDataService members we think will matter
-    let mock = jasmine.createSpyObj('HeroDataService',
-      ['getAllHeroes', 'getHero', 'removeHero']);
-  
+
+  function MockDataserviceFactory() {
+
+    // Mock the HeroDataservice members we think will matter
+    let mock = jasmine.createSpyObj('HeroDataservice',
+      ['getAllHeroes', 'removeHero']);
+
     mock.getAllHeroes.and.callFake((force:boolean) => {
       return Promise.resolve<Hero[]>(mockHeroData.map(h => h.clone()));
     });
-  
-    mock.getHero.and.callFake(() => {
-      return Promise.resolve<Hero>(mockHero);
-    });
-  
+
     mock.removeHero.and.callFake((hero:Hero) => {
       let ix = mockHeroData.indexOf(hero);
       if (ix > -1) {
@@ -173,19 +169,14 @@ describe('HeroesComponent', () => {
         return false;
       }
     });
-  
+
     // make it easy to wait on a promise from any of these calls
-  
+
     mock.getAllHeroesPromise = (callNum = 0) => {
       var call = mock.getAllHeroes.calls.all()[callNum];
       return <Promise<Hero[]>>call && call.returnValue;
     }
-  
-    mock.getHeroPromise = (callNum = 0) => {
-      var call = mock.getHero.calls.all()[callNum];
-      return <Promise<Hero>>call && call.returnValue;
-    }
-  
+
     return mock;
   }
 
