@@ -4,7 +4,7 @@ import {bind} from 'angular2/angular2';
 import {
   beforeEachBindings, DebugElement, RootTestComponent as RTC,
   // Jasmine overrides
-  beforeEach, ddescribe,xdescribe, describe, iit, it, xit //expect,
+  beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
 import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';

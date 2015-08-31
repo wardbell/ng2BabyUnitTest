@@ -4,7 +4,7 @@ import {bind, Component, Directive, EventEmitter, View} from 'angular2/angular2'
 import {
   beforeEachBindings, DebugElement, RootTestComponent as RTC,
   // Jasmine overrides
-  beforeEach, ddescribe,xdescribe, describe, iit, it, xit //expect,
+  beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
 import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
@@ -37,7 +37,6 @@ describe('HeroComponent', () => {
     tcb
       .createAsync(HeroWrapper)
       .then((rootTC:RTC) => {
-
         let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
         let hw:HeroWrapper = rootTC.componentInstance;
 
