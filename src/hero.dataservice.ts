@@ -23,12 +23,6 @@ export class HeroDataservice {
 		return this._getAllHeroesPromise;
 	}
 
-	// when cache is ready, return hero with that name or null if not found
-	getHero(name?: string) {
-		return this.getAllHeroes()
-			.then(heroes => heroes.filter(h => h.name === name)[0] || null);
-	}
-
 	removeHero(hero: Hero) {
 		let ix = this._heroes.indexOf(hero);
 		if (ix > -1) {

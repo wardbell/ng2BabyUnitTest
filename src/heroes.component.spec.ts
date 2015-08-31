@@ -154,14 +154,10 @@ describe('HeroesComponent', () => {
 
     // Mock the HeroDataservice members we think will matter
     let mock = jasmine.createSpyObj('HeroDataservice',
-      ['getAllHeroes', 'getHero', 'removeHero']);
+      ['getAllHeroes', 'removeHero']);
 
     mock.getAllHeroes.and.callFake((force:boolean) => {
       return Promise.resolve<Hero[]>(mockHeroData.map(h => h.clone()));
-    });
-
-    mock.getHero.and.callFake(() => {
-      return Promise.resolve<Hero>(mockHero);
     });
 
     mock.removeHero.and.callFake((hero:Hero) => {
@@ -179,11 +175,6 @@ describe('HeroesComponent', () => {
     mock.getAllHeroesPromise = (callNum = 0) => {
       var call = mock.getAllHeroes.calls.all()[callNum];
       return <Promise<Hero[]>>call && call.returnValue;
-    }
-
-    mock.getHeroPromise = (callNum = 0) => {
-      var call = mock.getHero.calls.all()[callNum];
-      return <Promise<Hero>>call && call.returnValue;
     }
 
     return mock;

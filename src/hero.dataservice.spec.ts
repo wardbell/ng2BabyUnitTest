@@ -98,40 +98,6 @@ describe('heroDataservice', () => {
     });
   });
 
-  describe('#getHero(name)', () => {
-
-    it('returns an existing hero when a hero with that name exists', done => {
-      service.getHero(existingHero.name).then(
-        hero => expect(hero).toBe(existingHero)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null if name not found', done => {
-      service.getHero('Not ' + existingHero.name).then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null when name is empty string', done => {
-      service.getHero('').then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null  when name is null', done => {
-      service.getHero(null).then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-    it('returns null when name is undefined', done => {
-      service.getHero().then(
-        hero => expect(hero).toEqual(null)
-      ).catch(fail).then(done,done);
-    });
-
-  });
-
   describe('#removeHero(hero)', () => {
 
     let cachedHeroes:Hero[];
