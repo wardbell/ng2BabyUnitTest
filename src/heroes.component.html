@@ -1,0 +1,13 @@
+<div id="output">
+  <h1>{{userName}}'s Heroes</h1>
+  <button (click)="onRefresh(h)">Refresh</button>
+  <ul class="heroes">
+    <li *ng-for="#hero of heroes" (click)="onSelect(hero)">
+      ({{hero.id}}) {{hero.name}}
+    </li>
+  </ul>
+  <div *ng-if="currentHero">
+    <hr/>
+    <hero [hero]="currentHero" [user-name]="userName" (delete)="onDelete()"></hero>
+  </div>
+</div>
