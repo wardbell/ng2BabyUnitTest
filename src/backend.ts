@@ -1,25 +1,25 @@
-// import {Http} from 'http/http';
+import {Http} from 'http/http';
 import {Injectable} from 'angular2/angular2';
 import {Hero} from 'hero';
-import {HEROES} from 'mockHeroes';
 
 @Injectable()
 export class Backend {
-	fetchAllHeroesAsync() : Promise<Hero[]> {
-		return new Promise<Hero[]>((resolve, reject) => {
-			setTimeout(() => {
-				resolve(HEROES.map(h => h.clone()));
-			}, 1000);
-		});
+	constructor(public http: Http) {
+		this.http = http;
 	}
 
-	// constructor(private http: Http) {
-	// 	this.http = http;
-	// }
+	fetchAllHeroesAsync(): Promise<Hero[]> {
 
-	// fetchAllHeroesAsync(): Promise<Hero[]> {
-	// 	return this.http.get('heroes.json').then((heroes: any[]) => {
-	// 		return heroes.map(hero => new Hero(hero.name, hero.id))
-	// 	});
-	// }
+		return new Promise<Hero[]>((resolve, reject) => {
+			setTimeout(() => {
+				var promise = this.http.get('heroes.json')
+					.toRx().map((response: any) => response.json()).toPromise();
+				resolve(promise);
+			}, 1000);
+		});
+
+		//TODO: here is all you need. We don;t actually want a delay
+		// return this.http.get('heroes.json')
+		// 	.toRx().map((response: any) => response.json()).toPromise();
+	}
 }

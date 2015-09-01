@@ -1,11 +1,11 @@
 import {bootstrap, Component, View} from 'angular2/angular2';
-import {coreInjectables} from 'core'
+import {CORE_BINDINGS} from 'core'
 import {HeroesComponent} from 'heroes.component';
 
 @Component({
   selector: 'app',
   // Injectables needed by this component or its children
-  bindings: [coreInjectables]
+  bindings: [CORE_BINDINGS]
 })
 @View({
   template: '<heroes></heroes>',

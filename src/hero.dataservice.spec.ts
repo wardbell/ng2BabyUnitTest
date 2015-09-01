@@ -1,6 +1,6 @@
 import {Hero} from 'hero';
 import {HeroDataservice} from 'hero.dataservice';
-import {HEROES} from 'mockHeroes';
+import {HEROES} from 'testMockHeroes';
 import {Backend} from 'backend';
 
 describe('heroDataservice', () => {
