@@ -13,7 +13,7 @@ import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
 import {HeroesComponent} from 'heroes.component';
 import {Hero} from 'hero';
 import {HeroDataservice} from 'hero.dataservice';
-import {HEROES} from 'mockHeroes';
+import {HEROES} from 'testMockHeroes';
 import {User} from 'user';
 
 describe('HeroesComponent', () => {
