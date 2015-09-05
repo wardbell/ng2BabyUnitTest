@@ -1,14 +1,14 @@
 import {Component, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2';
-import {Hero} from 'hero';
+import {Hero} from './hero';
 
 @Component({
-  selector: 'hero', properties: ['hero', 'userName'], events: ['delete']
+  selector: 'my-hero-detail', properties: ['hero', 'userName'], events: ['delete']
 })
 @View({
-  templateUrl: 'hero.component.html',
+  templateUrl: 'app/hero-detail-component.html',
   directives: [FORM_DIRECTIVES]
 })
-export class HeroComponent {
+export class HeroDetailComponent {
   hero: Hero;
 
   delete = new EventEmitter();

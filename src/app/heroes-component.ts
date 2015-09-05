@@ -1,21 +1,21 @@
 import {Component, NgFor, NgIf, View} from 'angular2/angular2';
-import {HeroComponent} from 'hero.component';
-import {HeroDataservice} from 'hero.dataservice';
-import {Hero} from 'hero';
-import {User} from 'user';
+import {HeroDetailComponent} from './hero-detail-component';
+import {HeroService} from './hero-service';
+import {Hero} from './hero';
+import {User} from './user';
 
 @Component({
-  selector: 'heroes'
+  selector: 'my-heroes'
 })
 @View({
-  templateUrl: 'heroes.component.html',
-  directives: [HeroComponent, NgFor, NgIf],
-  styleUrls: ['heroes.component.css']
+  templateUrl: 'app/heroes-component.html',
+  directives: [HeroDetailComponent, NgFor, NgIf],
+  styleUrls: ['app/heroes-component.css']
 })
 export class HeroesComponent {
   private _heroes: Hero[];
 
-  constructor(private _heroDataService: HeroDataservice, private _user: User) { }
+  constructor(private _heroService: HeroService, private _user: User) { }
 
   currentHero: Hero;
 
@@ -32,7 +32,7 @@ export class HeroesComponent {
   onDelete(hero: Hero) {
     hero = hero || this.currentHero;
     let ix = this._heroes.indexOf(hero);
-    this._heroDataService.removeHero(hero);
+    this._heroService.removeHero(hero);
     this.currentHero = this._heroes[ix] || this._heroes[ix - 1];
   }
 
@@ -47,7 +47,7 @@ export class HeroesComponent {
 
   /////////////
   private _getAllHeroes(force: boolean = false) {
-    this._heroDataService.getAllHeroes(force).then(heroes => {
+    this._heroService.getAllHeroes(force).then(heroes => {
       this._heroes = heroes;
       if (!this.currentHero) { this.currentHero = heroes[0]; }
     });

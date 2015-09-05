@@ -7,38 +7,38 @@ import {
   beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
-import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
+import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from './test-helpers';
 
 ///// Testing this component ////
-import {HeroComponent} from 'hero.component';
-import {Hero} from 'hero';
+import {HeroDetailComponent} from './hero-detail-component';
+import {Hero} from './hero';
 
-// HeroWrapper is a convenient way to communicate w/ HeroComponent in a test
+// TestWrapper is a convenient way to communicate w/ HeroDetailComponent in a test
 @Component({selector: 'hero-wrapper'})
 @View({
   template: `<hero [hero]="currentHero" [user-name]="userName" (delete)="onDelete()"></hero>`,
-  directives: [HeroComponent]
+  directives: [HeroDetailComponent]
 })
-class HeroWrapper {
+class TestWrapper {
   currentHero = new Hero('Cat Woman', 42);
   userName = 'Sally';
   testCallback() {} // monkey-punched in a test
   onDelete() { this.testCallback(); }
 }
 
-describe('HeroComponent', () => {
+describe('HeroDetailComponent', () => {
 
   it('can be created', () => {
-    let hc = new HeroComponent()
-    expect(hc instanceof HeroComponent).toEqual(true); // proof of life
+    let hc = new HeroDetailComponent()
+    expect(hc instanceof HeroDetailComponent).toEqual(true); // proof of life
   });
 
-  it('parent "currentHero" flows down to HeroComponent', injectTcb( (tcb, done) => {
+  it('parent "currentHero" flows down to HeroDetailComponent', injectTcb( (tcb, done) => {
     tcb
-      .createAsync(HeroWrapper)
+      .createAsync(TestWrapper)
       .then((rootTC:RTC) => {
-        let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
-        let hw:HeroWrapper = rootTC.componentInstance;
+        let hc:HeroDetailComponent = rootTC.componentViewChildren[0].componentInstance;
+        let hw:TestWrapper = rootTC.componentInstance;
 
         rootTC.detectChanges(); // trigger view binding
 
@@ -49,16 +49,16 @@ describe('HeroComponent', () => {
 
   it('delete button should raise delete event for parent component', injectTcb( (tcb, done) => {
     tcb
-      .createAsync(HeroWrapper)
+      .createAsync(TestWrapper)
       .then((rootTC:RTC) => {
 
-        let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
-        let hw:HeroWrapper = rootTC.componentInstance;
+        let hdc:HeroDetailComponent = rootTC.componentViewChildren[0].componentInstance;
+        let hw:TestWrapper = rootTC.componentInstance;
 
         rootTC.detectChanges(); // trigger view binding
 
         // Watch the HeroComponent.delete EventEmitter's event
-        let subscription = hc.delete.toRx().subscribe(() => {
+        let subscription = hdc.delete.toRx().subscribe(() => {
           // console.log('HeroComponent.delete event raised');
           subscription.dispose();})
 
@@ -86,11 +86,11 @@ describe('HeroComponent', () => {
   it('update button should modify hero', injectTcb( (tcb, done) => {
 
      tcb
-      .createAsync(HeroWrapper)
+      .createAsync(TestWrapper)
       .then((rootTC:RTC) => {
 
-        let hc:HeroComponent = rootTC.componentViewChildren[0].componentInstance;
-        let hw:HeroWrapper = rootTC.componentInstance;
+        let hc:HeroDetailComponent = rootTC.componentViewChildren[0].componentInstance;
+        let hw:TestWrapper = rootTC.componentInstance;
         let origNameLength = hw.currentHero.name.length;
 
         rootTC.detectChanges(); // trigger view binding

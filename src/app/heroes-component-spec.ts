@@ -7,14 +7,14 @@ import {
   beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
-import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'testHelpers';
+import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from './test-helpers';
 
 ///// Testing this component ////
-import {HeroesComponent} from 'heroes.component';
-import {Hero} from 'hero';
-import {HeroDataservice} from 'hero.dataservice';
-import {HEROES} from 'testMockHeroes';
-import {User} from 'user';
+import {HeroesComponent} from './heroes-component';
+import {Hero} from './hero';
+import {HeroService} from './hero-service';
+import {HEROES} from './mock-heroes';
+import {User} from './user';
 
 describe('HeroesComponent', () => {
 
@@ -77,7 +77,7 @@ describe('HeroesComponent', () => {
     // Set up DI bindings required by component (and its nested components?)
     // else hangs silently forever
     beforeEachBindings( () => [
-      bind(HeroDataservice).toFactory(MockDataserviceFactory),
+      bind(HeroService).toFactory(MockDataserviceFactory),
       bind(User).toValue(mockUser)
     ]);
 
@@ -152,8 +152,8 @@ describe('HeroesComponent', () => {
 
   function MockDataserviceFactory() {
 
-    // Mock the HeroDataservice members we think will matter
-    let mock = jasmine.createSpyObj('HeroDataservice',
+    // Mock the HeroService members we think will matter
+    let mock = jasmine.createSpyObj('HeroService',
       ['getAllHeroes', 'removeHero']);
 
     mock.getAllHeroes.and.callFake((force:boolean) => {

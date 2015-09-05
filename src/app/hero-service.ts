@@ -1,9 +1,9 @@
 import {Injectable} from 'angular2/angular2';
-import {Hero} from 'hero';
-import {Backend} from 'backend';
+import {Hero} from './hero';
+import {Backend} from './backend';
 
 @Injectable()
-export class HeroDataservice {
+export class HeroService {
 
 	constructor(private _backend: Backend) { }
 

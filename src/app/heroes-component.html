@@ -1,5 +1,5 @@
 <div id="output">
-  <h1>{{userName}}'s Heroes</h1>
+  <h1>{{userName}}'s Super Heroes</h1>
   <button (click)="onRefresh(h)">Refresh</button>
   <ul class="heroes">
     <li *ng-for="#hero of heroes" (click)="onSelect(hero)">
@@ -8,6 +8,6 @@
   </ul>
   <div *ng-if="currentHero">
     <hr/>
-    <hero [hero]="currentHero" [user-name]="userName" (delete)="onDelete()"></hero>
+    <my-hero-detail [hero]="currentHero" [user-name]="userName" (delete)="onDelete()"></hero>
   </div>
 </div>

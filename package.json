@@ -1,8 +1,14 @@
 {
   "name": "ng2BabyUnitTest",
-  "version": "0.0.0",
-  "private": true,
   "description": "Angular 2 Baby Unit Testing",
+  "version": "0.0.1",
+  "scripts": {
+    "postinstall": "npm run tsd",
+    "tsd": "tsd reinstall -r -o --config src/tsd.json",
+    "tsc": "tsc -p src -w",
+    "start": "live-server --open=src",
+    "test": "live-server --open=src/unit-tests.html"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/wardbell/ng2BabyUnitTest"
@@ -13,19 +19,10 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   ],
-  "scripts": {
-      "postinstall": "cd src && tsd reinstall -r -o && cd ..",
-      "tsc": "tsc -p src -w",
-      "start": "live-server --open=src",
-      "test": "live-server --open=src/tests.html"
-  },
-  "bugs": {
-    "url": ""
-  },
   "dependencies": {
-    "angular2": "2.0.0-alpha.35",
+    "angular2": "2.0.0-alpha.36",
     "es6-module-loader": "^0.16",
-    "systemjs": "^0.16",
+    "systemjs": "^0.18.17",
     "traceur": "0.0.91"
   },
   "devDependencies": {

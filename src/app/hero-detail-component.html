@@ -1,0 +1,21 @@
+<div>
+	<h2>{{hero.name}} is {{userName}}'s current super hero!</h2>
+	<div>
+		<button (click)="onDelete()" [disabled]="!hero">Delete</button>
+		<button (click)="onUpdate()" [disabled]="!hero">Update</button>
+	</div>
+	<div>
+		<label>Id: </label>{{hero.id}}</div>
+	<div>
+		<label>Name: </label>
+		<input [(ng-model)]="hero.name" placeholder="name"></input>
+	</div>
+		<div>
+		<label>Power: </label>
+		<input [(ng-model)]="hero.power" placeholder="super power"></input>
+	</div>
+		<div>
+		<label>Alter Ego: </label>
+		<input [(ng-model)]="hero.alterEgo" placeholder="alter ego"></input>
+	</div>
+</div>

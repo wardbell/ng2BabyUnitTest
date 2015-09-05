@@ -10,10 +10,9 @@
 <script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
 
 <script src="../node_modules/traceur/bin/traceur-runtime.js"></script>
-<script src="../node_modules/es6-module-loader/dist/es6-module-loader.src.js"></script>
 <script src="../node_modules/systemjs/dist/system.src.js"></script>
 <script src="../node_modules/angular2/bundles/angular2.dev.js"></script>
-<script src="../node_modules/angular2/bundles/http.dev.js"></script>
+
 <script src="../node_modules/angular2/bundles/test_lib.dev.js"></script>
 <script src="../node_modules/zone.js/dist/long-stack-trace-zone.js"></script>
 <script src="../node_modules/zone.js/dist/jasmine-patch.js"></script>
@@ -26,14 +25,23 @@
         Error.stackTraceLimit=Infinity;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 100;
 
+        System.config({
+          packages: {
+            'app': {defaultExtension: 'js'},
+            'dummy-tests': {defaultExtension: 'js'}
+            }
+        });
+
         var imports = [
-          'dummy-tests/dummy.spec',
-          'dummy-tests/dummyWithTCB.spec',
-          'hero.dataservice.spec',
-          'heroes.component.spec',
-          'hero.component.spec',
+
+          'dummy-tests/dummy-spec',
+          'dummy-tests/dummy-with-TCB-spec',
+          'app/hero-service-spec',
+          'app/heroes-component-spec',
+          'app/hero-detail-component-spec',
           '@empty' // placeholder makes it easier to comment-out specs above
-        ].map(System.import.bind(System));
+
+        ].map(function(spec) {return System.import(spec);});
 
         Promise.all(imports)
           .then( function() {
@@ -44,7 +52,9 @@
             //
             // TODO: BrowserDomAdapter should be exposed through 'angular2/test' instead
             var DomAdapterModule = System.get('angular2/src/dom/browser_adapter');
-            DomAdapterModule.BrowserDomAdapter.makeCurrent();
+            if (DomAdapterModule) {
+              DomAdapterModule.BrowserDomAdapter.makeCurrent();
+            }
           })
           .then(  function()    { window.onload();} ) // re-execute Jasmine's buildup
           .catch( function(err) { console.log(err);} );
