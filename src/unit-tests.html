@@ -44,18 +44,6 @@
         ].map(function(spec) {return System.import(spec);});
 
         Promise.all(imports)
-          .then( function() {
-            // Must designate a BrowserDomAdapter or else DOM testing bombs
-            // (e.g. when testing component and call `tcb.createAsync`) for lack of `DOM` object
-            // Igor's recommended approach based on
-            // https://github.com/angular/angular/blob/master/test-main.js
-            //
-            // TODO: BrowserDomAdapter should be exposed through 'angular2/test' instead
-            var DomAdapterModule = System.get('angular2/src/dom/browser_adapter');
-            if (DomAdapterModule) {
-              DomAdapterModule.BrowserDomAdapter.makeCurrent();
-            }
-          })
           .then(  function()    { window.onload();} ) // re-execute Jasmine's buildup
           .catch( function(err) { console.log(err);} );
       })();
