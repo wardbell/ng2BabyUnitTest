@@ -1,22 +1,9 @@
-
 import {
 AsyncTestCompleter,
 inject,
 RootTestComponent,
 TestComponentBuilder,
 } from 'angular2/test';
-
-///////  THIS SECTION SHOULD BE EXECUTED FOR US ////////////
-// should be in `angular2/test` or `angular2/angular2` but it isn't yet
-import {BrowserDomAdapter} from 'angular2/src/dom/browser_adapter';
-
-if (BrowserDomAdapter) {
-  // MUST be called before any specs involving the TestComponentBuilder
-  BrowserDomAdapter.makeCurrent();
-} else {
-  console.log("BrowserDomAdapter not found; TestComponentBuilder tests will fail");
-}
-///////////////////////////////////////////////////////
 
 export function injectAsync(testFn: (done: () => void) => void) {
   return inject([AsyncTestCompleter], function injectWrapper(async: AsyncTestCompleter) {

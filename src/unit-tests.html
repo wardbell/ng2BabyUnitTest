@@ -28,18 +28,20 @@
         System.config({
           packages: {
             'app': {defaultExtension: 'js'},
-            'dummy-tests': {defaultExtension: 'js'}
+            'dummy-tests': {defaultExtension: 'js'},
+            'test-helpers': {defaultExtension: 'js'}
             }
         });
 
         var imports = [
-
           'dummy-tests/dummy-spec',
           'dummy-tests/dummy-with-TCB-spec',
+
+          'test-helpers/dom-setup', // Essential for specs that touch the DOM
+
           'app/hero-service-spec',
           'app/heroes-component-spec',
           'app/hero-detail-component-spec',
-          '@empty' // placeholder makes it easier to comment-out specs above
 
         ].map(function(spec) {return System.import(spec);});
 

@@ -7,7 +7,7 @@ import {
   beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
-import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from './test-helpers';
+import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroDetailComponent} from './hero-detail-component';
