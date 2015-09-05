@@ -2,9 +2,9 @@
 import {bind} from 'angular2/angular2';
 
 import {
-  beforeEachBindings, DebugElement, RootTestComponent as RTC,
-  // Jasmine overrides
-  beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
+beforeEachBindings, DebugElement, RootTestComponent as RTC,
+// Jasmine overrides
+beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
 import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from './test-helpers';
@@ -18,10 +18,10 @@ import {User} from './user';
 
 describe('HeroesComponent', () => {
 
-  let mockHeroData:Hero[];
-  let mockHero:Hero;
-  let mockService:any; // too hard to maintain type safety on this mock
-  let mockUser:User;
+  let mockHeroData: Hero[];
+  let mockHero: Hero;
+  let mockService: any; // too hard to maintain type safety on this mock
+  let mockUser: User;
 
   beforeEach(() => {
     mockHeroData = HEROES.map(h => h.clone());
@@ -46,15 +46,14 @@ describe('HeroesComponent', () => {
     describe('#heroes', () => {
 
       it('lacks heroes when created', () => {
-        let hc = new HeroesComponent(mockService, mockUser )
-        let heroes = hc.heroes; // trigger service
-        expect(typeof heroes).toBe('undefined');  // not filled yet
-      });
-
-      it('has heroes after cache loaded', injectAsync (done => {
         let hc = new HeroesComponent(mockService, mockUser)
         let heroes = hc.heroes; // trigger service
-        expect(typeof heroes).toBe('undefined'); // not filled yet
+        expect(heroes.length).toEqual(0); // not filled yet
+      });
+
+      it('has heroes after cache loaded', injectAsync(done => {
+        let hc = new HeroesComponent(mockService, mockUser)
+        let heroes = hc.heroes; // trigger service
 
         // Wait for them ...
         mockService.getAllHeroesPromise(0)
@@ -62,7 +61,27 @@ describe('HeroesComponent', () => {
             heroes = hc.heroes; // now the component has heroes to show
             expect(heroes.length).toEqual(mockHeroData.length);
           })
-          .catch(fail).then(done,done);
+          .catch(fail).then(done, done);
+      }));
+
+      it('restores heroes after refresh called', injectAsync(done => {
+        let hc = new HeroesComponent(mockService, mockUser)
+        let heroes = hc.heroes; // trigger service
+
+        // Wait for them ...
+        mockService.getAllHeroesPromise(0)
+          .then(() => {
+            heroes = hc.heroes; // now the component has heroes to show
+            heroes[0].name = 'Wotan';
+            heroes.push(new Hero('Thor'));
+            hc.onRefresh();
+          })
+          .then(() => {
+            heroes = hc.heroes; // get it again (don't reuse old array!)
+            expect(heroes[0]).not.toEqual('Wotan'); // change reversed
+            expect(heroes.length).toEqual(mockHeroData.length); // orig num of heroes
+          })
+          .catch(fail).then(done, done);
       }));
     });
   });
@@ -76,7 +95,7 @@ describe('HeroesComponent', () => {
 
     // Set up DI bindings required by component (and its nested components?)
     // else hangs silently forever
-    beforeEachBindings( () => [
+    beforeEachBindings(() => [
       bind(HeroService).toFactory(MockDataserviceFactory),
       bind(User).toValue(mockUser)
     ]);
@@ -86,8 +105,8 @@ describe('HeroesComponent', () => {
       tcb
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
-        .then((rootTC:RTC) => expect(true).toBe(true)) // proof of life
-        .catch(fail).then(done,done);
+        .then((rootTC: RTC) => expect(true).toBe(true)) // proof of life
+        .catch(fail).then(done, done);
     }));
 
     it('binds view to userName', injectTcb((tcb, done) => {
@@ -95,12 +114,12 @@ describe('HeroesComponent', () => {
       tcb
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
-        .then((rootTC:RTC) => {
-          let hc:HeroesComponent = rootTC.componentInstance;
+        .then((rootTC: RTC) => {
+          let hc: HeroesComponent = rootTC.componentInstance;
           rootTC.detectChanges(); // trigger component property binding
           expectViewChildHtmlToMatch(rootTC, hc.userName);
         })
-        .catch(fail).then(done,done);
+        .catch(fail).then(done, done);
     }));
 
 
@@ -117,15 +136,15 @@ describe('HeroesComponent', () => {
         tcb
           .overrideTemplate(HeroesComponent, template)
           .createAsync(HeroesComponent)
-          .then((rootTC:RTC) => {
+          .then((rootTC: RTC) => {
             // trigger {{heroes}} binding which triggers async getAllHeroes
             rootTC.detectChanges();
 
             // hc.heroes is still undefined; need a JS cycle to get the data
             return rootTC;
           })
-          .then((rootTC:RTC) => {
-            let hc:HeroesComponent = rootTC.componentInstance;
+          .then((rootTC: RTC) => {
+            let hc: HeroesComponent = rootTC.componentInstance;
             // now heroes are available for binding
             expect(hc.heroes.length).toEqual(mockHeroData.length);
             rootTC.detectChanges(); // trigger component property binding
@@ -141,7 +160,7 @@ describe('HeroesComponent', () => {
             // })
             // expect(wasFound).toBe(true);
           })
-          .catch(fail).then(done,done);
+          .catch(fail).then(done, done);
       }));
 
     });
@@ -156,11 +175,11 @@ describe('HeroesComponent', () => {
     let mock = jasmine.createSpyObj('HeroService',
       ['getAllHeroes', 'removeHero']);
 
-    mock.getAllHeroes.and.callFake((force:boolean) => {
+    mock.getAllHeroes.and.callFake((force: boolean) => {
       return Promise.resolve<Hero[]>(mockHeroData.map(h => h.clone()));
     });
 
-    mock.removeHero.and.callFake((hero:Hero) => {
+    mock.removeHero.and.callFake((hero: Hero) => {
       let ix = mockHeroData.indexOf(hero);
       if (ix > -1) {
         mockHeroData.splice(ix, 1);

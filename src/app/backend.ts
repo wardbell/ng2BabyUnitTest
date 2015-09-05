@@ -8,10 +8,9 @@ let delay = 1000; // ms delay in return of data
 export class Backend {
 
 	fetchAllHeroesAsync(): Promise<Hero[]> {
-
 		return new Promise((resolve, reject) => {
 			// simulate latency by resolving promise after a delay
-			setTimeout(() => resolve(HEROES.slice()), delay)
+			setTimeout(() => resolve(HEROES.map(h => h.clone())), delay)
 		})
 	}
 }

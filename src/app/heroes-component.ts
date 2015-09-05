@@ -26,7 +26,7 @@ export class HeroesComponent {
 
   onSelect(hero: Hero) {
     this.currentHero = hero;
-    console.log(`Hero selected: ${hero.name}`);
+    console.log(`Hero selected: ` + JSON.stringify(hero));
   }
 
   onDelete(hero: Hero) {
@@ -37,19 +37,19 @@ export class HeroesComponent {
   }
 
   onRefresh() {
-    this.currentHero = undefined;
-    this._heroes = undefined;
     this._getAllHeroes(true /*force*/);
-    console.log('onRefreshed heroes');
+    console.log('Refreshing heroes');
   }
 
   get userName() { return this._user.name || 'someone'; }
 
   /////////////
   private _getAllHeroes(force: boolean = false) {
+    this._heroes = [];
+    this.currentHero = undefined;
     this._heroService.getAllHeroes(force).then(heroes => {
       this._heroes = heroes;
-      if (!this.currentHero) { this.currentHero = heroes[0]; }
+      this.currentHero = heroes[0];
     });
   }
 }

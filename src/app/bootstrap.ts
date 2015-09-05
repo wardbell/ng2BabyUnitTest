@@ -1,5 +1,11 @@
 import {bootstrap} from 'angular2/angular2';
-import {HeroesComponent} from './heroes-component';
-import {CORE_BINDINGS} from './core'
 
-bootstrap(HeroesComponent, [CORE_BINDINGS]);
+// Application root component
+import {HeroesComponent} from './heroes-component';
+
+// Application-wide "injectables""
+import {Backend} from './backend';
+import {HeroService} from './hero-service';
+import {User} from './user';
+
+bootstrap(HeroesComponent, [Backend, HeroService, User]);
