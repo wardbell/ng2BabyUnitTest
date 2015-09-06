@@ -2,12 +2,12 @@
 import {bind} from 'angular2/angular2';
 
 import {
-beforeEachBindings, DebugElement, RootTestComponent as RTC,
+beforeEachBindings, By, DebugElement, RootTestComponent as RTC,
 // Jasmine overrides
 beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
-import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'test-helpers/test-helpers';
+import {expectSelectedHtml, expectViewChildHtml, injectAsync, injectTcb} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroesComponent} from './heroes-component';
@@ -116,8 +116,11 @@ describe('HeroesComponent', () => {
         .createAsync(HeroesComponent)
         .then((rootTC: RTC) => {
           let hc: HeroesComponent = rootTC.componentInstance;
+
+
           rootTC.detectChanges(); // trigger component property binding
-          expectViewChildHtmlToMatch(rootTC, hc.userName);
+          expectSelectedHtml(rootTC, 'h1').toMatch(hc.userName);
+          expectViewChildHtml(rootTC).toMatch(hc.userName);
         })
         .catch(fail).then(done, done);
     }));
@@ -147,18 +150,11 @@ describe('HeroesComponent', () => {
             let hc: HeroesComponent = rootTC.componentInstance;
             // now heroes are available for binding
             expect(hc.heroes.length).toEqual(mockHeroData.length);
+
             rootTC.detectChanges(); // trigger component property binding
 
-            // confirm hero list is displayed by looking for a hero
-            let rx = RegExp(mockHero.name);
-            expect(rx.test(rootTC.nativeElement.innerHTML)).toBe(true);
-
-            // If we lacked confidence in the above
-            // we can loop through the component children like this:
-            // let wasFound = rootTC.componentViewChildren.some((child:DebugElement) =>{
-            //     return rx.test(child.nativeElement.innerHTML);
-            // })
-            // expect(wasFound).toBe(true);
+            // confirm hero list is displayed by looking for a known hero
+            expect(rootTC.nativeElement.innerHTML).toMatch(mockHero.name);
           })
           .catch(fail).then(done, done);
       }));

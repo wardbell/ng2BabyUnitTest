@@ -8,7 +8,7 @@ export class Hero {
 
 	constructor(options: string | IHeroOptions, private _id?: number) {
 		if (typeof options === 'string') {
-			name = options;
+			this.name = options;
 		} else {
 			this._id = options.id;
 			this.name = options.name || '';

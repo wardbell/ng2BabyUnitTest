@@ -1,114 +1,174 @@
 ///// Boiler Plate ////
-import {bind, Component, Directive, EventEmitter, View} from 'angular2/angular2';
+import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2';
 
 import {
-  beforeEachBindings, DebugElement, RootTestComponent as RTC,
-  // Jasmine overrides
-  beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
+beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ RootTestComponent as RTC,
+// Jasmine overrides
+beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
-import {injectAsync, injectTcb, expectViewChildHtmlToMatch} from 'test-helpers/test-helpers';
+import {dispatchEvent, injectAsync, injectTcb, rootTick} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroDetailComponent} from './hero-detail-component';
 import {Hero} from './hero';
 
-// TestWrapper is a convenient way to communicate w/ HeroDetailComponent in a test
-@Component({selector: 'hero-wrapper'})
-@View({
-  template: `<hero [hero]="currentHero" [user-name]="userName" (delete)="onDelete()"></hero>`,
-  directives: [HeroDetailComponent]
-})
-class TestWrapper {
-  currentHero = new Hero('Cat Woman', 42);
-  userName = 'Sally';
-  testCallback() {} // monkey-punched in a test
-  onDelete() { this.testCallback(); }
-}
-
 describe('HeroDetailComponent', () => {
 
-  it('can be created', () => {
-    let hc = new HeroDetailComponent()
-    expect(hc instanceof HeroDetailComponent).toEqual(true); // proof of life
+  /////////// Component Tests without DOM interaction /////////////
+  describe('(No DOM)', () => {
+    it('can be created', () => {
+      let hdc = new HeroDetailComponent();
+      expect(hdc instanceof HeroDetailComponent).toEqual(true); // proof of life
+    });
+
+    it('onDelete method should raise delete event', injectAsync(done => {
+      let hdc = new HeroDetailComponent();
+
+      // Listen for the HeroComponent.delete EventEmitter's event
+      hdc.delete.toRx().subscribe(() => {
+        console.log('HeroComponent.delete event raised');
+        done();  // it must have worked
+      });
+
+      hdc.onDelete();
+    }));
+
+    it('onUpdate method should modify hero', () => {
+      let hdc = new HeroDetailComponent();
+      hdc.hero = new Hero('Cat Woman', 42);
+      let origNameLength = hdc.hero.name.length;
+
+      hdc.onUpdate();
+      expect(hdc.hero.name.length).toBeGreaterThan(origNameLength);
+    });
   });
 
-  it('parent "currentHero" flows down to HeroDetailComponent', injectTcb( (tcb, done) => {
-    tcb
-      .createAsync(TestWrapper)
-      .then((rootTC:RTC) => {
-        let hc:HeroDetailComponent = rootTC.componentViewChildren[0].componentInstance;
-        let hw:TestWrapper = rootTC.componentInstance;
 
-        rootTC.detectChanges(); // trigger view binding
+  /////////// Component tests that check the DOM /////////////
+  describe('(DOM)', () => {
 
-        expect(hw.currentHero).toBe(hc.hero);
-        done();
-      });
-  }));
+    it('Delete button should raise delete event', injectTcb((tcb, done) => {
 
-  it('delete button should raise delete event for parent component', injectTcb( (tcb, done) => {
-    tcb
-      .createAsync(TestWrapper)
-      .then((rootTC:RTC) => {
+      // We only care about the button
+      let template = '<button (click)="onDelete()">Delete</button>';
 
-        let hdc:HeroDetailComponent = rootTC.componentViewChildren[0].componentInstance;
-        let hw:TestWrapper = rootTC.componentInstance;
+      tcb
+        .overrideTemplate(HeroDetailComponent, template)
+        .createAsync(HeroDetailComponent)
+        .then((rootTC: RTC) => {
+          let hdc: HeroDetailComponent = rootTC.componentInstance;
 
-        rootTC.detectChanges(); // trigger view binding
+          // Listen for the HeroComponent.delete EventEmitter's event
+          hdc.delete.toRx().subscribe(() => {
+            console.log('HeroComponent.delete event raised');
+            done(); // it must have worked
+          });
 
-        // Watch the HeroComponent.delete EventEmitter's event
-        let subscription = hdc.delete.toRx().subscribe(() => {
-          // console.log('HeroComponent.delete event raised');
-          subscription.dispose();})
+          // trigger the 'click' event on the HeroDetailComponent delete button
+          rootTC.query(By.css('button')).triggerEventHandler('click');
+        });
 
-        // We can EITHER invoke HeroComponent delete button handler OR
-        // trigger the 'click' event on the delete HeroComponent button
-        // BUT DON'T DO BOTH
+    }));
 
-        // Trigger event
-        // FRAGILE because assumes precise knowledge of HeroComponent template
-        rootTC.componentViewChildren[0]
-          .componentViewChildren[1]
-          .triggerEventHandler('click', {});
+    it('Update button should modify hero', injectTcb((tcb, done) => {
 
-        hw.testCallback = () => {
-          // if wrapper.onDelete is called, HeroComponent.delete event must have been raised
-          //console.log('HeroWrapper.onDelete called');
-          expect(true).toEqual(true);
+      let template =
+        `<div>
+          <button id="update" (click)="onUpdate()" [disabled]="!hero">Update</button>
+          <input [(ng-model)]="hero.name"/>
+        </div>`
+
+      tcb
+        .overrideTemplate(HeroDetailComponent, template)
+        .createAsync(HeroDetailComponent)
+        .then((rootTC: RTC) => {
+
+          let hdc: HeroDetailComponent = rootTC.componentInstance;
+          hdc.hero = new Hero('Cat Woman', 42);
+          let origNameLength = hdc.hero.name.length;
+
+          // trigger the 'click' event on the HeroDetailComponent update button
+          rootTC.query(By.css('#update')).triggerEventHandler('click');
+
+          expect(hdc.hero.name.length).toBeGreaterThan(origNameLength);
           done();
-        }
-        // hc.onDelete();
-        // done();
-      });
-  }), 500); // needs some time for event to complete; 100ms is not long enough
+        });
+    }));
 
-  it('update button should modify hero', injectTcb( (tcb, done) => {
+    it('Entering hero name in textbox changes hero', injectTcb((tcb, done) => {
 
-     tcb
-      .createAsync(TestWrapper)
-      .then((rootTC:RTC) => {
+      let hdc: HeroDetailComponent
+      let template = `<input [(ng-model)]="hero.name"/>`
 
-        let hc:HeroDetailComponent = rootTC.componentViewChildren[0].componentInstance;
-        let hw:TestWrapper = rootTC.componentInstance;
-        let origNameLength = hw.currentHero.name.length;
+      tcb
+        .overrideTemplate(HeroDetailComponent, template)
+        .createAsync(HeroDetailComponent)
+        .then((rootTC: RTC) => {
 
-        rootTC.detectChanges(); // trigger view binding
+          hdc = rootTC.componentInstance;
+          hdc.hero = new Hero('Cat Woman');
 
-        // We can EITHER invoke HeroComponent update button handler OR
-        // trigger the 'click' event on the HeroComponent update button
-        // BUT DON'T DO BOTH
+          rootTC.detectChanges();
+          // get the element and change its value
+          var input = rootTC.query(By.css('input')).nativeElement;
+          input.value = "Dog Man"
+          dispatchEvent(input, 'change'); // push it
 
-        // Trigger event
-        // FRAGILE because assumes precise knowledge of HeroComponent template
-        rootTC.componentViewChildren[0]
-          .componentViewChildren[2]
-          .triggerEventHandler('click', {});
+          // return rootTC; // if needed downstream, which it isn't here
+        })
+        .then(rootTick) // wait a tick for the event
+        .then(() => {
+          expect(hdc.hero.name).toEqual('Dog Man');
+          done();
+        })
+    }));
 
-        // hc.onUpdate(); // Invoke button handler
-        expect(hw.currentHero.name.length).toBeGreaterThan(origNameLength);
-        done();
-      });
-  }));
+    // Simulates ...
+    // 1. change a hero
+    // 2. select a different hero
+    // 3  re-select the first hero
+    // 4. confirm that the change is preserved in HTML
+    it('toggling heroes after modifying name preserves the change', injectTcb((tcb, done) => {
 
+      let hdc: HeroDetailComponent;
+      let hero1 = new Hero('Cat Woman');
+      let hero2 = new Hero('Goat Boy');
+      let input: HTMLInputElement;
+      let rootTC: RTC;
+      let template = `<input [(ng-model)]="hero.name"/>`
+
+      tcb
+        .overrideTemplate(HeroDetailComponent, template)
+        .createAsync(HeroDetailComponent)
+        .then((rtc: RTC) => {
+          rootTC = rtc;
+          hdc = rootTC.componentInstance;
+          hdc.hero = hero1; // start with hero1
+          rootTC.detectChanges();
+          // get the element and change its value
+          input = rootTC.query(By.css('input')).nativeElement;
+          input.value = "Dog Man"
+          dispatchEvent(input, 'change'); // push it
+        })
+        .then(rootTick) // wait a tick for the event
+        .then(() => {
+          hdc.hero = hero2 // switch to hero2
+          rootTC.detectChanges();
+        })
+        .then(rootTick)
+        .then(() => {
+          hdc.hero = hero1  // switch back to hero1
+          rootTC.detectChanges();
+        })
+        .then(rootTick)
+        .then(() => {
+          // model value will be the same changed value (of course)
+          expect(hdc.hero.name).toEqual('Dog Man');
+          // the view should reflect the same changed value
+          expect(input.value).toEqual('Dog Man'); // fails in alpha36; should be fixed in alpha37
+          done();
+        })
+    }));
+  });
 });
