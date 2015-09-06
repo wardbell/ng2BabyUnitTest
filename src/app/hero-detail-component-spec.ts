@@ -7,7 +7,7 @@ beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ RootTestComponent as RT
 beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
 } from 'angular2/test';
 
-import {dispatchEvent, injectAsync, injectTcb, rootTick} from 'test-helpers/test-helpers';
+import {dispatchEvent, injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroDetailComponent} from './hero-detail-component';
@@ -107,17 +107,21 @@ describe('HeroDetailComponent', () => {
         .then((rootTC: RTC) => {
 
           hdc = rootTC.componentInstance;
-          hdc.hero = new Hero('Cat Woman');
 
+          hdc.hero = new Hero('Cat Woman');
           rootTC.detectChanges();
-          // get the element and change its value
+
+          // get the HTML element and change its value in the DOM
           var input = rootTC.query(By.css('input')).nativeElement;
           input.value = "Dog Man"
-          dispatchEvent(input, 'change'); // push it
+          dispatchEvent(input, 'change'); // event triggers Ng to update model
 
-          // return rootTC; // if needed downstream, which it isn't here
+          rootTC.detectChanges();
+          // model update hasn't happened yet, despite `detectChanges`
+          expect(hdc.hero.name).toEqual('Cat Woman');
+
         })
-        .then(rootTick) // wait a tick for the event
+        .then(tick) // must wait a tick for the model update
         .then(() => {
           expect(hdc.hero.name).toEqual('Dog Man');
           done();
@@ -129,14 +133,16 @@ describe('HeroDetailComponent', () => {
     // 2. select a different hero
     // 3  re-select the first hero
     // 4. confirm that the change is preserved in HTML
-    it('toggling heroes after modifying name preserves the change', injectTcb((tcb, done) => {
+    // Reveals 2-way binding bug in alpha-36, fixed in pull #3715 for alpha-37
+
+    it('toggling heroes after modifying name preserves the change on screen', injectTcb((tcb, done) => {
 
       let hdc: HeroDetailComponent;
-      let hero1 = new Hero('Cat Woman');
-      let hero2 = new Hero('Goat Boy');
+      let hero1 = new Hero('Cat Woman', 1);
+      let hero2 = new Hero('Goat Boy', 2);
       let input: HTMLInputElement;
       let rootTC: RTC;
-      let template = `<input [(ng-model)]="hero.name"/>`
+      let template = `{{hero.id}} - <input [(ng-model)]="hero.name"/>`
 
       tcb
         .overrideTemplate(HeroDetailComponent, template)
@@ -144,29 +150,31 @@ describe('HeroDetailComponent', () => {
         .then((rtc: RTC) => {
           rootTC = rtc;
           hdc = rootTC.componentInstance;
+
           hdc.hero = hero1; // start with hero1
           rootTC.detectChanges();
-          // get the element and change its value
+
+          // get the HTML element and change its value in the DOM
           input = rootTC.query(By.css('input')).nativeElement;
           input.value = "Dog Man"
-          dispatchEvent(input, 'change'); // push it
+          dispatchEvent(input, 'change'); // event triggers Ng to update model
         })
-        .then(rootTick) // wait a tick for the event
+        .then(tick) // must wait a tick for the model update
         .then(() => {
+          expect(hdc.hero.name).toEqual('Dog Man');
+
           hdc.hero = hero2 // switch to hero2
           rootTC.detectChanges();
-        })
-        .then(rootTick)
-        .then(() => {
+
           hdc.hero = hero1  // switch back to hero1
           rootTC.detectChanges();
-        })
-        .then(rootTick)
-        .then(() => {
+
           // model value will be the same changed value (of course)
           expect(hdc.hero.name).toEqual('Dog Man');
+
           // the view should reflect the same changed value
           expect(input.value).toEqual('Dog Man'); // fails in alpha36; should be fixed in alpha37
+
           done();
         })
     }));

@@ -50,7 +50,23 @@ export function dispatchEvent(element: Element, eventType: string) {
   DOM.dispatchEvent(element, DOM.createEvent(eventType));
 }
 
-export function rootTick(rootTC: RootTestComponent, millis: number = 0){
+// Let time pass so that DOM or Ng can react
+// returns a promise that returns the RootTestComponent (if it was passed int)
+// after delaying for [millis] which is zero by default.
+// Usage:
+//     ...
+//     return rootTC;  // optional
+//   })
+//   .then(tick)
+//   .then(rootTC => { .. do something ..});
+//
+//   /* with non-zero delay but no rootTC */
+//     ...
+//   })
+//   .then(rootTC => tick(rootTC, 10)) // ten milliseconds pass
+//   .then(rootTC => { .. do something ..});
+//
+export function tick(rootTC: RootTestComponent, millis: number = 0){
   return new Promise<RootTestComponent>((resolve, reject) =>{
     setTimeout(() => resolve(rootTC), millis);
   });

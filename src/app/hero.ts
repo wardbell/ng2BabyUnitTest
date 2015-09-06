@@ -27,4 +27,8 @@ export class Hero {
 	clone() {
 		return new Hero(this);
 	}
+
+	static setNextId(next:number) {
+		nextId = next;
+	}
 }
