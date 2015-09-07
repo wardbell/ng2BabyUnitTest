@@ -9,15 +9,31 @@ TestComponentBuilder,
 
 import {DOM} from 'angular2/src/dom/dom_adapter';
 
-export function injectAsync(testFn: (done: () => void) => void) {
-  return inject([AsyncTestCompleter], function injectWrapper(async: AsyncTestCompleter) {
-    testFn(async.done.bind(async));
+export type DoneFn = (done?:any) => void;
+
+// Run an async test within the Angular test bed
+// Example
+//    it('async test', (done:DoneFn)=> {/* your test here */});
+//
+// May proceed the test fn with some injectables which will be passed as args AFTER the done
+// Example:
+//    it('async test w/ injectables', [HeroService], (done:DoneFn, service:HeroService) => {/* your test here */});
+export function injectAsync(dependencies: any[] | DoneFn, testFn?: (done: DoneFn, ...args:any[]) => void) {
+  if (typeof dependencies === 'function' ){
+    testFn = <DoneFn>dependencies;
+    dependencies = [];
+  }
+
+  return inject([AsyncTestCompleter, ...(<[]><any>dependencies)], function injectWrapper(async: AsyncTestCompleter, ...args:any[]) {
+    testFn(async.done.bind(async), ...args);
   });
 }
-export function injectTcb(testFn: (tcb: TestComponentBuilder, done: () => void) => void) {
-  return inject([TestComponentBuilder, AsyncTestCompleter], function injectWrapper(tcb: TestComponentBuilder, async: AsyncTestCompleter) {
-    testFn(tcb, async.done.bind(async));
-  });
+
+// Run an async component test within Angular test bed using TestComponentBuilder
+// Example
+//    it('async Component test', (done:DoneFn, tcb: TestComponentBuilder) => {/* your test here */});
+export function injectTcb(testFn: (done: DoneFn, tcb: TestComponentBuilder) => void) {
+  return injectAsync([TestComponentBuilder], testFn);
 }
 
 export function getViewChildHtml(rootTC: RootTestComponent, elIndex: number = 0) {

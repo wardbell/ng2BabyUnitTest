@@ -39,9 +39,13 @@
 
           'test-helpers/dom-setup', // Essential for specs that touch the DOM
 
-          'app/hero-service-spec',
+          'app/hero-service-no-ng-spec',
+          'app/hero-service-ng-spec',
+
           'app/heroes-component-spec',
           'app/hero-detail-component-spec',
+
+          '@empty' // safe sentinel
 
         ].map(function(spec) {return System.import(spec);});
 

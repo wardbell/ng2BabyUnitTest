@@ -1,10 +1,10 @@
 ///// Boiler Plate ////
 import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2';
 
+// Angular 2 Test Bed
 import {
-beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ RootTestComponent as RTC,
-// Jasmine overrides
-beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
+  beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ RootTestComponent as RTC,
+  beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
 import {dispatchEvent, injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
@@ -48,7 +48,7 @@ describe('HeroDetailComponent', () => {
   /////////// Component tests that check the DOM /////////////
   describe('(DOM)', () => {
 
-    it('Delete button should raise delete event', injectTcb((tcb, done) => {
+    it('Delete button should raise delete event', injectTcb((done, tcb) => {
 
       // We only care about the button
       let template = '<button (click)="onDelete()">Delete</button>';
@@ -71,7 +71,7 @@ describe('HeroDetailComponent', () => {
 
     }));
 
-    it('Update button should modify hero', injectTcb((tcb, done) => {
+    it('Update button should modify hero', injectTcb((done, tcb) => {
 
       let template =
         `<div>
@@ -96,7 +96,7 @@ describe('HeroDetailComponent', () => {
         });
     }));
 
-    it('Entering hero name in textbox changes hero', injectTcb((tcb, done) => {
+    it('Entering hero name in textbox changes hero', injectTcb((done, tcb) => {
 
       let hdc: HeroDetailComponent
       let template = `<input [(ng-model)]="hero.name"/>`
@@ -135,7 +135,7 @@ describe('HeroDetailComponent', () => {
     // 4. confirm that the change is preserved in HTML
     // Reveals 2-way binding bug in alpha-36, fixed in pull #3715 for alpha-37
 
-    it('toggling heroes after modifying name preserves the change on screen', injectTcb((tcb, done) => {
+    it('toggling heroes after modifying name preserves the change on screen', injectTcb((done, tcb) => {
 
       let hdc: HeroDetailComponent;
       let hero1 = new Hero('Cat Woman', 1);

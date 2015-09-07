@@ -1,10 +1,10 @@
 ///// Boiler Plate ////
 import {bind} from 'angular2/angular2';
 
+// Angular 2 Test Bed
 import {
-beforeEachBindings, By, DebugElement, RootTestComponent as RTC,
-// Jasmine overrides
-beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
+  beforeEachBindings, By, DebugElement, RootTestComponent as RTC,
+  beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
 import {expectSelectedHtml, expectViewChildHtml, injectAsync, injectTcb} from 'test-helpers/test-helpers';
@@ -100,7 +100,7 @@ describe('HeroesComponent', () => {
       bind(User).toValue(mockUser)
     ]);
 
-    it('can be created', injectTcb((tcb, done) => {
+    it('can be created', injectTcb((done, tcb) => {
       let template = '<h1>Nuts</h1>';
       tcb
         .overrideTemplate(HeroesComponent, template)
@@ -109,7 +109,7 @@ describe('HeroesComponent', () => {
         .catch(fail).then(done, done);
     }));
 
-    it('binds view to userName', injectTcb((tcb, done) => {
+    it('binds view to userName', injectTcb((done, tcb) => {
       let template = `<h1>{{userName}}'s Heroes</h1>`;
       tcb
         .overrideTemplate(HeroesComponent, template)
@@ -128,7 +128,7 @@ describe('HeroesComponent', () => {
 
     describe('#heroes', () => {
 
-      it('binds view to heroes', injectTcb((tcb, done) => {
+      it('binds view to heroes', injectTcb((done, tcb) => {
         mockHeroData.length = 3; // only need a few
 
         // focus on the part of the template that displays heroes

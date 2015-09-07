@@ -1,10 +1,10 @@
 ///// Boiler Plate ////
 import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2';
 
+// Angular 2 Test Bed
 import {
   beforeEachBindings, By, DebugElement, RootTestComponent as RTC,
-  // Jasmine overrides
-  beforeEach, ddescribe, xdescribe, describe, iit, it, xit //expect,
+  beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
 import {injectAsync, injectTcb} from 'test-helpers/test-helpers';
@@ -20,7 +20,7 @@ describe('HeroDetailComponent', () => {
     expect(hc instanceof HeroDetailComponent).toEqual(true); // proof of life
   });
 
-  it('parent "currentHero" flows down to HeroDetailComponent', injectTcb( (tcb, done) => {
+  it('parent "currentHero" flows down to HeroDetailComponent', injectTcb( (done, tcb) => {
     tcb
       .createAsync(TestWrapper)
       .then((rootTC:RTC) => {
@@ -34,7 +34,7 @@ describe('HeroDetailComponent', () => {
       });
   }));
 
-  it('delete button should raise delete event for parent component', injectTcb( (tcb, done) => {
+  it('delete button should raise delete event for parent component', injectTcb( (done, tcb) => {
 
     tcb
       //.overrideTemplate(HeroDetailComponent, '<button (click)="onDelete()" [disabled]="!hero">Delete</button>')
@@ -75,7 +75,7 @@ describe('HeroDetailComponent', () => {
       });
   }), 500); // needs some time for event to complete; 100ms is not long enough
 
-  it('update button should modify hero', injectTcb( (tcb, done) => {
+  it('update button should modify hero', injectTcb( (done, tcb) => {
 
      tcb
       .createAsync(TestWrapper)
