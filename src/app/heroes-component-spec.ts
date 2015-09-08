@@ -154,6 +154,23 @@ describe('HeroesComponent', () => {
 
     });
 
+    describe('#onSelected (TBD)', () => {
+      // focus on the part of the template that displays heroes
+      let template =
+        `<ul>
+          <li *ng-for="#h of heroes">({{h.id}}) {{h.name}}</li>
+        </ul>`;
+        
+      beforeEach(() => {
+        heroData.length = 3; // only need a few
+      })
+
+      xit('the "currentHero" is null/undefined before getting heroes');
+      xit('the "currentHero" is null/undefined when the heroes list is empty');
+      xit('the "currentHero" has the "selected" class');
+      xit('a non-selected hero does not have the "selected" class');
+    });
+
   });
 
 });
