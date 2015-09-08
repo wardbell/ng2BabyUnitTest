@@ -57,7 +57,7 @@ describe('HeroService (with angular DI)', () => {
     describe('#getAllHeroes', () => {
 
       it('returns expected # of heroes when ready',
-        inject([HeroService, AsyncTestCompleter], (service: HeroService, async: AsyncTestCompleter) => {
+        inject([AsyncTestCompleter, HeroService], (async: AsyncTestCompleter, service: HeroService) => {
 
         var done = async.done.bind(async);
 
@@ -69,7 +69,9 @@ describe('HeroService (with angular DI)', () => {
 
       it('returns no heroes when source data are empty',
         injectAsync([HeroService], (done: DoneFn, service: HeroService) => {
-        //inject([HeroService, AsyncTestCompleter], (service: HeroService, async: AsyncTestCompleter) => {
+        // Replaces:
+        //   inject([AsyncTestCompleter, HeroService], (async: AsyncTestCompleter, service: HeroService) => {
+        //     var done = async.done.bind(async);
 
         heroData = []; // simulate no heroes from the backend
 
