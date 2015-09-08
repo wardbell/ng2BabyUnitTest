@@ -9,6 +9,8 @@ TestComponentBuilder,
 
 import {DOM} from 'angular2/src/dom/dom_adapter';
 
+///////// test-lib `inject` wrappers  /////////
+
 export type DoneFn = (done?:any) => void;
 
 // Run an async test within the Angular test bed
@@ -56,6 +58,26 @@ export function injectTcb(
   return injectAsync([TestComponentBuilder, ...(<[]><any>dependencies)], testFn);
 }
 
+///////// inspectors and expectations /////////
+
+export function getSelectedHtml(rootTC: RootTestComponent, selector: string) {
+  var debugElement = rootTC.query(By.css(selector));
+  return debugElement && debugElement.nativeElement && debugElement.nativeElement.innerHTML;
+}
+
+export function expectSelectedHtml(rootTC: RootTestComponent, selector: string) {
+  return expect(getSelectedHtml(rootTC, selector));
+}
+
+export function getSelectedClassName(rootTC: RootTestComponent, selector: string) {
+  var debugElement = rootTC.query(By.css(selector));
+  return debugElement && debugElement.nativeElement && debugElement.nativeElement.className;
+}
+
+export function expectSelectedClassName(rootTC: RootTestComponent, selector: string) {
+  return expect(getSelectedClassName(rootTC, selector));
+}
+
 export function getViewChildHtml(rootTC: RootTestComponent, elIndex: number = 0) {
   let child = rootTC.componentViewChildren[elIndex];
   return child && child.nativeElement && child.nativeElement.innerHTML
@@ -68,15 +90,6 @@ export function expectViewChildHtml(rootTC: RootTestComponent, elIndex: number =
 export function expectViewChildClass(rootTC: RootTestComponent, elIndex: number = 0) {
   let child = rootTC.componentViewChildren[elIndex];
   return expect(child && child.nativeElement && child.nativeElement.className);
-}
-
-export function getSelectedHtml(rootTC: RootTestComponent, selector: string) {
-  var debugElement = rootTC.query(By.css(selector));
-  return debugElement && debugElement.nativeElement && debugElement.nativeElement.innerHTML;
-}
-
-export function expectSelectedHtml(rootTC: RootTestComponent, selector: string) {
-  return expect(getSelectedHtml(rootTC, selector));
 }
 
 ///////// Coming in alpha-37 //////////

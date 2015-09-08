@@ -1,4 +1,4 @@
-import {Component, NgFor, NgIf, View} from 'angular2/angular2';
+import {Component, NgClass, NgFor, NgIf, View} from 'angular2/angular2';
 import {HeroDetailComponent} from './hero-detail-component';
 import {HeroService} from './hero-service';
 import {Hero} from './hero';
@@ -9,7 +9,7 @@ import {User} from './user';
 })
 @View({
   templateUrl: 'app/heroes-component.html',
-  directives: [HeroDetailComponent, NgFor, NgIf],
+  directives: [HeroDetailComponent, NgClass, NgFor, NgIf],
   styleUrls: ['app/heroes-component.css']
 })
 export class HeroesComponent {
@@ -39,6 +39,10 @@ export class HeroesComponent {
   onRefresh() {
     this._getAllHeroes(true /*force*/);
     console.log('Refreshing heroes');
+  }
+
+  getSelectedClass(hero: Hero) {
+    return { 'selected': hero === this.currentHero };
   }
 
   get userName() { return this._user.name || 'someone'; }

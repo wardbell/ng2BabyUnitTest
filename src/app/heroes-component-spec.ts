@@ -3,11 +3,16 @@ import {bind} from 'angular2/angular2';
 
 // Angular 2 Test Bed
 import {
-  beforeEachBindings, By, DebugElement, RootTestComponent as RTC,
+  beforeEachBindings, By, DebugElement, RootTestComponent as RTC, TestComponentBuilder,
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
-import {expectSelectedHtml, expectViewChildHtml, injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
+import {
+  DoneFn,
+  expectSelectedHtml,
+  expectViewChildHtml,
+  expectViewChildClass,
+  injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroesComponent} from './heroes-component';
@@ -155,20 +160,74 @@ describe('HeroesComponent', () => {
     });
 
     describe('#onSelected (TBD)', () => {
-      // focus on the part of the template that displays heroes
-      let template =
-        `<ul>
-          <li *ng-for="#h of heroes">({{h.id}}) {{h.name}}</li>
-        </ul>`;
-        
+
       beforeEach(() => {
         heroData.length = 3; // only need a few
       })
 
-      xit('the "currentHero" is null/undefined before getting heroes');
-      xit('the "currentHero" is null/undefined when the heroes list is empty');
-      xit('the "currentHero" has the "selected" class');
-      xit('a non-selected hero does not have the "selected" class');
+      let hc: HeroesComponent;
+
+      // The same setup for every test in this suite
+      function injectHC(testFn: (rootTC: RTC) => void) {
+        // focus on the part of the template that displays heroes
+        let template =
+//            [ng-class]="getSelectedClass(hero)"
+          `<ul><li *ng-for="#hero of heroes"
+
+            (click)="onSelect(hero)">
+            ({{hero.id}}) {{hero.name}}
+           </li></ul>`;
+
+        return injectTcb((done, tcb) => {
+          tcb
+          .overrideTemplate(HeroesComponent, template)
+          .createAsync(HeroesComponent)
+          .then((rootTC:RTC) => {
+            hc = rootTC.componentInstance;
+            rootTC.detectChanges();// trigger {{heroes}} binding which triggers async getAllHeroes
+            return rootTC;
+          })
+          .then((rootTC:RTC) => { // wait a tick until heroes are fetched
+            rootTC.detectChanges(); // show the list
+            testFn(rootTC);
+          })
+          .catch(fail).then(done, done);
+        })
+      }
+
+      it('the first hero is selected by default', injectHC((rootTC:RTC) => {
+        expect(hc.currentHero).toEqual(heroData[0]);
+      }));
+
+      it('sets the "currentHero"', injectHC((rootTC:RTC) => {
+        hc.onSelect(heroData[1]); // select the second hero
+        expect(hc.currentHero).toEqual(heroData[1]);
+      }));
+
+      it('the "currentHero" has the "selected" class', injectHC((rootTC:RTC) => {
+        hc.onSelect(heroData[1]); // select the second hero
+
+        // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
+        // WITH EXCEPTION:
+        //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."
+        rootTC.detectChanges();
+
+        // The 3rd ViewChild is 2nd hero; the 1st is for the template
+        expectViewChildClass(rootTC, 2).toMatch('selected');
+      }));
+
+      it('a non-selected hero does NOT have the "selected" class', injectHC((rootTC:RTC) => {
+        hc.onSelect(heroData[1]); // select the second hero
+
+        // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
+        // WITH EXCEPTION:
+        //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."
+        rootTC.detectChanges();
+
+        // The 4th ViewChild is 3rd hero; the 1st is for the template
+        expectViewChildClass(rootTC, 4).not.toMatch('selected');
+      }));
+
     });
 
   });
