@@ -19,8 +19,8 @@ import {Backend} from './backend';
 
 function happyBackendFactory() {
   return {
-      fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData.slice())
-    };
+    fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData.slice())
+  };
 }
 
 function throwingBackendFactory() {

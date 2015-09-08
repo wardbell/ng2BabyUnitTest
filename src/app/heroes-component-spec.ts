@@ -7,7 +7,7 @@ import {
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
-import {expectSelectedHtml, expectViewChildHtml, injectAsync, injectTcb} from 'test-helpers/test-helpers';
+import {expectSelectedHtml, expectViewChildHtml, injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroesComponent} from './heroes-component';
@@ -16,60 +16,54 @@ import {HeroService} from './hero-service';
 import {HEROES} from './mock-heroes';
 import {User} from './user';
 
+let heroData: Hero[]; // fresh heroes for each test
+let mockUser: User;
+
 describe('HeroesComponent', () => {
 
-  let mockHeroData: Hero[];
-  let mockHero: Hero;
-  let mockService: any; // too hard to maintain type safety on this mock
-  let mockUser: User;
-
   beforeEach(() => {
-    mockHeroData = HEROES.map(h => h.clone());
-    mockHero = mockHeroData[0];
-    mockService = MockDataserviceFactory();
+    heroData = HEROES.map(h => h.clone()); // Clean copy of the mock HEROES
     mockUser = new User();
   });
 
   /////////// Component Tests without DOM interaction /////////////
   describe('(No DOM)', () => {
+    let hc:HeroesComponent;
+
+    beforeEach(()=> {
+      hc = new HeroesComponent(<any>new HappyHeroService(), mockUser)
+    });
 
     it('can be created', () => {
-      let hc = new HeroesComponent(mockService, mockUser)
       expect(hc instanceof HeroesComponent).toEqual(true); // proof of life
     });
 
     it('has expected userName', () => {
-      let hc = new HeroesComponent(mockService, mockUser)
       expect(hc.userName).toEqual(mockUser.name);
     });
 
     describe('#heroes', () => {
 
       it('lacks heroes when created', () => {
-        let hc = new HeroesComponent(mockService, mockUser)
         let heroes = hc.heroes; // trigger service
         expect(heroes.length).toEqual(0); // not filled yet
       });
 
       it('has heroes after cache loaded', injectAsync(done => {
-        let hc = new HeroesComponent(mockService, mockUser)
         let heroes = hc.heroes; // trigger service
 
-        // Wait for them ...
-        mockService.getAllHeroesPromise(0)
+        tick() // Wait for heroes to arrive
           .then(() => {
             heroes = hc.heroes; // now the component has heroes to show
-            expect(heroes.length).toEqual(mockHeroData.length);
+            expect(heroes.length).toEqual(heroData.length);
           })
           .catch(fail).then(done, done);
       }));
 
       it('restores heroes after refresh called', injectAsync(done => {
-        let hc = new HeroesComponent(mockService, mockUser)
         let heroes = hc.heroes; // trigger service
 
-        // Wait for them ...
-        mockService.getAllHeroesPromise(0)
+        tick() // Wait for heroes to arrive
           .then(() => {
             heroes = hc.heroes; // now the component has heroes to show
             heroes[0].name = 'Wotan';
@@ -79,7 +73,7 @@ describe('HeroesComponent', () => {
           .then(() => {
             heroes = hc.heroes; // get it again (don't reuse old array!)
             expect(heroes[0]).not.toEqual('Wotan'); // change reversed
-            expect(heroes.length).toEqual(mockHeroData.length); // orig num of heroes
+            expect(heroes.length).toEqual(heroData.length); // orig num of heroes
           })
           .catch(fail).then(done, done);
       }));
@@ -96,7 +90,7 @@ describe('HeroesComponent', () => {
     // Set up DI bindings required by component (and its nested components?)
     // else hangs silently forever
     beforeEachBindings(() => [
-      bind(HeroService).toFactory(MockDataserviceFactory),
+      bind(HeroService).toClass(HappyHeroService),
       bind(User).toValue(mockUser)
     ]);
 
@@ -117,7 +111,6 @@ describe('HeroesComponent', () => {
         .then((rootTC: RTC) => {
           let hc: HeroesComponent = rootTC.componentInstance;
 
-
           rootTC.detectChanges(); // trigger component property binding
           expectSelectedHtml(rootTC, 'h1').toMatch(hc.userName);
           expectViewChildHtml(rootTC).toMatch(hc.userName);
@@ -129,7 +122,7 @@ describe('HeroesComponent', () => {
     describe('#heroes', () => {
 
       it('binds view to heroes', injectTcb((done, tcb) => {
-        mockHeroData.length = 3; // only need a few
+        heroData.length = 3; // only need a few
 
         // focus on the part of the template that displays heroes
         let template =
@@ -149,12 +142,12 @@ describe('HeroesComponent', () => {
           .then((rootTC: RTC) => {
             let hc: HeroesComponent = rootTC.componentInstance;
             // now heroes are available for binding
-            expect(hc.heroes.length).toEqual(mockHeroData.length);
+            expect(hc.heroes.length).toEqual(heroData.length);
 
             rootTC.detectChanges(); // trigger component property binding
 
             // confirm hero list is displayed by looking for a known hero
-            expect(rootTC.nativeElement.innerHTML).toMatch(mockHero.name);
+            expect(rootTC.nativeElement.innerHTML).toMatch(heroData[0].name);
           })
           .catch(fail).then(done, done);
       }));
@@ -163,36 +156,18 @@ describe('HeroesComponent', () => {
 
   });
 
-  ////// Helpers //////
-
-  function MockDataserviceFactory() {
-
-    // Mock the HeroService members we think will matter
-    let mock = jasmine.createSpyObj('HeroService',
-      ['getAllHeroes', 'removeHero']);
-
-    mock.getAllHeroes.and.callFake((force: boolean) => {
-      return Promise.resolve<Hero[]>(mockHeroData.map(h => h.clone()));
-    });
-
-    mock.removeHero.and.callFake((hero: Hero) => {
-      let ix = mockHeroData.indexOf(hero);
-      if (ix > -1) {
-        mockHeroData.splice(ix, 1);
-        return true;
-      } else {
-        return false;
-      }
-    });
-
-    // make it easy to wait on a promise from any of these calls
-
-    mock.getAllHeroesPromise = (callNum = 0) => {
-      var call = mock.getAllHeroes.calls.all()[callNum];
-      return <Promise<Hero[]>>call && call.returnValue;
-    }
-
-    return mock;
-  }
-
 });
+
+////// Helpers //////
+
+class HappyHeroService {
+
+  cachedHeroes: Hero[];
+
+  getAllHeroes(force: boolean = false) {
+    if (force || !this.cachedHeroes) {
+      this.cachedHeroes = heroData.slice();
+    }
+    return Promise.resolve<Hero[]>(this.cachedHeroes)
+  }
+}

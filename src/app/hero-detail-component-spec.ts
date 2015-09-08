@@ -3,7 +3,7 @@ import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'a
 
 // Angular 2 Test Bed
 import {
-  beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ RootTestComponent as RTC,
+  beforeEachBindings, By, DebugElement, /*dispatchEvent - should be here but isn't,*/ RootTestComponent as RTC,
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
