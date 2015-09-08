@@ -6,7 +6,8 @@ import {Hero} from './hero';
 })
 @View({
   templateUrl: 'app/hero-detail-component.html',
-  directives: [FORM_DIRECTIVES]
+  directives: [FORM_DIRECTIVES],
+  styleUrls: ['app/hero-detail-component.css']
 })
 export class HeroDetailComponent {
   hero: Hero;
