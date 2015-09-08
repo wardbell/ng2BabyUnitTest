@@ -87,23 +87,25 @@ export function dispatchEvent(element: Element, eventType: string) {
 }
 
 // Let time pass so that DOM or Ng can react
-// returns a promise that returns the RootTestComponent (if it was passed int)
+// returns a promise that returns ("passes through")
+// the value resolved in the previous `then` (if any)
 // after delaying for [millis] which is zero by default.
-// Usage:
+// Example (passing along the rootTC w/ no delay):
 //     ...
 //     return rootTC;  // optional
 //   })
 //   .then(tick)
-//   .then(rootTC => { .. do something ..});
+//   .then(rootTC:RTC => { .. do something ..});
 //
-//   /* with non-zero delay but no rootTC */
+// Example (passing along nothing in particular w/ 10ms delay):
 //     ...
+//     // don't care if it returns something or not
 //   })
-//   .then(rootTC => tick(rootTC, 10)) // ten milliseconds pass
-//   .then(rootTC => { .. do something ..});
+//   .then(_ => tick(_, 10)) // ten milliseconds pass
+//   .then(() => { .. do something ..});
 //
-export function tick(rootTC?: RootTestComponent, millis: number = 0){
-  return new Promise<RootTestComponent>((resolve, reject) =>{
-    setTimeout(() => resolve(rootTC), millis);
+export function tick(passThru?: any, millis: number = 0){
+  return new Promise((resolve, reject) =>{
+    setTimeout(() => resolve(passThru), millis);
   });
 }
