@@ -13,12 +13,17 @@ export type DoneFn = (done?:any) => void;
 
 // Run an async test within the Angular test bed
 // Example
-//    it('async test', (done:DoneFn)=> {/* your test here */});
+//    it('async test', (done:DoneFn) => {/* your test here */});
 //
-// May proceed the test fn with some injectables which will be passed as args AFTER the done
+// May precede the test fn with some injectables which will be passed as args AFTER the done
 // Example:
-//    it('async test w/ injectables', [HeroService], (done:DoneFn, service:HeroService) => {/* your test here */});
-export function injectAsync(dependencies: any[] | DoneFn, testFn?: (done: DoneFn, ...args:any[]) => void) {
+//    it('async test w/ injectables', [HeroService], (done:DoneFn, service:HeroService) => {
+//      /* your test here */
+//    });
+export function injectAsync(
+  dependencies: any[] | DoneFn,
+  testFn?: (done: DoneFn, ...args:any[]) => void) {
+
   if (typeof dependencies === 'function' ){
     testFn = <DoneFn>dependencies;
     dependencies = [];
@@ -29,11 +34,26 @@ export function injectAsync(dependencies: any[] | DoneFn, testFn?: (done: DoneFn
   });
 }
 
+type TCBFn = (done:DoneFn, tcb: TestComponentBuilder) => void;
+
 // Run an async component test within Angular test bed using TestComponentBuilder
 // Example
 //    it('async Component test', (done:DoneFn, tcb: TestComponentBuilder) => {/* your test here */});
-export function injectTcb(testFn: (done: DoneFn, tcb: TestComponentBuilder) => void) {
-  return injectAsync([TestComponentBuilder], testFn);
+//
+// May precede the test fn with some injectables which will be passed as args AFTER the TestComponentBuilder
+// Example:
+//    it('async Component test w/ injectables', [HeroService], (done:DoneFn, tcb:TestComponentBuilder. service:HeroService) => {
+//      /* your test here */
+//    });
+export function injectTcb(
+  dependencies: any[] | TCBFn,
+  testFn?: (done: DoneFn, tcb: TestComponentBuilder, ...args:any[]) => void) {
+
+  if (typeof dependencies === 'function' ){
+    testFn = <TCBFn>dependencies;
+    dependencies = [];
+  }
+  return injectAsync([TestComponentBuilder, ...(<[]><any>dependencies)], testFn);
 }
 
 export function getViewChildHtml(rootTC: RootTestComponent, elIndex: number = 0) {
@@ -82,7 +102,7 @@ export function dispatchEvent(element: Element, eventType: string) {
 //   .then(rootTC => tick(rootTC, 10)) // ten milliseconds pass
 //   .then(rootTC => { .. do something ..});
 //
-export function tick(rootTC: RootTestComponent, millis: number = 0){
+export function tick(rootTC?: RootTestComponent, millis: number = 0){
   return new Promise<RootTestComponent>((resolve, reject) =>{
     setTimeout(() => resolve(rootTC), millis);
   });
