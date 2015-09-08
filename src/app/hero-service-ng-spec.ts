@@ -99,7 +99,7 @@ describe('HeroService (with angular DI)', () => {
           })
           .catch(fail)
           .then(done, done);
-      });
+      }));
 
       it('re-execution w/ force=true returns new array w/ original data',
         injectAsync([HeroService], (done: DoneFn, service: HeroService) => {
@@ -119,7 +119,7 @@ describe('HeroService (with angular DI)', () => {
           })
           .catch(fail)
           .then(done, done);
-      });
+      }));
     });
 
     describe('#removeHero(hero)', () => {
@@ -189,9 +189,7 @@ describe('HeroService (with angular DI)', () => {
     });
 
     it('#fetchAllHeroesAsync fails with expected error',
-      inject([HeroService, AsyncTestCompleter], (service: HeroService, async: AsyncTestCompleter) => {
-
-      var done = async.done.bind(async);
+      injectAsync([HeroService], (done:DoneFn, service: HeroService) => {
 
       service.getAllHeroes()
         .then( _ => fail('getAllHeroes should have failed') )
