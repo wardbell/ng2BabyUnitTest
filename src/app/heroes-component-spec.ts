@@ -171,9 +171,9 @@ describe('HeroesComponent', () => {
       function injectHC(testFn: (rootTC: RTC) => void) {
         // focus on the part of the template that displays heroes
         let template =
-//            [ng-class]="getSelectedClass(hero)"
+//        This is the bad boy:   [ng-class]="getSelectedClass(hero)"
           `<ul><li *ng-for="#hero of heroes"
-
+            [ng-class]="getSelectedClass(hero)"
             (click)="onSelect(hero)">
             ({{hero.id}}) {{hero.name}}
            </li></ul>`;
@@ -188,6 +188,11 @@ describe('HeroesComponent', () => {
             return rootTC;
           })
           .then((rootTC:RTC) => { // wait a tick until heroes are fetched
+
+          // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
+          // WITH EXCEPTION:
+          //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."
+
             rootTC.detectChanges(); // show the list
             testFn(rootTC);
           })
@@ -204,26 +209,18 @@ describe('HeroesComponent', () => {
         expect(hc.currentHero).toEqual(heroData[1]);
       }));
 
-      it('the "currentHero" has the "selected" class', injectHC((rootTC:RTC) => {
+      it('the view of the "currentHero" has the "selected" class', injectHC((rootTC:RTC) => {
         hc.onSelect(heroData[1]); // select the second hero
 
-        // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
-        // WITH EXCEPTION:
-        //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."
         rootTC.detectChanges();
 
         // The 3rd ViewChild is 2nd hero; the 1st is for the template
         expectViewChildClass(rootTC, 2).toMatch('selected');
       }));
 
-      it('a non-selected hero does NOT have the "selected" class', injectHC((rootTC:RTC) => {
+      it('the view of a non-selected hero does NOT have the "selected" class', injectHC((rootTC:RTC) => {
         hc.onSelect(heroData[1]); // select the second hero
-
-        // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
-        // WITH EXCEPTION:
-        //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."
         rootTC.detectChanges();
-
         // The 4th ViewChild is 3rd hero; the 1st is for the template
         expectViewChildClass(rootTC, 4).not.toMatch('selected');
       }));
