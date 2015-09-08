@@ -1,4 +1,4 @@
-let nextId = 1;
+let nextId = 30;
 
 interface IHeroOptions {
 	id?: number, name?: string, power?: string, alterEgo?: string
