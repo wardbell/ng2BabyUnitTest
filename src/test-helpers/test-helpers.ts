@@ -13,6 +13,13 @@ import {DOM} from 'angular2/src/dom/dom_adapter';
 
 export type DoneFn = (done?:any) => void;
 
+// compensate for https://github.com/angular/angular.io/issues/204
+function getAsyncTestCompleterDone(async: AsyncTestCompleter){
+  var done = async.done.bind(async)
+  done.fail = (reason:any) => {fail(reason); done();}
+  return done;
+}
+
 // Run an async test within the Angular test bed
 // Example
 //    it('async test', (done:DoneFn) => {/* your test here */});
@@ -32,7 +39,7 @@ export function injectAsync(
   }
 
   return inject([AsyncTestCompleter, ...(<[]><any>dependencies)], function injectWrapper(async: AsyncTestCompleter, ...args:any[]) {
-    testFn(async.done.bind(async), ...args);
+    testFn(getAsyncTestCompleterDone(async), ...args);
   });
 }
 

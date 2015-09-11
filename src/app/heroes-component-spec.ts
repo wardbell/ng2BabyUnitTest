@@ -62,7 +62,7 @@ describe('HeroesComponent', () => {
             heroes = hc.heroes; // now the component has heroes to show
             expect(heroes.length).toEqual(heroData.length);
           })
-          .catch(fail).then(done, done);
+          .catch(fail).then(done);
       }));
 
       it('restores heroes after refresh called', injectAsync(done => {
@@ -80,7 +80,7 @@ describe('HeroesComponent', () => {
             expect(heroes[0]).not.toEqual('Wotan'); // change reversed
             expect(heroes.length).toEqual(heroData.length); // orig num of heroes
           })
-          .catch(fail).then(done, done);
+          .catch(fail).then(done);
       }));
     });
   });
@@ -105,7 +105,7 @@ describe('HeroesComponent', () => {
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
         .then((rootTC: RTC) => expect(true).toBe(true)) // proof of life
-        .catch(fail).then(done, done);
+        .catch(fail).then(done);
     }));
 
     it('binds view to userName', injectTcb((done, tcb) => {
@@ -120,7 +120,7 @@ describe('HeroesComponent', () => {
           expectSelectedHtml(rootTC, 'h1').toMatch(hc.userName);
           expectViewChildHtml(rootTC).toMatch(hc.userName);
         })
-        .catch(fail).then(done, done);
+        .catch(fail).then(done);
     }));
 
 
@@ -154,7 +154,7 @@ describe('HeroesComponent', () => {
             // confirm hero list is displayed by looking for a known hero
             expect(rootTC.nativeElement.innerHTML).toMatch(heroData[0].name);
           })
-          .catch(fail).then(done, done);
+          .catch(fail).then(done);
       }));
 
     });
@@ -196,7 +196,7 @@ describe('HeroesComponent', () => {
             rootTC.detectChanges(); // show the list
             testFn(rootTC);
           })
-          .catch(fail).then(done, done);
+          .catch(fail).then(done);
         })
       }
 

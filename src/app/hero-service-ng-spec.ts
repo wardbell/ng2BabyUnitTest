@@ -131,7 +131,7 @@ describe('HeroService (with angular DI)', () => {
             let wasRemoved = service.removeHero(existingHero);
             expect(wasRemoved).toEqual(true)
           })
-          .catch(fail).then(done, done);
+          .catch(fail).then(done);
       }));
 
       it('actually removed an existing hero from the cache',
@@ -141,7 +141,7 @@ describe('HeroService (with angular DI)', () => {
             service.removeHero(existingHero);
             expect(heroes).not.toContain(existingHero);
           })
-          .catch(fail).then(done, done);
+          .catch(fail).then(done);
 
       }));
 
@@ -164,7 +164,7 @@ describe('HeroService (with angular DI)', () => {
 //         service = hs;
 //         service.getAllHeroes()
 //         .then(heroes => cachedHeroes = heroes)
-//         .catch(fail).then(done, done)
+//         .catch(fail).then(done)
 //       }));
 //
 //       // the following tests can be synchronous because the tested `remove` method is synchronous
