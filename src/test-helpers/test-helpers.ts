@@ -1,13 +1,11 @@
 import {
-AsyncTestCompleter,
-By,
-DebugElement,
-inject,
-RootTestComponent,
-TestComponentBuilder,
+  AsyncTestCompleter,
+  By,
+  DebugElement,
+  inject,
+  RootTestComponent,
+  TestComponentBuilder,
 } from 'angular2/test';
-
-import {DOM} from 'angular2/src/dom/dom_adapter';
 
 ///////// test-lib `inject` wrappers  /////////
 
@@ -102,9 +100,9 @@ export function expectViewChildClass(rootTC: RootTestComponent, elIndex: number 
 ///////// Coming in alpha-37 //////////
 
 // src/test_lib/utils.ts
-export function dispatchEvent(element: Element, eventType: string) {
-  DOM.dispatchEvent(element, DOM.createEvent(eventType));
-}
+// export function dispatchEvent(element: Element, eventType: string) {
+//   DOM.dispatchEvent(element, DOM.createEvent(eventType));
+// }
 
 // Let time pass so that DOM or Ng can react
 // returns a promise that returns ("passes through")

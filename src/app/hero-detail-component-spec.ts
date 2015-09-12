@@ -3,11 +3,13 @@ import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'a
 
 // Angular 2 Test Bed
 import {
-  beforeEachBindings, By, DebugElement, /*dispatchEvent - should be here but isn't,*/ RootTestComponent as RTC,
+  beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ RootTestComponent as RTC,
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
-import {dispatchEvent, injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
+import {dispatchEvent} from 'angular2/src/test_lib/utils';
+
+import {injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroDetailComponent} from './hero-detail-component';
@@ -60,18 +62,19 @@ describe('HeroDetailComponent', () => {
           let hdc: HeroDetailComponent = rootTC.componentInstance;
 
           // USE PROMISE WRAPPING AN OBSERVABLE UNTIL can get `toPromise` working
-          let p = new Promise((resolve) => {
+          let p = new Promise<Hero>((resolve) => {
             // Listen for the HeroComponent.delete EventEmitter's event with observable
-            hdc.delete.toRx().subscribe(() => {
+            hdc.delete.toRx().subscribe(hero => {
               console.log('Observable heard HeroComponent.delete event raised');
-              resolve(true);
+              resolve(hero);
             });
           })
 
           // Listen for the HeroComponent.delete EventEmitter's event with promise
           // NOT WORKING. PROMISE NEVER RESOLVED
-          // let p = hdc.delete.toRx().toPromise().then(() => {
+          // p = <Promise<Hero>> hdc.delete.toRx().toPromise().then(hero => {
           //   console.log('Promise heard HeroComponent.delete event raised');
+          //   return hero;
           // });
 
           // trigger the 'click' event on the HeroDetailComponent delete button
@@ -145,7 +148,7 @@ describe('HeroDetailComponent', () => {
     // 2. select a different hero
     // 3  re-select the first hero
     // 4. confirm that the change is preserved in HTML
-    // Reveals 2-way binding bug #3715 in alpha-36
+    // Reveals 2-way binding bug in alpha-36, fixed in pull #3715 for alpha-37
 
     it('toggling heroes after modifying name preserves the change on screen', injectTcb((done, tcb) => {
 
