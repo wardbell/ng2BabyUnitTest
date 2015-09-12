@@ -59,15 +59,27 @@ describe('HeroDetailComponent', () => {
         .then((rootTC: RTC) => {
           let hdc: HeroDetailComponent = rootTC.componentInstance;
 
-          // Listen for the HeroComponent.delete EventEmitter's event
-          hdc.delete.toRx().subscribe(() => {
-            console.log('HeroComponent.delete event raised');
-            done(); // it must have worked
-          });
+          // USE PROMISE WRAPPING AN OBSERVABLE UNTIL can get `toPromise` working
+          let p = new Promise((resolve) => {
+            // Listen for the HeroComponent.delete EventEmitter's event with observable
+            hdc.delete.toRx().subscribe(() => {
+              console.log('Observable heard HeroComponent.delete event raised');
+              resolve(true);
+            });
+          })
+
+          // Listen for the HeroComponent.delete EventEmitter's event with promise
+          // NOT WORKING. PROMISE NEVER RESOLVED
+          // let p = hdc.delete.toRx().toPromise().then(() => {
+          //   console.log('Promise heard HeroComponent.delete event raised');
+          // });
 
           // trigger the 'click' event on the HeroDetailComponent delete button
           rootTC.query(By.css('button')).triggerEventHandler('click');
-        });
+
+          return p;
+        })
+        .catch(fail).then(done);
 
     }));
 
@@ -92,8 +104,8 @@ describe('HeroDetailComponent', () => {
           rootTC.query(By.css('#update')).triggerEventHandler('click');
 
           expect(hdc.hero.name.length).toBeGreaterThan(origNameLength);
-          done();
-        });
+        })
+        .catch(fail).then(done);
     }));
 
     it('Entering hero name in textbox changes hero', injectTcb((done, tcb) => {
@@ -124,8 +136,8 @@ describe('HeroDetailComponent', () => {
         .then(tick) // must wait a tick for the model update
         .then(() => {
           expect(hdc.hero.name).toEqual('Dog Man');
-          done();
         })
+        .catch(fail).then(done);
     }));
 
     // Simulates ...
@@ -133,7 +145,7 @@ describe('HeroDetailComponent', () => {
     // 2. select a different hero
     // 3  re-select the first hero
     // 4. confirm that the change is preserved in HTML
-    // Reveals 2-way binding bug in alpha-36, fixed in pull #3715 for alpha-37
+    // Reveals 2-way binding bug #3715 in alpha-36
 
     it('toggling heroes after modifying name preserves the change on screen', injectTcb((done, tcb) => {
 
@@ -174,9 +186,8 @@ describe('HeroDetailComponent', () => {
 
           // the view should reflect the same changed value
           expect(input.value).toEqual('Dog Man'); // fails in alpha36; should be fixed in alpha37
-
-          done();
         })
+        .catch(fail).then(done);
     }));
   });
 });
