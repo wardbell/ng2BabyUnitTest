@@ -20,8 +20,7 @@ export class HeroesComponent {
   currentHero: Hero;
 
   get heroes() {
-    if (!this._heroes) { this._getAllHeroes(); }
-    return this._heroes;
+    return this._heroes || this._getAllHeroes();
   }
 
   onSelect(hero: Hero) {
@@ -55,5 +54,7 @@ export class HeroesComponent {
       this._heroes = heroes;
       this.currentHero = heroes[0];
     });
+    
+    return this._heroes;
   }
 }

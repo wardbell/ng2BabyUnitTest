@@ -1,0 +1,38 @@
+<!-- #docregion -->
+<!DOCTYPE html>
+<html>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<title>Ng App Unit Tests</title>
+<link rel="stylesheet" href="../node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
+
+<script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+<script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+<script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
+
+</head>
+
+<body>
+  <!-- load the application's User definition -->
+  <script src="app/user.js"></script>
+  
+  <script>
+    // Demo only!
+    describe('User', function() {
+      var user;
+      beforeEach(function() {
+        user = new User();
+      });
+
+      it('has id === 42', function() {
+        expect(user.id).toEqual(42);
+      });
+
+      it('has an email address', function() {
+        expect(user.email.length).toBeGreaterThan(0);
+      });
+
+    });
+  </script>
+</body>
+
+</html>

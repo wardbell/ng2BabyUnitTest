@@ -16,4 +16,3 @@ if (BrowserDomAdapter) {
 } else {
   console.log("BrowserDomAdapter not found; TestComponentBuilder tests will fail");
 }
-
