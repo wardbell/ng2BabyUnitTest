@@ -33,7 +33,7 @@ function getAsyncTestCompleterDone(async: AsyncTestCompleter){
 //      // your test here
 //      return aPromise;
 //    })
-export function injectAsync(testFn: ThenableTestFn): void;
+export function injectAsync(testFn: () => Thenable<any>): void;
 export function injectAsync(dependencies: any[], testFn: ThenableTestFn): void;
 export function injectAsync( dependencies: any[] | ThenableTestFn, testFn?: ThenableTestFn) {
 
@@ -64,7 +64,7 @@ type ThenableTcbTestFn = (tcb: TestComponentBuilder, ...args:any[]) => Thenable<
 //      // your test here
 //      return aPromise;
 //    });
-export function injectTcb(testFn: ThenableTcbTestFn): void;
+export function injectTcb(testFn: (tcb: TestComponentBuilder) => Thenable<any>): void;
 export function injectTcb(dependencies: any[], testFn: ThenableTcbTestFn): void;
 export function injectTcb(dependencies: any[] | ThenableTcbTestFn, testFn?: ThenableTcbTestFn) {
 
