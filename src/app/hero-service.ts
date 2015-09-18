@@ -3,33 +3,28 @@ import {Hero} from './hero';
 import {Backend} from './backend';
 
 @Injectable()
-export class HeroService {
+export class HeroService implements IHeroService {
+
+	private _heroes: Hero[]; // cache of heroes
 
 	constructor(private _backend: Backend) { }
 
-	private _heroes: Hero[] = []; // cache of heroes
-	private _getAllHeroesPromise: Promise<Hero[]>;
-
 	getAllHeroes(force: boolean = false) {
-		// getAll if force==true OR this is the first time through
-		force = force || !this._getAllHeroesPromise
-		if (!force) {
-			return this._getAllHeroesPromise;
+		if (force || !this._heroes) {
+			this._heroes = [];
+			return this._backend.fetchAllHeroesAsync()
+				.then(heroes => this._heroes = heroes);
 		}
-
-		this._getAllHeroesPromise = this._backend.fetchAllHeroesAsync()
-			.then(heroes => this._heroes = heroes);
-
-		return this._getAllHeroesPromise;
+		return Promise.resolve(this._heroes);
 	}
+}
 
-	removeHero(hero: Hero) {
-		let ix = this._heroes.indexOf(hero);
-		if (ix > -1) {
-			this._heroes.splice(ix, 1);
-			return true;
-		} else {
-			return false;
-		}
-	}
+interface IHeroService {
+
+  // Get all heroes from cache
+	// unless the `force` is true or we haven't filled the cache yet
+	// in which case fill the cache from the server.
+	// Returns a promise with the cached heroes.
+	getAllHeroes(force?: boolean) : Promise<Hero[]>;
+
 }

@@ -31,12 +31,14 @@ export class HeroesComponent {
   onDelete(hero: Hero) {
     hero = hero || this.currentHero;
     let ix = this._heroes.indexOf(hero);
-    this._heroService.removeHero(hero);
+    if (ix > -1) {
+      this._heroes.splice(ix, 1);
+    }
     this.currentHero = this._heroes[ix] || this._heroes[ix - 1];
   }
 
   onRefresh() {
-    this._getAllHeroes(true /*force*/);
+    this._getAllHeroes(true);
     console.log('Refreshing heroes');
   }
 
@@ -54,7 +56,7 @@ export class HeroesComponent {
       this._heroes = heroes;
       this.currentHero = heroes[0];
     });
-    
+
     return this._heroes;
   }
 }

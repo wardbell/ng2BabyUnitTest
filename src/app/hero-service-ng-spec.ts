@@ -15,25 +15,25 @@ import {HeroService} from './hero-service';
 import {HEROES} from './mock-heroes';
 import {Backend} from './backend';
 
-///////// helpers /////////
+///////// test helpers /////////
+var heroData: Hero[];
 
 function happyBackendFactory() {
   return {
+    // return a promise for fake heroes that resolves as quickly as possible
     fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData.slice())
   };
 }
 
+var testError = 'backend.fetchAllHeroesAsync failed on purpose';
+
 function throwingBackendFactory() {
-  testError ='backend.fetchAllHeroesAsync failed on purpose';
   return {
+    // return a promise that failse as quickly as possible
     fetchAllHeroesAsync: () => Promise.reject(testError)
- };
+  };
 }
-
 //////  tests ////////////
-
-var heroData: Hero[]; // fresh heroes for each test
-var testError ='test error';
 
 describe('HeroService (with angular DI)', () => {
 
@@ -63,8 +63,7 @@ describe('HeroService (with angular DI)', () => {
 
         service.getAllHeroes()
           .then( heroes =>  expect(heroes.length).toEqual(heroData.length) )
-          .catch(fail)
-          .then(done, done);
+          .catch(fail).then(done);
       }));
 
       it('returns no heroes when source data are empty',
@@ -77,8 +76,7 @@ describe('HeroService (with angular DI)', () => {
 
         service.getAllHeroes()
           .then( heroes => expect(heroes.length).toEqual(0) )
-          .catch(fail)
-          .then(done, done);
+          .catch(fail).then(done);
       }));
 
 
@@ -97,8 +95,7 @@ describe('HeroService (with angular DI)', () => {
             expect(firstHeroes).toBe(secondHeroes);
             expect (secondHeroes.length).toEqual(heroData.length + 1);
           })
-          .catch(fail)
-          .then(done, done);
+          .catch(fail).then(done);
       }));
 
       it('re-execution w/ force=true returns new array w/ original data',
@@ -117,69 +114,9 @@ describe('HeroService (with angular DI)', () => {
             expect(firstHeroes.length).toEqual(heroData.length + 1);
             expect(secondHeroes.length).toEqual(heroData.length);
           })
-          .catch(fail)
-          .then(done, done);
-      }));
-    });
-
-    describe('#removeHero(hero)', () => {
-
-      it('returns "true" after removing an existing hero from the cache',
-        injectAsync([HeroService], (done:DoneFn, service: HeroService) => {
-        service.getAllHeroes()
-          .then(heroes => {
-            let wasRemoved = service.removeHero(existingHero);
-            expect(wasRemoved).toEqual(true)
-          })
           .catch(fail).then(done);
       }));
-
-      it('actually removed an existing hero from the cache',
-        injectAsync([HeroService], (done:DoneFn, service: HeroService) => {
-        service.getAllHeroes()
-          .then(heroes => {
-            service.removeHero(existingHero);
-            expect(heroes).not.toContain(existingHero);
-          })
-          .catch(fail).then(done);
-
-      }));
-
     });
-
-/////////// BETTER VERSION WHEN #4035 IS FIXED /////////////////
-//     describe('#removeHero(hero)', () => {
-//       let service: HeroService;
-//       let cachedHeroes:Hero[];
-//
-//       // prime the HeroService's cache asynchronously
-//       // notice we can use `injectAsync` in a `beforeEach` too!
-//       // Well we COULD do this after fix to issue #4035
-//       // https://github.com/angular/angular/issues/4035
-//       beforeEach(
-//         inject([AsyncTestCompleter, HeroService], (async: AsyncTestCompleter, hs:HeroService) => {
-//         var done = async.done.bind(async);
-//
-//         //injectAsync([HeroService],  (done:DoneFn, hs:HeroService) => {
-//         service = hs;
-//         service.getAllHeroes()
-//         .then(heroes => cachedHeroes = heroes)
-//         .catch(fail).then(done)
-//       }));
-//
-//       // the following tests can be synchronous because the tested `remove` method is synchronous
-//       // it presupposes that the cache of heroes has been filled by a previous `getAllHeroes` async call
-//
-//       it('returns "true" after removing an existing hero from the cache', () => {
-//         expect(service.removeHero(existingHero)).toBe(true);
-//       });
-//
-//       it('actually removed an existing hero from the cache', () => {
-//         service.removeHero(existingHero);
-//         expect(cachedHeroes).not.toContain(existingHero);
-//       });
-//     });
-
   });
 
   describe('when backend throws an error', () => {
@@ -194,7 +131,7 @@ describe('HeroService (with angular DI)', () => {
       service.getAllHeroes()
         .then( _ => fail('getAllHeroes should have failed') )
         .catch(err => expect(err).toBe(testError) )
-        .then(done, done);
+        .catch(fail).then(done);
       }));
   });
 
