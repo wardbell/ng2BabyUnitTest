@@ -3,7 +3,7 @@ import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'a
 
 // Angular 2 Test Bed
 import {
-  beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ RootTestComponent as RTC,
+  AsyncTestCompleter, beforeEachBindings, By, DebugElement, /*dispatchEvent,*/ inject, RootTestComponent as RTC,
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
@@ -24,16 +24,35 @@ describe('HeroDetailComponent', () => {
       expect(hdc instanceof HeroDetailComponent).toEqual(true); // proof of life
     });
 
-    it('onDelete method should raise delete event', injectAsync(done => {
+    it('onDelete method should raise delete event',
+      inject([AsyncTestCompleter], (async: AsyncTestCompleter) => {
+      let done = async.done.bind(async);
       let hdc = new HeroDetailComponent();
 
       // Listen for the HeroComponent.delete EventEmitter's event
       hdc.delete.toRx().subscribe(() => {
         console.log('HeroComponent.delete event raised');
         done();  // it must have worked
+      }, error => {fail(error); done()});
+
+      hdc.onDelete();
+    }));
+
+    // Won't work until someone figures out why the `toPromise`
+    // never invokes the callback in the presence of test-lib
+    // (although works fine outside of test-lib)
+    xit('onDelete method should raise delete event (w/ promise)', injectAsync(() => {
+
+      let hdc = new HeroDetailComponent();
+
+      // Listen for the HeroComponent.delete EventEmitter's event
+      var p = hdc.delete.toRx().toPromise().then(() => {
+        console.log('HeroComponent.delete event raised');
       });
 
       hdc.onDelete();
+
+      return p;
     }));
 
     it('onUpdate method should modify hero', () => {

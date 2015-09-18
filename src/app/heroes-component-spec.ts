@@ -54,21 +54,20 @@ describe('HeroesComponent', () => {
         expect(heroes.length).toEqual(0); // not filled yet
       });
 
-      it('has heroes after cache loaded', injectAsync(done => {
+      it('has heroes after cache loaded', injectAsync(() => {
         let heroes = hc.heroes; // trigger service
 
-        tick() // Wait for heroes to arrive
+        return tick() // Wait for heroes to arrive
           .then(() => {
             heroes = hc.heroes; // now the component has heroes to show
             expect(heroes.length).toEqual(heroData.length);
-          })
-          .catch(fail).then(done);
+          });
       }));
 
-      it('restores heroes after refresh called', injectAsync(done => {
+      it('restores heroes after refresh called', injectAsync(() => {
         let heroes = hc.heroes; // trigger service
 
-        tick() // Wait for heroes to arrive
+        return tick() // Wait for heroes to arrive
           .then(() => {
             heroes = hc.heroes; // now the component has heroes to show
             heroes[0].name = 'Wotan';
@@ -79,8 +78,7 @@ describe('HeroesComponent', () => {
             heroes = hc.heroes; // get it again (don't reuse old array!)
             expect(heroes[0]).not.toEqual('Wotan'); // change reversed
             expect(heroes.length).toEqual(heroData.length); // orig num of heroes
-          })
-          .catch(fail).then(done);
+          });
       }));
     });
   });

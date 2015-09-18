@@ -1,4 +1,5 @@
-import {Injectable} from 'angular2/angular2';
+//import {Injectable} from 'angular2/angular2'; // Don't get it from Angular
+import {Injectable} from './decorators'; // Use the app's version
 import {Hero} from './hero';
 import {Backend} from './backend';
 

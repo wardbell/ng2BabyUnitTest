@@ -68,6 +68,7 @@ describe('HeroService (intermediate tests)', () => {
 			console.log('** end of test **');
 		});
 	});
+	
   // Now it's async!
 	it('returns expected # of heroes when fulfilled', done => {
 

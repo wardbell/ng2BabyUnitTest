@@ -7,7 +7,7 @@ import {
 } from 'angular2/test';
 
 import {bind} from 'angular2/angular2';
-import {DoneFn, injectAsync} from 'test-helpers/test-helpers';
+import {injectAsync} from 'test-helpers/test-helpers';
 
 // Service related imports
 import {Hero} from './hero';
@@ -57,35 +57,36 @@ describe('HeroService (with angular DI)', () => {
     describe('#getAllHeroes', () => {
 
       it('returns expected # of heroes when ready',
-        inject([AsyncTestCompleter, HeroService], (async: AsyncTestCompleter, service: HeroService) => {
-
-        var done = async.done.bind(async);
+        inject([AsyncTestCompleter, HeroService],
+          (async: AsyncTestCompleter, service: HeroService) => {
 
         service.getAllHeroes()
-          .then( heroes =>  expect(heroes.length).toEqual(heroData.length) )
-          .catch(fail).then(done);
+          .then( heroes => expect(heroes.length).toEqual(heroData.length) )
+          .catch(fail).then(() => async.done());
+      }));
+
+      it('returns expected # of heroes when ready (simpler)',
+        injectAsync([HeroService], (service: HeroService) => {
+
+        return service.getAllHeroes()
+          .then( heroes => expect(heroes.length).toEqual(heroData.length) );
       }));
 
       it('returns no heroes when source data are empty',
-        injectAsync([HeroService], (done: DoneFn, service: HeroService) => {
-        // Replaces:
-        //   inject([AsyncTestCompleter, HeroService], (async: AsyncTestCompleter, service: HeroService) => {
-        //     var done = async.done.bind(async);
+        injectAsync([HeroService], (service: HeroService) => {
 
         heroData = []; // simulate no heroes from the backend
 
-        service.getAllHeroes()
-          .then( heroes => expect(heroes.length).toEqual(0) )
-          .catch(fail).then(done);
+        return service.getAllHeroes()
+          .then( heroes => expect(heroes.length).toEqual(0) );
       }));
 
-
       it('re-execution preserves existing data in same cached array',
-        injectAsync([HeroService], (done: DoneFn, service: HeroService) => {
+        injectAsync([HeroService], (service: HeroService) => {
 
         let firstHeroes:Hero[];
 
-        service.getAllHeroes()
+        return service.getAllHeroes()
           .then( heroes => {
             firstHeroes = heroes;
             firstHeroes.push(new Hero('Perseus'));
@@ -94,29 +95,29 @@ describe('HeroService (with angular DI)', () => {
           .then(secondHeroes => {
             expect(firstHeroes).toBe(secondHeroes);
             expect (secondHeroes.length).toEqual(heroData.length + 1);
-          })
-          .catch(fail).then(done);
+          });
       }));
 
       it('re-execution w/ force=true returns new array w/ original data',
-        injectAsync([HeroService], (done: DoneFn, service: HeroService) => {
+        injectAsync([HeroService], (service: HeroService) => {
 
         let firstHeroes:Hero[];
 
-        service.getAllHeroes()
+        return service.getAllHeroes()
           .then( heroes => {
             firstHeroes = heroes;
             firstHeroes.push(new Hero('Hercules'));
-            return service.getAllHeroes(true /*force*/)
+            return service.getAllHeroes(true)
           })
           .then( secondHeroes => {
             expect(firstHeroes).not.toBe(secondHeroes);
             expect(firstHeroes.length).toEqual(heroData.length + 1);
             expect(secondHeroes.length).toEqual(heroData.length);
-          })
-          .catch(fail).then(done);
+          });
       }));
+
     });
+
   });
 
   describe('when backend throws an error', () => {
@@ -126,13 +127,14 @@ describe('HeroService (with angular DI)', () => {
     });
 
     it('#fetchAllHeroesAsync fails with expected error',
-      injectAsync([HeroService], (done:DoneFn, service: HeroService) => {
+      injectAsync([HeroService], (service: HeroService) => {
 
-      service.getAllHeroes()
+      return service.getAllHeroes()
         .then( _ => fail('getAllHeroes should have failed') )
-        .catch(err => expect(err).toBe(testError) )
-        .catch(fail).then(done);
-      }));
+        .catch(err => expect(err).toBe(testError) );
+      })
+    );
+
   });
 
 });

@@ -11,6 +11,8 @@ import {
 
 export type DoneFn = (done?:any) => void;
 
+type ThenableTestFn = (...args:any[]) => Thenable<any>;
+
 // compensate for https://github.com/angular/angular.io/issues/204
 function getAsyncTestCompleterDone(async: AsyncTestCompleter){
   var done = async.done.bind(async)
@@ -27,17 +29,21 @@ function getAsyncTestCompleterDone(async: AsyncTestCompleter){
 //    it('async test w/ injectables', [HeroService], (done:DoneFn, service:HeroService) => {
 //      /* your test here */
 //    });
+export function injectAsync(testFn: ThenableTestFn): void;
+export function injectAsync(dependencies: any[], testFn: ThenableTestFn): void;
 export function injectAsync(
-  dependencies: any[] | DoneFn,
-  testFn?: (done: DoneFn, ...args:any[]) => void) {
+  dependencies: any[] | ThenableTestFn,
+  testFn?: ThenableTestFn) {
 
   if (typeof dependencies === 'function' ){
-    testFn = <DoneFn>dependencies;
+    testFn = <ThenableTestFn>dependencies;
     dependencies = [];
   }
 
-  return inject([AsyncTestCompleter, ...(<[]><any>dependencies)], function injectWrapper(async: AsyncTestCompleter, ...args:any[]) {
-    testFn(getAsyncTestCompleterDone(async), ...args);
+  return inject([AsyncTestCompleter, ...(<any[]>dependencies)],
+    function injectWrapper(async: AsyncTestCompleter, ...args:any[]) {
+      testFn(...args)
+        .then(null, fail).then(async.done.bind(async));
   });
 }
 
@@ -60,7 +66,12 @@ export function injectTcb(
     testFn = <TCBFn>dependencies;
     dependencies = [];
   }
-  return injectAsync([TestComponentBuilder, ...(<[]><any>dependencies)], testFn);
+
+  return inject([AsyncTestCompleter, TestComponentBuilder, ...(<[]><any>dependencies)],
+    function injectWrapper(async: AsyncTestCompleter, tcb: TestComponentBuilder, ...args:any[]) {
+    testFn(getAsyncTestCompleterDone(async), tcb, ...args);
+  });
+  // return injectAsync([TestComponentBuilder, ...(<[]><any>dependencies)], testFn);
 }
 
 ///////// inspectors and expectations /////////
