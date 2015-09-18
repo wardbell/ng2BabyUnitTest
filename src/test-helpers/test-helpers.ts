@@ -22,18 +22,20 @@ function getAsyncTestCompleterDone(async: AsyncTestCompleter){
 
 // Run an async test within the Angular test bed
 // Example
-//    it('async test', (done:DoneFn) => {/* your test here */});
+//    it('async test', () => {
+//      // * your test here
+//      return aPromise;
+//    });
 //
 // May precede the test fn with some injectables which will be passed as args AFTER the done
 // Example:
-//    it('async test w/ injectables', [HeroService], (done:DoneFn, service:HeroService) => {
-//      /* your test here */
-//    });
+//    it('async test w/ injectables', [HeroService], (service:HeroService) => {
+//      // your test here
+//      return aPromise;
+//    })
 export function injectAsync(testFn: ThenableTestFn): void;
 export function injectAsync(dependencies: any[], testFn: ThenableTestFn): void;
-export function injectAsync(
-  dependencies: any[] | ThenableTestFn,
-  testFn?: ThenableTestFn) {
+export function injectAsync( dependencies: any[] | ThenableTestFn, testFn?: ThenableTestFn) {
 
   if (typeof dependencies === 'function' ){
     testFn = <ThenableTestFn>dependencies;
@@ -47,31 +49,31 @@ export function injectAsync(
   });
 }
 
-type TCBFn = (done:DoneFn, tcb: TestComponentBuilder) => void;
+type ThenableTcbTestFn = (tcb: TestComponentBuilder, ...args:any[]) => Thenable<any>;
 
 // Run an async component test within Angular test bed using TestComponentBuilder
 // Example
-//    it('async Component test', (done:DoneFn, tcb: TestComponentBuilder) => {/* your test here */});
+//    it('async Component test', tcb => {
+//      // * your test here
+//      return aPromise;
+//    });
 //
 // May precede the test fn with some injectables which will be passed as args AFTER the TestComponentBuilder
 // Example:
-//    it('async Component test w/ injectables', [HeroService], (done:DoneFn, tcb:TestComponentBuilder. service:HeroService) => {
-//      /* your test here */
+//    it('async Component test w/ injectables', [HeroService], (tcb, service:HeroService) => {
+//      // your test here
+//      return aPromise;
 //    });
-export function injectTcb(
-  dependencies: any[] | TCBFn,
-  testFn?: (done: DoneFn, tcb: TestComponentBuilder, ...args:any[]) => void) {
+export function injectTcb(testFn: ThenableTcbTestFn): void;
+export function injectTcb(dependencies: any[], testFn: ThenableTcbTestFn): void;
+export function injectTcb(dependencies: any[] | ThenableTcbTestFn, testFn?: ThenableTcbTestFn) {
 
   if (typeof dependencies === 'function' ){
-    testFn = <TCBFn>dependencies;
+    testFn = <ThenableTcbTestFn>dependencies;
     dependencies = [];
   }
 
-  return inject([AsyncTestCompleter, TestComponentBuilder, ...(<[]><any>dependencies)],
-    function injectWrapper(async: AsyncTestCompleter, tcb: TestComponentBuilder, ...args:any[]) {
-    testFn(getAsyncTestCompleterDone(async), tcb, ...args);
-  });
-  // return injectAsync([TestComponentBuilder, ...(<[]><any>dependencies)], testFn);
+  return injectAsync([TestComponentBuilder, ...(<any[]>dependencies)], testFn);
 }
 
 ///////// inspectors and expectations /////////

@@ -20,8 +20,8 @@ describe('HeroDetailComponent', () => {
     expect(hc instanceof HeroDetailComponent).toEqual(true); // proof of life
   });
 
-  it('parent "currentHero" flows down to HeroDetailComponent', injectTcb( (done, tcb) => {
-    tcb
+  it('parent "currentHero" flows down to HeroDetailComponent', injectTcb( tcb => {
+    return tcb
       .createAsync(TestWrapper)
       .then((rootTC:RTC) => {
         let hc:HeroDetailComponent = rootTC.componentViewChildren[0].componentInstance;
@@ -30,13 +30,12 @@ describe('HeroDetailComponent', () => {
         rootTC.detectChanges(); // trigger view binding
 
         expect(hw.currentHero).toBe(hc.hero);
-        done();
       });
   }));
 
-  it('delete button should raise delete event for parent component', injectTcb( (done, tcb) => {
+  it('delete button should raise delete event for parent component', injectTcb( tcb => {
 
-    tcb
+    return tcb
       //.overrideTemplate(HeroDetailComponent, '<button (click)="onDelete()" [disabled]="!hero">Delete</button>')
       .overrideDirective(TestWrapper, HeroDetailComponent, mockHDC)
       .createAsync(TestWrapper)
@@ -68,16 +67,14 @@ describe('HeroDetailComponent', () => {
           // if wrapper.onDelete is called, HeroComponent.delete event must have been raised
           //console.log('HeroWrapper.onDelete called');
           expect(true).toEqual(true);
-          done();
         }
         // hc.onDelete();
-        // done();
       });
   }), 500); // needs some time for event to complete; 100ms is not long enough
 
-  it('update button should modify hero', injectTcb( (done, tcb) => {
+  it('update button should modify hero', injectTcb( tcb => {
 
-     tcb
+     return tcb
       .createAsync(TestWrapper)
       .then((rootTC:RTC) => {
 
@@ -99,7 +96,6 @@ describe('HeroDetailComponent', () => {
 
         // hc.onUpdate(); // Invoke button handler
         expect(hw.currentHero.name.length).toBeGreaterThan(origNameLength);
-        done();
       });
   }));
 

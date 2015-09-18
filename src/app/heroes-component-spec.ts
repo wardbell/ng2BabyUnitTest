@@ -97,18 +97,17 @@ describe('HeroesComponent', () => {
       bind(User).toValue(mockUser)
     ]);
 
-    it('can be created', injectTcb((done, tcb) => {
+    it('can be created', injectTcb(tcb => {
       let template = '<h1>Nuts</h1>';
-      tcb
+      return tcb
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
-        .then((rootTC: RTC) => expect(true).toBe(true)) // proof of life
-        .catch(fail).then(done);
+        .then((rootTC: RTC) => expect(true).toBe(true)); // proof of life
     }));
 
-    it('binds view to userName', injectTcb((done, tcb) => {
+    it('binds view to userName', injectTcb(tcb => {
       let template = `<h1>{{userName}}'s Heroes</h1>`;
-      tcb
+      return tcb
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
         .then((rootTC: RTC) => {
@@ -117,14 +116,13 @@ describe('HeroesComponent', () => {
           rootTC.detectChanges(); // trigger component property binding
           expectSelectedHtml(rootTC, 'h1').toMatch(hc.userName);
           expectViewChildHtml(rootTC).toMatch(hc.userName);
-        })
-        .catch(fail).then(done);
+        });
     }));
 
 
     describe('#heroes', () => {
 
-      it('binds view to heroes', injectTcb((done, tcb) => {
+      it('binds view to heroes', injectTcb(tcb => {
         heroData.length = 3; // only need a few
 
         // focus on the part of the template that displays heroes
@@ -132,7 +130,7 @@ describe('HeroesComponent', () => {
           `<ul>
             <li *ng-for="#h of heroes">({{h.id}}) {{h.name}}</li>
           </ul>`;
-        tcb
+        return tcb
           .overrideTemplate(HeroesComponent, template)
           .createAsync(HeroesComponent)
           .then((rootTC: RTC) => {
@@ -151,8 +149,7 @@ describe('HeroesComponent', () => {
 
             // confirm hero list is displayed by looking for a known hero
             expect(rootTC.nativeElement.innerHTML).toMatch(heroData[0].name);
-          })
-          .catch(fail).then(done);
+          });
       }));
 
     });
@@ -176,8 +173,8 @@ describe('HeroesComponent', () => {
             ({{hero.id}}) {{hero.name}}
            </li></ul>`;
 
-        return injectTcb((done, tcb) => {
-          tcb
+        return injectTcb(tcb => {
+          return tcb
           .overrideTemplate(HeroesComponent, template)
           .createAsync(HeroesComponent)
           .then((rootTC:RTC) => {
@@ -193,8 +190,7 @@ describe('HeroesComponent', () => {
 
             rootTC.detectChanges(); // show the list
             testFn(rootTC);
-          })
-          .catch(fail).then(done);
+          });
         })
       }
 
