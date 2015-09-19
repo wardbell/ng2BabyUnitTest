@@ -8,7 +8,6 @@ import {
 } from 'angular2/test';
 
 import {
-  DoneFn,
   expectSelectedHtml,
   expectViewChildHtml,
   expectViewChildClass,

@@ -29,7 +29,7 @@
           packages: {
             'app': {defaultExtension: 'js'},
             'test-helpers': {defaultExtension: 'js'}
-            }
+           }
         });
 
         var imports = [
@@ -48,8 +48,8 @@
         ].map(function(spec) {return System.import(spec);});
 
         Promise.all(imports)
-          .then(  function()    { window.onload();} ) // re-execute Jasmine's buildup
-          .catch( function(err) { console.log(err);} );
+          .then(window.onload) // re-execute Jasmine's buildup
+          .catch(console.error.bind(console));
       })();
   </script>
 </body>
