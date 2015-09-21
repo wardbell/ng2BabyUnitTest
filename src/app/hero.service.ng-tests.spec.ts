@@ -11,9 +11,9 @@ import {injectAsync} from 'test-helpers/test-helpers';
 
 // Service related imports
 import {Hero} from './hero';
-import {HeroService} from './hero-service';
+import {HeroService} from './hero.service';
 import {HEROES} from './mock-heroes';
-import {Backend} from './backend';
+import {Backend} from './backend.service';
 
 ///////// test helpers /////////
 var heroData: Hero[];
@@ -54,30 +54,30 @@ describe('HeroService (with angular DI)', () => {
       return [bind(Backend).toFactory(happyBackendFactory)];
     });
 
-    describe('#getAllHeroes', () => {
+    describe('#refresh', () => {
 
-      it('returns expected # of heroes when ready',
+      it('returns heroes w/ expected # of heroes when ready',
         inject([AsyncTestCompleter, HeroService],
           (async: AsyncTestCompleter, service: HeroService) => {
 
-        service.getAllHeroes()
+        service.refresh()
           .then( heroes => expect(heroes.length).toEqual(heroData.length) )
           .catch(fail).then(() => async.done());
       }));
 
-      it('returns expected # of heroes when ready (simpler)',
+      it('returns heroes w/ of heroes when ready (using injectAsync)',
         injectAsync([HeroService], (service: HeroService) => {
 
-        return service.getAllHeroes()
+        return service.refresh()
           .then( heroes => expect(heroes.length).toEqual(heroData.length) );
       }));
 
-      it('returns no heroes when source data are empty',
+      it('returned heroes have no data when source data are empty',
         injectAsync([HeroService], (service: HeroService) => {
 
         heroData = []; // simulate no heroes from the backend
 
-        return service.getAllHeroes()
+        return service.refresh()
           .then( heroes => expect(heroes.length).toEqual(0) );
       }));
 
@@ -86,11 +86,11 @@ describe('HeroService (with angular DI)', () => {
 
         let firstHeroes:Hero[];
 
-        return service.getAllHeroes()
+        return service.refresh()
           .then( heroes => {
             firstHeroes = heroes;
             firstHeroes.push(new Hero('Perseus'));
-            return service.getAllHeroes();
+            return service.refresh();
           })
           .then(secondHeroes => {
             expect(firstHeroes).toBe(secondHeroes);
@@ -98,16 +98,16 @@ describe('HeroService (with angular DI)', () => {
           });
       }));
 
-      it('re-execution w/ force=true returns new array w/ original data',
+      it('re-execution returns same array w/ original data',
         injectAsync([HeroService], (service: HeroService) => {
 
         let firstHeroes:Hero[];
 
-        return service.getAllHeroes()
+        return service.refresh()
           .then( heroes => {
             firstHeroes = heroes;
             firstHeroes.push(new Hero('Hercules'));
-            return service.getAllHeroes(true)
+            return service.refresh()
           })
           .then( secondHeroes => {
             expect(firstHeroes).not.toBe(secondHeroes);
@@ -129,8 +129,8 @@ describe('HeroService (with angular DI)', () => {
     it('#fetchAllHeroesAsync fails with expected error',
       injectAsync([HeroService], (service: HeroService) => {
 
-      return service.getAllHeroes()
-        .then( _ => fail('getAllHeroes should have failed') )
+      return service.refresh()
+        .then( _ => fail('refresh should have failed') )
         .catch(err => expect(err).toBe(testError) );
       })
     );

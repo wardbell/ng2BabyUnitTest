@@ -10,7 +10,7 @@ import {
 import {injectAsync, injectTcb} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
-import {HeroDetailComponent} from './hero-detail-component';
+import {HeroDetailComponent} from './hero-detail.component';
 import {Hero} from './hero';
 
 describe('HeroDetailComponent', () => {

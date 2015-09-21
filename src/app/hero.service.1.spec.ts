@@ -1,39 +1,52 @@
 // The phase of hero-service-spec
 // when we're outlining what we want to test
-import {HeroService} from './hero-service';
-import {Backend} from './backend';
 
 describe('HeroService (test plan)', () => {
 
-  it('we can instantiate the service', () => {
-		let backend = <Backend>{};
-		let service = new HeroService(backend);
-		expect(service).toBeDefined();
+	describe('creation', () => {
+		xit('can instantiate the service');
+		xit('heroes array is empty');
 	});
 
-  describe('#getAllHeroes', () => {
+  describe('#refresh', () => {
 
 		describe('when server provides heroes', () => {
 			xit('returns expected # of heroes when fulfilled');
+			xit('heroes array is empty until fulfilled');
+			xit('heroes array is populated when fulfilled');
 			xit('returns no heroes when source data are empty');
-			xit('re-execution preserves existing data in same cached array');
-			xit('re-execution w/ force=true returns new array w/ original data');
-			xit('when the server fails, returns failed promise with the server error');
+			xit('resets existing heroes array w/ original data when re-refresh');
+			xit('resets heroes array to empty while waiting for re-refresh');
 		});
 
 		describe('when the server fails', () => {
 			xit('returns failed promise with the server error');
+			xit('resets heroes array to empty');
 		});
 
 	});
 
 });
 
+import {HeroService} from './hero.service';
+import {Backend} from './backend.service';
 import {Hero} from './hero';
 
 let heroData:Hero[];
 
 describe('HeroService (intermediate tests)', () => {
+
+	describe('creation', () => {
+		it('can instantiate the service', () => {
+			let service = new HeroService(null);
+			expect(service).toBeDefined();
+		});
+
+		it('heroes is empty', () => {
+			let service = new HeroService(null);
+			expect(service.heroes.length).toEqual(0);
+		});
+	});
 
 	xdescribe('dont run', () => {
 
@@ -41,7 +54,7 @@ describe('HeroService (intermediate tests)', () => {
 		it('returns expected # of heroes when fulfilled', () => {
 			let backend = <Backend>{};
 			let service = new HeroService(backend);
-			service.getAllHeroes()
+			service.refresh()
 				.then(heroes => {
 					expect(heroes.length).toBeGreaterThan(0); // don’t know how many to expect yet
 				});
@@ -58,7 +71,7 @@ describe('HeroService (intermediate tests)', () => {
 			};
 
 			let service = new HeroService(backend);
-			service.getAllHeroes()
+			service.refresh()
 				.then(heroes => {
 					expect(heroes.length).toEqual(heroData.length); // is it?
 					expect(heroes.length).not.toEqual(heroData.length); // or is it not?
@@ -68,7 +81,7 @@ describe('HeroService (intermediate tests)', () => {
 			console.log('** end of test **');
 		});
 	});
-	
+
   // Now it's async!
 	it('returns expected # of heroes when fulfilled', done => {
 
@@ -80,7 +93,7 @@ describe('HeroService (intermediate tests)', () => {
     };
 
     let service = new HeroService(backend);
-    service.getAllHeroes()
+    service.refresh()
       .then(heroes => {
         expect(heroes.length).toEqual(heroData.length); // is it?
         //expect(heroes.length).not.toEqual(heroData.length); // or is it not?
@@ -102,7 +115,7 @@ describe('HeroService (intermediate tests)', () => {
     };
 
     let service = new HeroService(backend);
-    service.getAllHeroes()
+    service.refresh()
       .then(heroes => {
         expect(heroes.length).toEqual(heroData.length);
 			})
@@ -120,7 +133,7 @@ describe('HeroService (intermediate tests)', () => {
     };
 
     let service = new HeroService(backend);
-    service.getAllHeroes()
+    service.refresh()
       .then(heroes => {
         expect(heroes.length).toEqual(heroData.length);
 			})

@@ -14,9 +14,9 @@ import {
   injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
 
 ///// Testing this component ////
-import {HeroesComponent} from './heroes-component';
+import {HeroesComponent} from './heroes.component';
 import {Hero} from './hero';
-import {HeroService} from './hero-service';
+import {HeroService} from './hero.service';
 import {HEROES} from './mock-heroes';
 import {User} from './user';
 

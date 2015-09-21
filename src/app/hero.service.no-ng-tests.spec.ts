@@ -1,6 +1,6 @@
 // Test a service without using any Angular (no Angular DI)
-import {HeroService} from './hero-service';
-import {Backend} from './backend';
+import {HeroService} from './hero.service';
+import {Backend} from './backend.service';
 import {Hero} from './hero';
 
 ///////// test helpers /////////
