@@ -14,18 +14,29 @@ import {User} from './user';
 })
 export class HeroesComponent {
   private _heroes: Hero[];
+  private _currentHero: Hero;
 
   constructor(private _heroService: HeroService, private _user: User) { }
 
-  currentHero: Hero;
+  get currentHero() {
+    return this._currentHero || this._heroes[0];
+  };
 
-  get heroes() {
-    return this._heroes || this._getAllHeroes();
+  set currentHero(hero) {
+    this._currentHero = hero;
   }
 
-  onSelect(hero: Hero) {
-    this.currentHero = hero;
-    console.log(`Hero selected: ` + JSON.stringify(hero));
+  get heroes() {
+    return this._heroes || this._refreshHeroes();
+  }
+
+
+  getSelectedClass(hero: Hero) {
+    return { 'selected': hero === this.currentHero };
+  }
+
+  get userName() {
+    return this._user.name || 'someone';
   }
 
   onDelete(hero: Hero) {
@@ -38,25 +49,21 @@ export class HeroesComponent {
   }
 
   onRefresh() {
-    this._getAllHeroes(true);
-    console.log('Refreshing heroes');
+    this._refreshHeroes();
   }
 
-  getSelectedClass(hero: Hero) {
-    return { 'selected': hero === this.currentHero };
+  onSelect(hero: Hero) {
+    this.currentHero = hero;
+    console.log(`Hero selected: ` + JSON.stringify(hero));
   }
-
-  get userName() { return this._user.name || 'someone'; }
 
   /////////////
-  private _getAllHeroes(force: boolean = false) {
-    this._heroes = [];
+  private _refreshHeroes() {
+    console.log('Refreshing heroes');
     this.currentHero = undefined;
-    this._heroService.getAllHeroes(force).then(heroes => {
-      this._heroes = heroes;
-      this.currentHero = heroes[0];
-    });
-
+    this._heroService.refresh();
+    this._heroes = this._heroService.heroes;
     return this._heroes;
   }
+
 }
