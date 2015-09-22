@@ -15,3 +15,4 @@
 	top: -1px;
 }
 .selected { background-color: lightblue; color: #369; }
+.message {padding: 0.4em 0; font-size: 20px; color: #888}
