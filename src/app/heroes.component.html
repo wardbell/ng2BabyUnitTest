@@ -1,8 +1,8 @@
 <div class="container">
   <h1>{{userName}}'s Super Heroes</h1>
   <button (click)="onRefresh(h)">Refresh</button>
-  <div *ng-if="!heroes.length"  class="heroes">Loading heroes...</div>
-  <ul class="heroes">
+  <div class="message" *ng-if="!heroes.length"  class="heroes">Loading heroes...</div>
+  <div class="message" *ng-if="heroes.length"  class="heroes">Pick a hero</div>  <ul class="heroes">
     <li *ng-for="#hero of heroes"
       [ng-class]="getSelectedClass(hero)"
       (click)="onSelect(hero)">

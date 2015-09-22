@@ -15,13 +15,9 @@ import {User} from './user';
 })
 export class HeroesComponent {
   private _heroes: Hero[];
-  private _currentHero: Hero;
+  currentHero: Hero;
 
   constructor(private _heroService: HeroService, private _user: User) {   }
-
-  get currentHero() { return this._currentHero || this._heroes[0]; };
-
-  set currentHero(hero) { this._currentHero = hero; }
 
   get heroes() { return this._heroes || this.onRefresh(); }
 

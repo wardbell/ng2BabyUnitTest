@@ -153,55 +153,17 @@ describe('HeroesComponent', () => {
 
     describe('#onSelected (TBD)', () => {
 
-      let hc: HeroesComponent;
-
-      // The same setup for every test in this suite
-      // TODO: Remove `withNgClass` and always include in template ONCE BUG IS FIXED
-      function injectHC(testFn: (rootTC: RTC) => void, withNgClass:boolean = false) {
-
-        // This is the bad boy:   [ng-class]="getSelectedClass(hero)"
-        let ngClass = withNgClass ? '[ng-class]="getSelectedClass(hero)"' : '';
-
-        // focus on the part of the template that displays heroes
-        let template =
-          `<ul><li *ng-for="#hero of heroes"
-            ${ngClass}
-            (click)="onSelect(hero)">
-            ({{hero.id}}) {{hero.name}}
-           </li></ul>`;
-
-        return injectTcb(tcb => {
-          return tcb
-          .overrideTemplate(HeroesComponent, template)
-          .createAsync(HeroesComponent)
-          .then((rootTC:RTC) => {
-            hc = rootTC.componentInstance;
-            rootTC.detectChanges();// trigger {{heroes}} binding which triggers async getAllHeroes
-            return rootTC;
-          })
-          .then((rootTC:RTC) => { // wait a tick until heroes are fetched
-
-          // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
-          // WITH EXCEPTION:
-          //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."
-
-            rootTC.detectChanges(); // show the list
-            testFn(rootTC);
-          });
-        })
-      }
-
-      it('the first hero is selected by default', injectHC((rootTC:RTC) => {
-        expect(hc.currentHero).toEqual(heroData[0]);
+      it('no hero is selected by default', injectHC(hc => {
+        expect(hc.currentHero).not.toBeDefined();
       }));
 
-      it('sets the "currentHero"', injectHC((rootTC:RTC) => {
+      it('sets the "currentHero"', injectHC(hc => {
         hc.onSelect(heroData[1]); // select the second hero
         expect(hc.currentHero).toEqual(heroData[1]);
       }));
 
       // TODO: Remove `withNgClass=true` ONCE BUG IS FIXED
-      it('the view of the "currentHero" has the "selected" class (NG2 BUG)', injectHC((rootTC:RTC) => {
+      it('the view of the "currentHero" has the "selected" class (NG2 BUG)', injectHC((hc, rootTC) => {
         hc.onSelect(heroData[1]); // select the second hero
 
         rootTC.detectChanges();
@@ -210,13 +172,18 @@ describe('HeroesComponent', () => {
         expectViewChildClass(rootTC, 2).toMatch('selected');
       }, true /* true == include ngClass */));
 
-      it('the view of a non-selected hero does NOT have the "selected" class', injectHC((rootTC:RTC) => {
+      it('the view of a non-selected hero does NOT have the "selected" class', injectHC((hc, rootTC)  => {
         hc.onSelect(heroData[1]); // select the second hero
         rootTC.detectChanges();
         // The 4th ViewChild is 3rd hero; the 1st is for the template
         expectViewChildClass(rootTC, 4).not.toMatch('selected');
       }));
 
+      it('no hero is selected after onRefresh() called', injectHC(hc => {
+        hc.onSelect(heroData[1]); // select the second hero
+        hc.onRefresh();
+        expect(hc.currentHero).not.toBeDefined();
+      }));
     });
 
   });
@@ -237,4 +204,43 @@ class HappyHeroService {
       resolve(this.heroes);
     });
   }
+}
+
+
+// The same setup for every test in this suite
+// TODO: Remove `withNgClass` and always include in template ONCE BUG IS FIXED
+function injectHC(testFn: (hc: HeroesComponent, rootTC?: RTC) => void, withNgClass:boolean = false) {
+
+  // This is the bad boy:   [ng-class]="getSelectedClass(hero)"
+  let ngClass = withNgClass ? '[ng-class]="getSelectedClass(hero)"' : '';
+
+  // focus on the part of the template that displays heroes
+  let template =
+    `<ul><li *ng-for="#hero of heroes"
+      ${ngClass}
+      (click)="onSelect(hero)">
+      ({{hero.id}}) {{hero.name}}
+      </li></ul>`;
+
+  return injectTcb(tcb => {
+    let hc: HeroesComponent;
+
+    return tcb
+    .overrideTemplate(HeroesComponent, template)
+    .createAsync(HeroesComponent)
+    .then((rootTC:RTC) => {
+      hc = rootTC.componentInstance;
+      rootTC.detectChanges();// trigger {{heroes}} binding which triggers async getAllHeroes
+      return rootTC;
+    })
+    .then((rootTC:RTC) => { // wait a tick until heroes are fetched
+
+    // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
+    // WITH EXCEPTION:
+    //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."
+
+      rootTC.detectChanges(); // show the list
+      testFn(hc, rootTC);
+    });
+  })
 }
