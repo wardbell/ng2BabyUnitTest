@@ -10,7 +10,7 @@ import {
 
 import {dispatchEvent} from 'angular2/src/test_lib/utils';
 
-import {injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
+import {injectAsync, injectTcb, tick} from '../test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroDetailComponent} from './hero-detail.component';
@@ -39,21 +39,32 @@ describe('HeroDetailComponent', () => {
       hdc.onDelete();
     }));
 
-    // Won't work until someone figures out why the `toPromise`
-    // never invokes the callback in the presence of test-lib
-    // (although works fine outside of test-lib)
-    xit('onDelete method should raise delete event (w/ promise)', injectAsync(() => {
+    it('onDelete method should raise delete event (w/ promise)', injectAsync(() => {
 
       let hdc = new HeroDetailComponent();
 
       // Listen for the HeroComponent.delete EventEmitter's event
-      var p = hdc.delete.toRx().toPromise().then(() => {
-        console.log('HeroComponent.delete event raised');
+      let p = hdc.delete.toRx().toPromise().then(() => {
+        console.log('HeroComponent.delete event raised in promise');
       });
+
+      hdc.delete.toRx().subscribe(() => {
+        console.log('HeroComponent.delete event raised in subscription')
+      })
 
       hdc.onDelete();
 
+      // toPromise() does not fulfill until emitter is completed.
+      hdc.delete.return();
+
       return p;
+       // Returns promise with the last value emitted by HeroComponent.delete
+      // Must come AFTER `hdc.onDelete() else promise never resolves
+      // see https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/topromise.md
+      return hdc.delete.toRx().toPromise().then(() => {
+        console.log('HeroComponent.delete event raised in promise');
+      });
+
     }));
 
     it('onUpdate method should modify hero', () => {
@@ -167,7 +178,7 @@ describe('HeroDetailComponent', () => {
     // 4. confirm that the change is preserved in HTML
     // Reveals 2-way binding bug in alpha-36, fixed in pull #3715 for alpha-37
 
-    it('toggling heroes after modifying name preserves the change on screen', injectTcb(tcb => {
+    it('toggling heroes after modifying name preserves the change on screen (NG2 BUG)', injectTcb(tcb => {
 
       let hdc: HeroDetailComponent;
       let hero1 = new Hero('Cat Woman', 1);

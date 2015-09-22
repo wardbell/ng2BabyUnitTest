@@ -2,18 +2,17 @@
 
 // Angular 2 Test Bed
 import {
-  AsyncTestCompleter, beforeEachBindings, inject,
-  beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
+AsyncTestCompleter, beforeEachBindings, inject,
+beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
 import {bind} from 'angular2/angular2';
-import {injectAsync} from 'test-helpers/test-helpers';
+import {injectAsync} from '../test-helpers/test-helpers';
 
 // Service related imports
 import {Hero} from './hero';
 import {HeroService} from './hero.service';
-import {HEROES} from './mock-heroes';
-import {Backend} from './backend.service';
+import {BackendService} from './backend.service';
 
 ///////// test helpers /////////
 var heroData: Hero[];
@@ -21,15 +20,15 @@ var heroData: Hero[];
 function happyBackendFactory() {
   return {
     // return a promise for fake heroes that resolves as quickly as possible
-    fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData.slice())
+    fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData.map(h => h.clone()))
   };
 }
 
-var testError = 'backend.fetchAllHeroesAsync failed on purpose';
+var testError = 'BackendService.fetchAllHeroesAsync failed on purpose';
 
 function throwingBackendFactory() {
   return {
-    // return a promise that failse as quickly as possible
+    // return a promise that fails as quickly as possible
     fetchAllHeroesAsync: () => Promise.reject(testError)
   };
 }
@@ -37,120 +36,152 @@ function throwingBackendFactory() {
 
 describe('HeroService (with angular DI)', () => {
 
-  let existingHero:Hero;
-
-  beforeEachBindings(() =>{
+  beforeEachBindings(() => {
     return [HeroService];
   });
 
-  beforeEach(() => {
-    heroData = HEROES.map(h => h.clone()); // Clean copy of the mock HEROES
-    existingHero = heroData[0];
-  });
+  describe('creation', () => {
 
-  describe('when backend provides data', () => {
-
-    beforeEachBindings(() =>{
-      return [bind(Backend).toFactory(happyBackendFactory)];
+    beforeEachBindings(() => {
+      // The backend doesn't matter.
+      return [bind(BackendService).toFactory(() => { })];
     });
 
-    describe('#refresh', () => {
+    it('can instantiate the service',
+      inject([HeroService], (service: HeroService) => {
+        expect(service).toBeDefined();
+      }));
 
-      it('returns heroes w/ expected # of heroes when ready',
+    it('heroes is empty',
+      inject([HeroService], (service: HeroService) => {
+        expect(service.heroes.length).toEqual(0);
+      }));
+  });
+
+  describe('#refresh', () => {
+
+    describe('when backend provides data', () => {
+
+      beforeEach(() => {
+        heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+      });
+
+      beforeEachBindings(() => {
+        return [bind(BackendService).toFactory(happyBackendFactory)];
+      });
+
+      it('returns expected # of heroes when fulfilled',
         inject([AsyncTestCompleter, HeroService],
           (async: AsyncTestCompleter, service: HeroService) => {
 
-        service.refresh()
-          .then( heroes => expect(heroes.length).toEqual(heroData.length) )
-          .catch(fail).then(() => async.done());
+          service.refresh()
+            .then(heroes =>
+              expect(heroes.length).toEqual(heroData.length)
+            )
+            .catch(fail).then(() => async.done());
+        }));
+
+      it('returns expected # of heroes when fulfilled (using injectAsync)',
+        injectAsync([HeroService], (service: HeroService) => {
+
+          return service.refresh()
+            .then(heroes =>
+              expect(heroes.length).toEqual(heroData.length)
+            );
+        }));
+
+      it('heroes array is empty until fulfilled',
+        injectAsync([HeroService], (service: HeroService) => {
+
+        let p = service.refresh();
+
+        // this test executed before refresh completes
+        expect(service.heroes.length).toEqual(0);
+
+        return p;
       }));
 
-      it('returns heroes w/ of heroes when ready (using injectAsync)',
+      it('heroes array is populated when fulfilled',
         injectAsync([HeroService], (service: HeroService) => {
 
         return service.refresh()
-          .then( heroes => expect(heroes.length).toEqual(heroData.length) );
+          .then(() =>
+            expect(service.heroes.length).toEqual(heroData.length)
+          );
       }));
 
-      it('returned heroes have no data when source data are empty',
+      it('returns no heroes when when source data are empty',
         injectAsync([HeroService], (service: HeroService) => {
 
         heroData = []; // simulate no heroes from the backend
 
         return service.refresh()
-          .then( heroes => expect(heroes.length).toEqual(0) );
+          .then(heroes =>
+            expect(heroes.length).toEqual(0)
+          );
       }));
 
-      it('re-execution preserves existing data in same cached array',
+      it('resets existing heroes array w/ original data when re-refresh',
         injectAsync([HeroService], (service: HeroService) => {
 
-        let firstHeroes:Hero[];
+        let firstHeroes: Hero[];
+        let changedName = 'Gerry Mander';
 
         return service.refresh()
-          .then( heroes => {
+          .then(heroes => {
             firstHeroes = heroes;
-            firstHeroes.push(new Hero('Perseus'));
-            return service.refresh();
-          })
-          .then(secondHeroes => {
-            expect(firstHeroes).toBe(secondHeroes);
-            expect (secondHeroes.length).toEqual(heroData.length + 1);
-          });
-      }));
-
-      it('re-execution returns same array w/ original data',
-        injectAsync([HeroService], (service: HeroService) => {
-
-        let firstHeroes:Hero[];
-
-        return service.refresh()
-          .then( heroes => {
-            firstHeroes = heroes;
+            // Changes to cache!  Should disappear after refresh
+            firstHeroes[0].name = changedName;
             firstHeroes.push(new Hero('Hercules'));
             return service.refresh()
           })
-          .then( secondHeroes => {
-            expect(firstHeroes).not.toBe(secondHeroes);
-            expect(firstHeroes.length).toEqual(heroData.length + 1);
-            expect(secondHeroes.length).toEqual(heroData.length);
+          .then(secondHeroes => {
+            expect(firstHeroes).toBe(secondHeroes); // same object
+            expect(firstHeroes.length).toEqual(heroData.length); // no Hercules
+            expect(firstHeroes[0].name).not.toEqual(changedName); // reverted name change
           });
       }));
 
     });
 
-  });
+    describe('when backend throws an error', () => {
 
-  describe('when backend throws an error', () => {
+      beforeEachBindings(() => {
+        return [bind(BackendService).toFactory(throwingBackendFactory)];
+      });
 
-    beforeEachBindings(() =>{
-      return [bind(Backend).toFactory(throwingBackendFactory)];
+      it('returns failed promise with the server error',
+        injectAsync([HeroService], (service: HeroService) => {
+
+        return service.refresh()
+          .then(_ => fail('refresh should have failed'))
+          .catch(err => expect(err).toBe(testError));
+      }));
+
+      it('resets heroes array to empty',
+        injectAsync([HeroService], (service: HeroService) => {
+
+        return service.refresh()
+          .then(_ => fail('refresh should have failed'))
+          .catch(err => expect(service.heroes.length).toEqual(0))
+      }));
     });
 
-    it('#fetchAllHeroesAsync fails with expected error',
-      injectAsync([HeroService], (service: HeroService) => {
-
-      return service.refresh()
-        .then( _ => fail('refresh should have failed') )
-        .catch(err => expect(err).toBe(testError) );
-      })
-    );
-
   });
-
 });
 
 //// mock spy versions
-function HappyBackendSpy(){
-  var mock = new Backend();
+function HappyBackendSpy() {
+  var mock = new BackendService();
   spyOn(mock, 'fetchAllHeroesAsync').and.callFake(() => {
     return Promise.resolve<Hero[]>(heroData);
   });
   return mock;
 }
 
-function ThrowingBackendSpy(){
-  var mock = new Backend();
-  testError ='backend.fetchAllHeroesAsync failed on purpose';
+function ThrowingBackendSpy() {
+  var mock = new BackendService();
+  testError = 'BackendService.fetchAllHeroesAsync failed on purpose';
   spyOn(mock, 'fetchAllHeroesAsync').and.callFake(() => {
     return Promise.reject(testError);
   });

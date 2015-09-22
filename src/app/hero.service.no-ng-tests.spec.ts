@@ -1,6 +1,6 @@
 // Test a service without using any Angular (no Angular DI)
 import {HeroService} from './hero.service';
-import {Backend} from './backend.service';
+import {BackendService} from './backend.service';
 import {Hero} from './hero';
 
 ///////// test helpers /////////
@@ -9,15 +9,15 @@ var heroData: Hero[];
 function happyBackendFactory() {
   return {
     // return a promise for fake heroes that resolves as quickly as possible
-    fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData.slice())
+    fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData.map(h => h.clone()))
   };
 }
 
-var testError = 'backend.fetchAllHeroesAsync failed on purpose';
+var testError = 'BackendService.fetchAllHeroesAsync failed on purpose';
 
 function throwingBackendFactory() {
   return {
-    // return a promise that failse as quickly as possible
+    // return a promise that fails as quickly as possible
     fetchAllHeroesAsync: () => Promise.reject(testError)
   };
 }
@@ -26,94 +26,122 @@ function throwingBackendFactory() {
 
 describe('HeroService (no-angular)', () => {
 
-  let existingHero: Hero;
   let service: HeroService;
 
-  describe('when backend provides data', () => {
-
-    beforeEach(() => {
-      heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
-      service = new HeroService(happyBackendFactory());
+  describe('creation', () => {
+    it('can instantiate the service', () => {
+      let service = new HeroService(null);
+      expect(service).toBeDefined();
     });
 
-    describe('#getAllHeroes', () => {
+    it('heroes is empty', () => {
+      let service = new HeroService(null);
+      expect(service.heroes.length).toEqual(0);
+    });
+  });
+
+  describe('#refresh', () => {
+
+    describe('when backend provides data', () => {
+
+      beforeEach(() => {
+        heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+        service = new HeroService(happyBackendFactory());
+      });
 
       it('returns expected # of heroes when fulfilled', done => {
-        service.getAllHeroes()
-          .then(heroes => {
-            expect(heroes.length).toEqual(heroData.length);
-          })
+        service.refresh()
+          .then(heroes =>
+            expect(heroes.length).toEqual(heroData.length)
+          )
           .catch(fail).then(done);
       });
 
       // the paranoid will verify not only that the array lengths are the same
       // but also that the contents are the same.
-      it('returns the expected heroes when fulfilled', done => {
-        service.getAllHeroes()
+      it('returns the expected heroes when fulfilled (paranoia)', done => {
+        service.refresh()
           .then(heroes => {
             expect(heroes.length).toEqual(heroData.length);
-            heroData.forEach(h => expect(heroes).toContain(h));
+            heroes.forEach(h =>
+              expect(heroData.some(
+                // hero instances are not the same objects but
+                // each hero in result matches an original hero by value
+                hd => hd.name === h.name && hd.id === h.id)
+              )
+            );
           })
+          .catch(fail).then(done);
+      });
+
+      it('heroes array is empty until fulfilled', done => {
+        service.refresh()
+          .catch(fail).then(done);
+
+        // this test executed before refresh completes
+        expect(service.heroes.length).toEqual(0);
+      });
+
+      it('heroes array is populated when fulfilled', done => {
+        service.refresh()
+          .then(() =>
+            expect(service.heroes.length).toEqual(heroData.length)
+          )
           .catch(fail).then(done);
       });
 
       it('returns no heroes when source data are empty', done => {
         heroData = []; // simulate no heroes from the backend
 
-        service.getAllHeroes()
-          .then(heroes => {
-            expect(heroes.length).toEqual(0);
-          })
+        service.refresh()
+          .then(heroes =>
+            expect(heroes.length).toEqual(0)
+          )
           .catch(fail).then(done);
       });
 
-      it('re-execution preserves existing data in same cached array', done => {
+      it('resets existing heroes array w/ original data when re-refresh', done => {
         let firstHeroes: Hero[];
+        let changedName = 'Gerry Mander';
 
-        service.getAllHeroes()
+        service.refresh()
           .then(heroes => {
             firstHeroes = heroes;
-            firstHeroes.push(new Hero('Perseus'));
-            return service.getAllHeroes();
-          })
-          .then(secondHeroes => {
-            expect(firstHeroes).toBe(secondHeroes);
-            expect(secondHeroes.length).toEqual(heroData.length + 1);
-          })
-          .catch(fail).then(done);
-      });
-
-      it('re-execution w/ force=true returns new array w/ original data', done => {
-        let firstHeroes: Hero[];
-
-        service.getAllHeroes()
-          .then(heroes => {
-            firstHeroes = heroes;
+            // Changes to cache!  Should disappear after refresh
+            firstHeroes[0].name = changedName;
             firstHeroes.push(new Hero('Hercules'));
-            return service.getAllHeroes(true /*force*/)
+            return service.refresh()
           })
           .then(secondHeroes => {
-            expect(firstHeroes).not.toBe(secondHeroes);
-            expect(firstHeroes.length).toEqual(heroData.length + 1);
-            expect(secondHeroes.length).toEqual(heroData.length);
+            expect(firstHeroes).toBe(secondHeroes); // same object
+            expect(firstHeroes.length).toEqual(heroData.length); // no Hercules
+            expect(firstHeroes[0].name).not.toEqual(changedName); // reverted name change
           })
           .catch(fail).then(done);
       });
+
+    });
+
+    describe('when backend throws an error', () => {
+
+      beforeEach(() => {
+        service = new HeroService(throwingBackendFactory());
+      });
+
+      it('returns failed promise with the server error', done => {
+        service.refresh()
+          .then(_ => fail('refresh should have failed'))
+          .catch(err => expect(err).toEqual(testError))
+          .catch(fail).then(done);
+      });
+
+      it('resets heroes array to empty', done => {
+        service.refresh()
+          .then(_ => fail('refresh should have failed'))
+          .catch(err => expect(service.heroes.length).toEqual(0))
+          .catch(fail).then(done);
+      });
+
     });
   });
-  describe('when backend throws an error', () => {
-
-    beforeEach(() => {
-      service = new HeroService(throwingBackendFactory());
-    });
-
-    it('fails with expected error', done => {
-      service.getAllHeroes()
-        .then(_ => fail('getAllHeroes should have failed'))
-        .catch(err => expect(err).toBe(testError))
-        .catch(fail).then(done);
-    });
-
-  });
-
 });

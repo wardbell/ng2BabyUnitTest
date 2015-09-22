@@ -3,7 +3,7 @@ import {HEROES} from './mock-heroes';
 
 let delay = 1000; // ms delay in return of data
 
-export class Backend {
+export class BackendService {
 
 	fetchAllHeroesAsync(): Promise<Hero[]> {
 		return new Promise((resolve, reject) => {

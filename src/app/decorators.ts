@@ -10,7 +10,7 @@
 // by creating our own @Injectable decorator
 
 // for the hip Functional Programmer:
-export const Injectable = () => () => {}
+export const Injectable = () => (cls:any) => cls;
 
 // for everyone else, this is the same thing
-//export function Injectable() { return () => {}; }
+//export function Injectable() { return (cls:any) => cls; }

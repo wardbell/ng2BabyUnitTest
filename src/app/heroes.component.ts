@@ -27,7 +27,7 @@ export class HeroesComponent {
 
   get userName() { return this._user.name || 'someone'; }
 
-  getSelectedClass = (hero: Hero) => { selected: hero === this.currentHero };
+  getSelectedClass(hero: Hero) {return { selected: hero === this.currentHero }};
 
   onDelete(hero: Hero) {
     hero = hero || this.currentHero;
@@ -39,7 +39,7 @@ export class HeroesComponent {
   }
 
   onRefresh() {
-    console.log('Refreshing heroes');
+    //console.log('Refreshing heroes');
     // clear the decks
     this.currentHero = undefined;
     this._heroes = [];

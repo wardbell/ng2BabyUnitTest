@@ -7,7 +7,7 @@ import {
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/test';
 
-import {injectAsync, injectTcb} from 'test-helpers/test-helpers';
+import {injectAsync, injectTcb} from '../test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroDetailComponent} from './hero-detail.component';

@@ -29,7 +29,7 @@ describe('HeroService (test plan)', () => {
 });
 
 import {HeroService} from './hero.service';
-import {Backend} from './backend.service';
+import {BackendService} from './backend.service';
 import {Hero} from './hero';
 
 let heroData:Hero[];
@@ -52,7 +52,7 @@ describe('HeroService (intermediate tests)', () => {
 
 		// No good!
 		it('returns expected # of heroes when fulfilled', () => {
-			let backend = <Backend>{};
+			let backend = <BackendService>{};
 			let service = new HeroService(backend);
 			service.refresh()
 				.then(heroes => {
@@ -65,7 +65,7 @@ describe('HeroService (intermediate tests)', () => {
 
 			heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
 
-			let backend = <Backend>{
+			let backend = <BackendService>{
 				// return a promise for fake heroes that resolves as quickly as possible
 				fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData)
 			};
@@ -87,7 +87,7 @@ describe('HeroService (intermediate tests)', () => {
 
     heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
 
-    let backend = <Backend>{
+    let backend = <BackendService>{
 			// return a promise for fake heroes that resolves as quickly as possible
       fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData)
     };
@@ -109,7 +109,7 @@ describe('HeroService (intermediate tests)', () => {
 
     heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
 
-    let backend = <Backend>{
+    let backend = <BackendService>{
 			// return a promise for fake heroes that resolves as quickly as possible
       fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData)
     };
@@ -127,7 +127,7 @@ describe('HeroService (intermediate tests)', () => {
 
     heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
 
-    let backend = <Backend>{
+    let backend = <BackendService>{
 			// return a promise for fake heroes that resolves as quickly as possible
       fetchAllHeroesAsync: () => Promise.resolve<Hero[]>(heroData)
     };

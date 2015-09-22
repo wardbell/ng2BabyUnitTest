@@ -11,13 +11,12 @@ import {
   expectSelectedHtml,
   expectViewChildHtml,
   expectViewChildClass,
-  injectAsync, injectTcb, tick} from 'test-helpers/test-helpers';
+  injectAsync, injectTcb, tick} from '../test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroesComponent} from './heroes.component';
 import {Hero} from './hero';
 import {HeroService} from './hero.service';
-import {HEROES} from './mock-heroes';
 import {User} from './user';
 
 let heroData: Hero[]; // fresh heroes for each test
@@ -26,7 +25,7 @@ let mockUser: User;
 describe('HeroesComponent', () => {
 
   beforeEach(() => {
-    heroData = HEROES.map(h => h.clone()); // Clean copy of the mock HEROES
+    heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
     mockUser = new User();
   });
 
@@ -122,7 +121,6 @@ describe('HeroesComponent', () => {
     describe('#heroes', () => {
 
       it('binds view to heroes', injectTcb(tcb => {
-        heroData.length = 3; // only need a few
 
         // focus on the part of the template that displays heroes
         let template =
@@ -155,19 +153,19 @@ describe('HeroesComponent', () => {
 
     describe('#onSelected (TBD)', () => {
 
-      beforeEach(() => {
-        heroData.length = 3; // only need a few
-      })
-
       let hc: HeroesComponent;
 
       // The same setup for every test in this suite
-      function injectHC(testFn: (rootTC: RTC) => void) {
+      // TODO: Remove `withNgClass` and always include in template ONCE BUG IS FIXED
+      function injectHC(testFn: (rootTC: RTC) => void, withNgClass:boolean = false) {
+
+        // This is the bad boy:   [ng-class]="getSelectedClass(hero)"
+        let ngClass = withNgClass ? '[ng-class]="getSelectedClass(hero)"' : '';
+
         // focus on the part of the template that displays heroes
         let template =
-//        This is the bad boy:   [ng-class]="getSelectedClass(hero)"
           `<ul><li *ng-for="#hero of heroes"
-            [ng-class]="getSelectedClass(hero)"
+            ${ngClass}
             (click)="onSelect(hero)">
             ({{hero.id}}) {{hero.name}}
            </li></ul>`;
@@ -202,14 +200,15 @@ describe('HeroesComponent', () => {
         expect(hc.currentHero).toEqual(heroData[1]);
       }));
 
-      it('the view of the "currentHero" has the "selected" class', injectHC((rootTC:RTC) => {
+      // TODO: Remove `withNgClass=true` ONCE BUG IS FIXED
+      it('the view of the "currentHero" has the "selected" class (NG2 BUG)', injectHC((rootTC:RTC) => {
         hc.onSelect(heroData[1]); // select the second hero
 
         rootTC.detectChanges();
 
         // The 3rd ViewChild is 2nd hero; the 1st is for the template
         expectViewChildClass(rootTC, 2).toMatch('selected');
-      }));
+      }, true /* true == include ngClass */));
 
       it('the view of a non-selected hero does NOT have the "selected" class', injectHC((rootTC:RTC) => {
         hc.onSelect(heroData[1]); // select the second hero
@@ -228,12 +227,14 @@ describe('HeroesComponent', () => {
 
 class HappyHeroService {
 
-  cachedHeroes: Hero[];
+  heroes: Hero[];
 
-  getAllHeroes(force: boolean = false) {
-    if (force || !this.cachedHeroes) {
-      this.cachedHeroes = heroData.slice();
-    }
-    return Promise.resolve<Hero[]>(this.cachedHeroes)
+  refresh() {
+    this.heroes = [];
+    // updates cached heroes after one JavaScript cycle
+    return new Promise((resolve, reject) => {
+      this.heroes.push(...heroData);
+      resolve(this.heroes);
+    });
   }
 }

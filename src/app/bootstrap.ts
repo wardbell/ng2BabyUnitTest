@@ -4,8 +4,8 @@ import {bootstrap} from 'angular2/angular2';
 import {HeroesComponent} from './heroes.component';
 
 // Application-wide "injectables""
-import {Backend} from './backend.service';
+import {BackendService} from './backend.service';
 import {HeroService} from './hero.service';
 import {User} from './user';
 
-bootstrap(HeroesComponent, [Backend, HeroService, User]);
+bootstrap(HeroesComponent, [BackendService, HeroService, User]);

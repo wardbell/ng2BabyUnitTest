@@ -1,14 +1,14 @@
 //import {Injectable} from 'angular2/angular2'; // Don't get it from Angular
 import {Injectable} from './decorators'; // Use the app's version
 import {Hero} from './hero';
-import {Backend} from './backend.service';
+import {BackendService} from './backend.service';
 
 @Injectable()
 export class HeroService implements IHeroService {
 
 	heroes: Hero[] = []; // cache of heroes
 
-	constructor(private _backend: Backend) { }
+	constructor(private _backend: BackendService) { }
 
 	refresh() {
 		this.heroes.length = 0;
