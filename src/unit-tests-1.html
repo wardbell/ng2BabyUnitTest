@@ -1,20 +1,25 @@
 <!-- #docregion -->
 <!DOCTYPE html>
 <html>
-<meta http-equiv="content-type" content="text/html;charset=utf-8">
-<title>Ng App Unit Tests</title>
-<link rel="stylesheet" href="../node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>Ng App Unit Tests</title>
+  <link rel="stylesheet" href="../node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
 
-<script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
-<script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
-<script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
-
+  <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+  <script src="../node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+  <script src="../node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
 </head>
 
 <body>
+  <!-- Unit Testing Chapter #1: Proof of life.  -->
+  <script>
+    it('true is true', function(){ expect(true).toEqual(true); });
+  </script>
+
   <!-- load the application's User definition -->
   <script src="app/user.js"></script>
-  
+
   <script>
     // Demo only!
     describe('User', function() {
