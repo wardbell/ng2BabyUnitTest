@@ -33,7 +33,7 @@ export var HEROES: Hero[] = [
 	},
 	{
 		"id": 16,
-		"name": "RubberMan",
+		"name": "Rubber Man",
 		"alterEgo": "Jimmy Longfellow",
 		"power": "Super flexible"
 	},
@@ -60,5 +60,11 @@ export var HEROES: Hero[] = [
 		"name": "Tornado",
 		"alterEgo": "Ted Baxter",
 		"power": "Weather changer"
+	},
+	{
+		"id": 21,
+		"name": "eeny weenie",
+		"alterEgo": "Ima Small",
+		"power": "shrink to infinitesimal size"
 	}
 ].map(heroData => new Hero(heroData));
