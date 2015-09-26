@@ -12,7 +12,14 @@ describe('Hero', () => {
     expect(hero.id).toEqual(1);
   });
 
+
   /* more tests we could run
+
+  it('can clone itself', () => {
+    let hero = new Hero(1, 'Super Cat');
+    let clone = hero.clone();
+    expect(hero).toEqual(clone);
+  });
   
   it('has expected generated id when id not given in the constructor', () => {
     Hero.setNextId(100); // reset the `nextId` seed

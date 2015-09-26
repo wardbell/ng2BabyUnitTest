@@ -10,7 +10,7 @@ export class Hero {
 		this.id = id || nextId++;
 	}
 
-	clone = (h:Hero) => Hero.clone(this);
+	clone() { return Hero.clone(this); }
 
 	static clone = (h:any) => new Hero(h.id, h.name, h.alterEgo, h.power);
 
