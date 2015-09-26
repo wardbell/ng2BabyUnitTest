@@ -110,7 +110,7 @@ describe('HeroDetailComponent', () => {
   directives: [HeroDetailComponent]
 })
 class TestWrapper {
-  currentHero = new Hero('Cat Woman', 42);
+  currentHero = new Hero(42, 'Cat Woman');
   userName = 'Sally';
   testCallback() {} // monkey-punched in a test
   onDelete() { this.testCallback(); }

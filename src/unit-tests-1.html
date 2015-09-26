@@ -12,11 +12,6 @@
 </head>
 
 <body>
-  <!-- Unit Testing Chapter #1: Proof of life.  -->
-  <script>
-    it('true is true', function(){ expect(true).toEqual(true); });
-  </script>
-
   <!-- load the application's User definition -->
   <script src="app/hero.js"></script>
 
@@ -24,14 +19,14 @@
     // Demo only!
     describe('Hero', function() {
 
-      it('has name given in the ctor', function() {
-        var hero = new Hero('Super Cat');
+      it('has name given in the constructor', function() {
+        var hero = new Hero(1, 'Super Cat');
         expect(hero.name).toEqual('Super Cat');
       });
 
-      it('has id given in the ctor', function() {
-        var hero = new Hero('Cool Kitty', 42);
-        expect(hero.id).toEqual(42);
+      it('has id given in the constructor', function() {
+        var hero = new Hero(2, 'Cool Kitty');
+        expect(hero.id).toEqual(2);
       });
     });
   </script>

@@ -63,7 +63,7 @@ describe('HeroService (intermediate tests)', () => {
 		// better ... but not async!
 		it('returns expected # of heroes when fulfilled', () => {
 
-			heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+			heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3, 'Baz')];
 
 			let backend = <BackendService>{
 				// return a promise for fake heroes that resolves as quickly as possible
@@ -85,7 +85,7 @@ describe('HeroService (intermediate tests)', () => {
   // Now it's async!
 	it('returns expected # of heroes when fulfilled', done => {
 
-    heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+		heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3, 'Baz')];
 
     let backend = <BackendService>{
 			// return a promise for fake heroes that resolves as quickly as possible
@@ -107,7 +107,7 @@ describe('HeroService (intermediate tests)', () => {
   // Final before catch
 	it('returns expected # of heroes when fulfilled', done => {
 
-    heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+		heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3, 'Baz')];    heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
 
     let backend = <BackendService>{
 			// return a promise for fake heroes that resolves as quickly as possible
@@ -125,7 +125,7 @@ describe('HeroService (intermediate tests)', () => {
 	// Final before beforeEach refactoring
 	it('returns expected # of heroes when fulfilled', done => {
 
-    heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+		heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3, 'Baz')];
 
     let backend = <BackendService>{
 			// return a promise for fake heroes that resolves as quickly as possible

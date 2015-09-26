@@ -25,7 +25,7 @@ let mockUser: User;
 describe('HeroesComponent', () => {
 
   beforeEach(() => {
-    heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+    heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3, 'Baz')];
     mockUser = new User();
   });
 
@@ -69,7 +69,7 @@ describe('HeroesComponent', () => {
           .then(() => {
             heroes = hc.heroes; // now the component has heroes to show
             heroes[0].name = 'Wotan';
-            heroes.push(new Hero('Thor'));
+            heroes.push(new Hero(33, 'Thor'));
             hc.onRefresh();
           })
           .then(() => {

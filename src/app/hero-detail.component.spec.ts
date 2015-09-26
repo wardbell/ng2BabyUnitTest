@@ -69,7 +69,7 @@ describe('HeroDetailComponent', () => {
 
     it('onUpdate method should modify hero', () => {
       let hdc = new HeroDetailComponent();
-      hdc.hero = new Hero('Cat Woman', 42);
+      hdc.hero = new Hero(42, 'Cat Woman');
       let origNameLength = hdc.hero.name.length;
 
       hdc.onUpdate();
@@ -130,7 +130,7 @@ describe('HeroDetailComponent', () => {
         .then((rootTC: RTC) => {
 
           let hdc: HeroDetailComponent = rootTC.componentInstance;
-          hdc.hero = new Hero('Cat Woman', 42);
+          hdc.hero = new Hero(42, 'Cat Woman');
           let origNameLength = hdc.hero.name.length;
 
           // trigger the 'click' event on the HeroDetailComponent update button
@@ -152,7 +152,7 @@ describe('HeroDetailComponent', () => {
 
           hdc = rootTC.componentInstance;
 
-          hdc.hero = new Hero('Cat Woman');
+          hdc.hero = new Hero(42, 'Cat Woman');
           rootTC.detectChanges();
 
           // get the HTML element and change its value in the DOM
@@ -181,8 +181,8 @@ describe('HeroDetailComponent', () => {
     it('toggling heroes after modifying name preserves the change on screen (NG2 BUG)', injectTcb(tcb => {
 
       let hdc: HeroDetailComponent;
-      let hero1 = new Hero('Cat Woman', 1);
-      let hero2 = new Hero('Goat Boy', 2);
+      let hero1 = new Hero(1, 'Cat Woman');
+      let hero2 = new Hero(2, 'Goat Boy');
       let input: HTMLInputElement;
       let rootTC: RTC;
       let template = `{{hero.id}} - <input [(ng-model)]="hero.name"/>`

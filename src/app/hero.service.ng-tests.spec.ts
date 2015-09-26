@@ -63,7 +63,7 @@ describe('HeroService (with angular DI)', () => {
     describe('when backend provides data', () => {
 
       beforeEach(() => {
-        heroData = [new Hero('Foo'), new Hero('Bar'), new Hero('Baz')];
+        heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3,'Baz')];
       });
 
       beforeEachBindings(() => {
@@ -132,7 +132,7 @@ describe('HeroService (with angular DI)', () => {
             firstHeroes = heroes;
             // Changes to cache!  Should disappear after refresh
             firstHeroes[0].name = changedName;
-            firstHeroes.push(new Hero('Hercules'));
+            firstHeroes.push(new Hero(42, 'Hercules'));
             return service.refresh()
           })
           .then(secondHeroes => {

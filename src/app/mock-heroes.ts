@@ -67,4 +67,4 @@ export var HEROES: Hero[] = [
 		"alterEgo": "Ima Small",
 		"power": "shrink to infinitesimal size"
 	}
-].map(heroData => new Hero(heroData));
+	].map(h => Hero.clone(h));
