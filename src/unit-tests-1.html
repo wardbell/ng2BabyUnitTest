@@ -1,6 +1,7 @@
 <!-- #docregion -->
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <title>Ng App Unit Tests</title>
@@ -24,12 +25,19 @@
         expect(hero.name).toEqual('Super Cat');
       });
 
-      it('has id given in the constructor', function() {
-        var hero = new Hero(2, 'Cool Kitty');
-        expect(hero.id).toEqual(2);
+      it('has the id given in the constructor', function() {
+        var hero = new Hero(1, 'Super Cat');
+        expect(hero.id).toEqual(1);
       });
+
     });
   </script>
+
+  <!-- THIS WON'T WORK
+  <script src="app/hero.js"></script>
+  <script src="app/hero.spec.js"></script>
+  -->
+
 </body>
 
 </html>
