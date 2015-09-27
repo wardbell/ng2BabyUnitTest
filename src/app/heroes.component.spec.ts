@@ -48,12 +48,14 @@ describe('HeroesComponent', () => {
     describe('#heroes', () => {
 
       it('lacks heroes when created', () => {
-        let heroes = hc.heroes; // trigger service
+        hc.onInit(); // component initialization triggers service
+        let heroes = hc.heroes;
         expect(heroes.length).toEqual(0); // not filled yet
       });
 
       it('has heroes after cache loaded', injectAsync(() => {
-        let heroes = hc.heroes; // trigger service
+        hc.onInit(); // component initialization triggers service
+        let heroes = hc.heroes;
 
         return tick() // Wait for heroes to arrive
           .then(() => {
@@ -63,7 +65,8 @@ describe('HeroesComponent', () => {
       }));
 
       it('restores heroes after refresh called', injectAsync(() => {
-        let heroes = hc.heroes; // trigger service
+        hc.onInit(); // component initialization triggers service
+        let heroes = hc.heroes;
 
         return tick() // Wait for heroes to arrive
           .then(() => {
@@ -100,7 +103,25 @@ describe('HeroesComponent', () => {
       return tcb
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
-        .then((rootTC: RTC) => expect(true).toBe(true)); // proof of life
+        .then((rootTC: RTC) => {
+          let hc: HeroesComponent = rootTC.componentInstance;
+          expect(hc).toBeDefined();// proof of life
+        });
+    }));
+
+    it('onInit called after the test calls detectChanges', injectTcb(tcb => {
+      let template = '<h1></h1>';
+      return tcb
+        .overrideTemplate(HeroesComponent, template)
+        .createAsync(HeroesComponent)
+        .then((rootTC: RTC) => {
+          let hc: HeroesComponent = rootTC.componentInstance;
+          let spy = spyOn(hc, 'onInit').and.callThrough();
+
+          expect(spy.calls.count()).toEqual(0);
+          rootTC.detectChanges();
+          expect(spy.calls.count()).toEqual(1);
+        });
     }));
 
     it('binds view to userName', injectTcb(tcb => {
@@ -131,10 +152,10 @@ describe('HeroesComponent', () => {
           .overrideTemplate(HeroesComponent, template)
           .createAsync(HeroesComponent)
           .then((rootTC: RTC) => {
-            // trigger {{heroes}} binding which triggers async getAllHeroes
+            // trigger {{heroes}} binding
             rootTC.detectChanges();
 
-            // hc.heroes is still undefined; need a JS cycle to get the data
+            // hc.heroes is still empty; need a JS cycle to get the data
             return rootTC;
           })
           .then((rootTC: RTC) => {
@@ -230,7 +251,7 @@ function injectHC(testFn: (hc: HeroesComponent, rootTC?: RTC) => void, withNgCla
     .createAsync(HeroesComponent)
     .then((rootTC:RTC) => {
       hc = rootTC.componentInstance;
-      rootTC.detectChanges();// trigger {{heroes}} binding which triggers async getAllHeroes
+      rootTC.detectChanges();// trigger {{heroes}} binding
       return rootTC;
     })
     .then((rootTC:RTC) => { // wait a tick until heroes are fetched

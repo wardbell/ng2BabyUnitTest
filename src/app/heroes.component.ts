@@ -1,4 +1,4 @@
-import {Component, View} from 'angular2/angular2';
+import {Component, View, OnInit} from 'angular2/angular2';
 import {COMMON_DIRECTIVES} from './constants';
 import {HeroDetailComponent} from './hero-detail.component';
 import {HeroService} from './hero.service';
@@ -13,37 +13,40 @@ import {User} from './user';
   directives: [HeroDetailComponent, COMMON_DIRECTIVES],
   styleUrls: ['app/heroes.component.css']
 })
-export class HeroesComponent {
-  private _heroes: Hero[];
+export class HeroesComponent implements OnInit {
+  heroes: Hero[] = [];
   currentHero: Hero;
+  userName: string;
 
-  constructor(private _heroService: HeroService, private _user: User) {   }
-
-  get heroes() { return this._heroes || this.onRefresh(); }
-
-  get userName() { return this._user.name || 'someone'; }
+  constructor(private _heroService: HeroService, private _user: User) {
+    this.userName = this._user.name || 'someone';
+  }
 
   getSelectedClass(hero: Hero) {return { selected: hero === this.currentHero }};
 
   onDelete(hero: Hero) {
     hero = hero || this.currentHero;
-    let i = this._heroes.indexOf(hero);
+    let i = this.heroes.indexOf(hero);
     if (i > -1) {
-      this._heroes.splice(i, 1);
+      this.heroes.splice(i, 1);
     }
-    this.currentHero = this._heroes[i] || this._heroes[i - 1];
+    this.currentHero = this.heroes[i] || this.heroes[i - 1];
+  }
+
+  onInit(){
+    this.heroes = this.onRefresh();
   }
 
   onRefresh() {
     //console.log('Refreshing heroes');
     // clear the decks
     this.currentHero = undefined;
-    this._heroes = [];
+    this.heroes = [];
 
     this._heroService.refresh()
-      .then(heroes => this._heroes = heroes);
+      .then(heroes => this.heroes = heroes);
 
-    return this._heroes;
+    return this.heroes;
   }
 
   onSelect(hero: Hero) {
