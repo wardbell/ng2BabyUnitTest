@@ -4,30 +4,29 @@ import {Hero} from './hero';
 import {BackendService} from './backend.service';
 
 @Injectable()
-export class HeroService implements IHeroService {
+export class HeroService {
 
 	heroes: Hero[] = []; // cache of heroes
 
-	constructor(private _backend: BackendService) { }
+	constructor(protected _backend: BackendService) { }
 
-	refresh() {
+	refresh() : Promise<Hero[]> { // refresh heroes w/ latest from the server
 		this.heroes.length = 0;
-		return this._backend.fetchAllHeroesAsync()
+		return <Promise<Hero[]>> this._backend.fetchAllHeroesAsync()
 			.then(heroes => {
 				this.heroes.push(...heroes);
 				return this.heroes;
 			})
-			//.catch(e => this._fetchFailed(e)) // want we want to say
-			// baroque way to ensure promise stays Promise<Hero[]>
-			.then<Hero[]>(_ => _, e => this._fetchFailed(e));
+			.catch(e => this._fetchFailed(e));
 	}
 
-	private _fetchFailed(error:any) {
+	protected _fetchFailed(error:any) {
 		console.error(error);
 		return Promise.reject(error);
 	}
 }
 
+// FOR DOCUMENTATION ONLY. NOT USED
 interface IHeroService {
 	heroes : Hero[];
 	refresh() : Promise<Hero[]>;
