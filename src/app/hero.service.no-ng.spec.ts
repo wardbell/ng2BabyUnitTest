@@ -23,8 +23,6 @@ describe('HeroService (no-angular)', () => {
 
     describe('when backend provides data', () => {
 
-      let service:HeroService; // local to describe so tests can see it
-
       beforeEach(() => {
         heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3,'Baz')];
         service = new HeroService(new HappyBackendService());
@@ -33,7 +31,7 @@ describe('HeroService (no-angular)', () => {
 
       it('refresh promise returns expected # of heroes when fulfilled', done => {
         service.refresh().then(heroes =>
-            expect(service.heroes.length).toEqual(heroData.length)
+            expect(heroes.length).toEqual(heroData.length)
           )
           .catch(fail).then(done);
       });
@@ -55,7 +53,7 @@ describe('HeroService (no-angular)', () => {
       it('service.heroes remains empty when the server returns no data', done => {
         heroData = []; // simulate no heroes from the backend
 
-        service.refresh().then(heroes =>
+        service.refresh().then(() =>
             expect(service.heroes.length).toEqual(0)
           )
           .catch(fail).then(done);
@@ -82,8 +80,7 @@ describe('HeroService (no-angular)', () => {
       });
 
       it('clears service.heroes while waiting for re-refresh', done => {
-        service.refresh()
-          .then(() => {
+        service.refresh().then(() => {
             service.refresh();
             expect(service.heroes.length).toEqual(0);
           })

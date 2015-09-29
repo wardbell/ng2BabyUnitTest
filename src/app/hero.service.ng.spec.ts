@@ -34,7 +34,7 @@ describe('HeroService (with angular DI)', () => {
         expect(service).toBeDefined();
       }));
 
-    it('heroes is empty',
+    it('service.heroes is empty',
       inject([HeroService], (service: HeroService) => {
         expect(service.heroes.length).toEqual(0);
       }));
@@ -52,16 +52,7 @@ describe('HeroService (with angular DI)', () => {
         [bind(BackendService).toClass(HappyBackendService)]
       );
 
-      it('heroes array is empty until fulfilled',
-        inject([HeroService], (service: HeroService) => {
-
-        service.refresh();
-
-        // executed before refresh completes
-        expect(service.heroes.length).toEqual(0);
-      }));
-
-      it('returns expected # of heroes when fulfilled',
+      it('refresh promise returns expected # of heroes when fulfilled',
         inject([AsyncTestCompleter, HeroService],
           (async: AsyncTestCompleter, service: HeroService) => {
 
@@ -71,7 +62,7 @@ describe('HeroService (with angular DI)', () => {
             .catch(fail).then(() => async.done());
         }));
 
-      it('returns expected # of heroes when fulfilled (using injectAsync)',
+      it('refresh promise returns expected # of heroes when fulfilled (using injectAsync)',
         injectAsync([HeroService], (service: HeroService) => {
 
           return service.refresh().then(heroes =>
@@ -79,7 +70,7 @@ describe('HeroService (with angular DI)', () => {
             );
         }));
 
-      it('heroes array is populated when fulfilled',
+      it('service.heroes has expected # of heroes when fulfilled',
         injectAsync([HeroService], (service: HeroService) => {
 
         return service.refresh().then(() =>
@@ -87,34 +78,68 @@ describe('HeroService (with angular DI)', () => {
           );
       }));
 
-      it('returns no heroes when when source data are empty',
+      it('service.heroes remains empty until fulfilled',
+        inject([HeroService], (service: HeroService) => {
+
+        service.refresh();
+
+        // executed before refresh completes
+        expect(service.heroes.length).toEqual(0);
+      }));
+
+      it('service.heroes remains empty when the server returns no data',
         injectAsync([HeroService], (service: HeroService) => {
 
         heroData = []; // simulate no heroes from the backend
 
-        return service.refresh()
-          .then(heroes =>
-            expect(heroes.length).toEqual(0)
+        return service.refresh().then(() =>
+            expect(service.heroes.length).toEqual(0)
           );
       }));
 
-      it('resets existing heroes array w/ original data when re-refresh',
+      it('resets service.heroes w/ original data after re-refresh',
         injectAsync([HeroService], (service: HeroService) => {
 
         let firstHeroes: Hero[];
         let changedName = 'Gerry Mander';
 
         return service.refresh().then(heroes => {
-            firstHeroes = heroes;
+            firstHeroes = heroes;  // remember array reference
+
             // Changes to cache!  Should disappear after refresh
-            firstHeroes[0].name = changedName;
-            firstHeroes.push(new Hero(42, 'Hercules'));
+            service.heroes[0].name = changedName;
+            service.heroes.push(new Hero(33, 'Hercules'));
             return service.refresh()
           })
-          .then(secondHeroes => {
-            expect(firstHeroes).toBe(secondHeroes); // same object
-            expect(firstHeroes.length).toEqual(heroData.length); // no Hercules
-            expect(firstHeroes[0].name).not.toEqual(changedName); // reverted name change
+          .then(() => {
+            expect(firstHeroes).toBe(service.heroes); // same object
+            expect(service.heroes.length).toEqual(heroData.length); // no Hercules
+            expect(service.heroes[0].name).not.toEqual(changedName); // reverted name change
+          });
+      }));
+
+      it('clears service.heroes while waiting for re-refresh',
+        injectAsync([HeroService], (service: HeroService) => {
+
+        return service.refresh().then(() => {
+            service.refresh();
+            expect(service.heroes.length).toEqual(0);
+          });
+      }));
+      // the paranoid will verify not only that the array lengths are the same
+      // but also that the contents are the same.
+      it('service.heroes has expected heroes when fulfilled (paranoia)',
+        injectAsync([HeroService], (service: HeroService) => {
+
+        return service.refresh().then(() => {
+            expect(service.heroes.length).toEqual(heroData.length);
+            service.heroes.forEach(h =>
+              expect(heroData.some(
+                // hero instances are not the same objects but
+                // each hero in result matches an original hero by value
+                hd => hd.name === h.name && hd.id === h.id)
+              )
+            );
           });
       }));
 

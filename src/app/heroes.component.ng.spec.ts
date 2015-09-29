@@ -169,7 +169,7 @@ describe('HeroesComponent (with Angular)', () => {
     }));
 
     // TODO: Remove `withNgClass=true` ONCE BUG IS FIXED
-    it('the view of the "currentHero" has the "selected" class (NG2 BUG)', injectHC((hc, rootTC) => {
+    xit('the view of the "currentHero" has the "selected" class (NG2 BUG)', injectHC((hc, rootTC) => {
       hc.onSelect(heroData[1]); // select the second hero
 
       rootTC.detectChanges();
