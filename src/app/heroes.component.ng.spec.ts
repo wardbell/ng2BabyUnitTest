@@ -211,8 +211,8 @@ describe('HeroesComponent (with Angular)', () => {
           // confirm hero list is not displayed by looking for removed hero
           expect(rootTC.nativeElement.innerHTML).not.toMatch(heroData[1].name);
         });
-  }));
-
+    }));
+  });
 });
 
 ////// Helpers //////
