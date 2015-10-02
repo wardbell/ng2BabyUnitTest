@@ -24,7 +24,7 @@ export class HeroesComponent implements OnInit {
 
   getSelectedClass(hero: Hero) {return { selected: hero === this.currentHero }};
 
-  onDelete(hero: Hero) {
+  onDelete(hero?: Hero) {
     hero = hero || this.currentHero;
     let i = this.heroes.indexOf(hero);
     if (i > -1) {

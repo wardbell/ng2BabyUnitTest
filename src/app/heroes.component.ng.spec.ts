@@ -118,11 +118,9 @@ describe('HeroesComponent (with Angular)', () => {
   })
 
   describe('#heroes', () => {
-    // focus on the part of the template that displays heroes
+    // focus on the part of the template that displays heroe names
     let template =
-      `<ul>
-        <li *ng-for="#h of heroes">({{h.id}}) {{h.name}}</li>
-      </ul>`;
+      '<ul><li *ng-for="#h of heroes">{{h.name}}</li></ul>';
 
     it('binds view to heroes', injectTcb((tcb:TCB) => {
       return tcb
@@ -186,6 +184,34 @@ describe('HeroesComponent (with Angular)', () => {
     }));
 
   });
+
+  // Most #onDelete tests not re-implemented because
+  // writing those tests w/in Angular adds little value and
+  // is far more painful than writing them to run outside Angular
+  // Only bother with the one test that checks the DOM
+  describe('#onDeleted', () => {
+    let template =
+      '<ul><li *ng-for="#h of heroes">{{h.name}}</li></ul>';
+
+    it('the list view does not contain the "deleted" currentHero', injectTcb((tcb:TCB) => {
+      return tcb
+        .overrideTemplate(HeroesComponent, template)
+        .createAsync(HeroesComponent)
+        .then((rootTC: RTC) => {
+          hc = rootTC.componentInstance;
+          // trigger {{heroes}} binding
+          rootTC.detectChanges();
+          return rootTC; // wait for heroes to arrive
+        })
+        .then((rootTC: RTC) => {
+          hc.currentHero = heroData[1];
+          hc.onDelete()
+          rootTC.detectChanges(); // trigger component property binding
+
+          // confirm hero list is not displayed by looking for removed hero
+          expect(rootTC.nativeElement.innerHTML).not.toMatch(heroData[1].name);
+        });
+  }));
 
 });
 
