@@ -2,32 +2,27 @@
 
 // Angular 2 Test Bed
 import {
-AsyncTestCompleter, beforeEachBindings, inject,
-beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
+  beforeEach, xdescribe, describe, it, xit, // Jasmine wrappers
+  beforeEachBindings, inject, AsyncTestCompleter
 } from 'angular2/test';
 
 import {bind} from 'angular2/angular2';
 import {injectAsync} from '../test-helpers/test-helpers';
 
 // Service related imports
-import {Hero} from './hero';
 import {HeroService} from './hero.service';
 import {BackendService} from './backend.service';
+import {Hero} from './hero';
 
 //////  tests ////////////
 
 describe('HeroService (with angular DI)', () => {
 
-  beforeEachBindings(() => {
-    return [HeroService];
-  });
+  beforeEachBindings(() => [HeroService]);
 
   describe('creation', () => {
 
-    beforeEachBindings(() => {
-      // The backend doesn't matter but we need it because HeroService expects it
-      return [bind(BackendService).toFactory(() => { })];
-    });
+    beforeEachBindings( () => [bind(BackendService).toValue(null)] );
 
     it('can instantiate the service',
       inject([HeroService], (service: HeroService) => {
