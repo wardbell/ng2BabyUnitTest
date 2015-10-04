@@ -4,7 +4,7 @@
 import {
   beforeEach, xdescribe, describe, it, xit, // Jasmine wrappers
   beforeEachBindings, inject, AsyncTestCompleter
-} from 'angular2/test';
+} from 'angular2/test_lib';
 
 import {bind} from 'angular2/angular2';
 import {injectAsync} from '../test-helpers/test-helpers';

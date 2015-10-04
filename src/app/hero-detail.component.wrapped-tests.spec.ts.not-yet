@@ -5,7 +5,7 @@ import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'a
 import {
   beforeEachBindings, By, DebugElement, RootTestComponent as RTC,
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
-} from 'angular2/test';
+} from 'angular2/test_lib';
 
 import {injectAsync, injectTcb} from '../test-helpers/test-helpers';
 

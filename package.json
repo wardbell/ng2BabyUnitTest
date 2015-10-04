@@ -1,7 +1,8 @@
 {
   "name": "ng2BabyUnitTest",
+  "version": "1.0.0",
   "description": "Angular 2 Baby Unit Testing",
-  "version": "0.0.1",
+  "main": "index.js",
   "scripts": {
     "postinstall": "npm run tsd",
     "tsd": "tsd link --config src/tsd.json && tsd reinstall -ro --config src/tsd.json",
@@ -9,29 +10,26 @@
     "start": "live-server --open=src",
     "test": "live-server --open=src/unit-tests.html"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wardbell/ng2BabyUnitTest"
-  },
-  "licenses": [
-    {
-      "type": "Apache",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    }
-  ],
   "dependencies": {
-    "angular2": "2.0.0-alpha.37",
-    "systemjs": "0.19.0",
-    "traceur": "0.0.91"
+    "angular2": "2.0.0-alpha.38",
+    "systemjs": "0.19.2"
   },
   "devDependencies": {
     "jasmine-core": "^2.3.4",
-    "karma": "^0.13.8",
-    "karma-chrome-launcher": "^0.2.0",
-    "karma-jasmine": "^0.3.6",
-    "zone.js": "^0.5.3"
+    "live-server": "0.8.1",
+    "tsd": "0.6.5",
+    "typescript": "1.6.2",
+    "zone.js": "^0.5.7"
   },
-  "contributors": [
-    "Ward Bell <wardb@ideablade.com>"
-  ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wardbell/ng2BabyUnitTest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wardbell/ng2BabyUnitTest/issues"
+  },
+  "homepage": "https://github.com/wardbell/ng2BabyUnitTest#readme"
 }

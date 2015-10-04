@@ -6,7 +6,7 @@ import {
   beforeEachBindings, By, DebugElement,
   RootTestComponent as RTC,
   TestComponentBuilder as TCB
-} from 'angular2/test';
+} from 'angular2/test_lib';
 
 import {
   expectSelectedHtml,

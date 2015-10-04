@@ -144,6 +144,7 @@ var testError = 'BackendService.fetchAllHeroesAsync failed on purpose';
 
 class FailingBackendService {
   // return a promise that fails as quickly as possible
-  fetchAllHeroesAsync = () =>
-    Promise.reject(testError);
+  // force-cast it to <Promise<Hero[]> because of TS typing bug.
+  fetchAllHeroesAsync =  () =>
+    <Promise<Hero[]>> <any> Promise.reject(testError);
 }

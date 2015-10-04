@@ -5,7 +5,7 @@ import {
   inject,
   RootTestComponent,
   TestComponentBuilder,
-} from 'angular2/test';
+} from 'angular2/test_lib';
 
 ///////// test-lib `inject` wrappers  /////////
 
