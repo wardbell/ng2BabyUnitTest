@@ -1,4 +1,4 @@
-import {Component, View, OnInit} from 'angular2/angular2';
+import {Component, OnInit} from 'angular2/core';
 import {COMMON_DIRECTIVES} from './constants';
 import {HeroDetailComponent} from './hero-detail.component';
 import {HeroService} from './hero.service';
@@ -6,9 +6,7 @@ import {Hero} from './hero';
 import {User} from './user';
 
 @Component({
-  selector: 'my-heroes'
-})
-@View({
+  selector: 'my-heroes',
   templateUrl: 'app/heroes.component.html',
   directives: [HeroDetailComponent, COMMON_DIRECTIVES],
   styleUrls: ['app/heroes.component.css']

@@ -1,12 +1,12 @@
 ///// Angular 2 Test Bed  ////
-import {bind} from 'angular2/angular2';
+import {bind} from 'angular2/core';
 
 import {
   beforeEach, xdescribe, describe, it, xit, // Jasmine wrappers
-  beforeEachBindings, By, DebugElement,
+  beforeEachProviders, By, DebugElement,
   RootTestComponent as RTC,
   TestComponentBuilder as TCB
-} from 'angular2/test_lib';
+} from 'angular2/testing';
 
 import {
   expectSelectedHtml,
@@ -38,7 +38,7 @@ describe('HeroesComponent (with Angular)', () => {
 
   // Set up DI bindings required by component (and its nested components?)
   // else hangs silently forever
-  beforeEachBindings(() => [
+  beforeEachProviders(() => [
     bind(HeroService).toClass(HappyHeroService),
     bind(User).toValue(mockUser)
   ]);

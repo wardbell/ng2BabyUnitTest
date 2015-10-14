@@ -1,12 +1,12 @@
 ///// Boiler Plate ////
-import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2';
+import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/core';
 
 // Angular 2 Test Bed
 import {
-  AsyncTestCompleter, beforeEachBindings, By, DebugElement, dispatchEvent,
+  AsyncTestCompleter, beforeEachProviders, By, DebugElement, dispatchEvent,
   inject, RootTestComponent as RTC,
   beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
-} from 'angular2/test_lib';
+} from 'angular2/testing';
 
 import {injectAsync, injectTcb, tick} from '../test-helpers/test-helpers';
 

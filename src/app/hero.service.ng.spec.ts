@@ -3,10 +3,10 @@
 // Angular 2 Test Bed
 import {
   beforeEach, xdescribe, describe, it, xit, // Jasmine wrappers
-  beforeEachBindings, inject, AsyncTestCompleter
-} from 'angular2/test_lib';
+  beforeEachProviders, inject, AsyncTestCompleter
+} from 'angular2/testing';
 
-import {bind} from 'angular2/angular2';
+import {bind} from 'angular2/core';
 import {injectAsync} from '../test-helpers/test-helpers';
 
 // Service related imports
@@ -18,11 +18,11 @@ import {Hero} from './hero';
 
 describe('HeroService (with angular DI)', () => {
 
-  beforeEachBindings(() => [HeroService]);
+  beforeEachProviders(() => [HeroService]);
 
   describe('creation', () => {
 
-    beforeEachBindings( () => [bind(BackendService).toValue(null)] );
+    beforeEachProviders( () => [bind(BackendService).toValue(null)] );
 
     it('can instantiate the service',
       inject([HeroService], (service: HeroService) => {
@@ -43,7 +43,7 @@ describe('HeroService (with angular DI)', () => {
         heroData = [new Hero(1, 'Foo'), new Hero(2, 'Bar'), new Hero(3,'Baz')];
       });
 
-      beforeEachBindings(() =>
+      beforeEachProviders(() =>
         [bind(BackendService).toClass(HappyBackendService)]
       );
 
@@ -142,7 +142,7 @@ describe('HeroService (with angular DI)', () => {
 
     describe('when backend throws an error', () => {
 
-      beforeEachBindings(() =>
+      beforeEachProviders(() =>
         [bind(BackendService).toClass(FailingBackendService)]
       );
 
@@ -165,7 +165,7 @@ describe('HeroService (with angular DI)', () => {
 
      describe('when backend throws an error (spy version)', () => {
 
-      beforeEachBindings(() => [BackendService]);
+      beforeEachProviders(() => [BackendService]);
 
       beforeEach(inject([BackendService], (backend: BackendService) =>
         spyOn(backend, 'fetchAllHeroesAsync').and.callFake(() => Promise.reject(testError)

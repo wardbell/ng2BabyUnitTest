@@ -1,14 +1,21 @@
-import {Component, EventEmitter, View} from 'angular2/angular2';
+import {Component, Directive, EventEmitter , ElementRef} from 'angular2/core';
+
 import {COMMON_DIRECTIVES} from './constants';
 import {Hero} from './hero';
 import {InitCapsPipe} from './init-caps-pipe';
 
+@Directive({selector: 'button'})
+class DecoratorDirective {
+  constructor(el: ElementRef){
+    console.log(el)
+  }
+}
 @Component({
-  selector: 'my-hero-detail', properties: ['hero', 'userName'], events: ['delete']
-})
-@View({
+  selector: 'my-hero-detail',
   templateUrl: 'app/hero-detail.component.html',
-  directives: [COMMON_DIRECTIVES],
+  inputs: ['hero', 'userName'], // inputs
+  outputs: ['delete'], // outputs
+  directives: [COMMON_DIRECTIVES, DecoratorDirective],
   styleUrls: ['app/hero-detail.component.css'],
   pipes: [InitCapsPipe]
 })
