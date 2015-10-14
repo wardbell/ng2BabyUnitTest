@@ -1,4 +1,4 @@
-import {Component, Directive, EventEmitter , ElementRef} from 'angular2/core';
+import {Component, Directive, EventEmitter , ElementRef} from 'angular2/angular2';
 
 import {COMMON_DIRECTIVES} from './constants';
 import {Hero} from './hero';

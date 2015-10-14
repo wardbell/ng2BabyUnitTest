@@ -1,5 +1,5 @@
 ///// Boiler Plate ////
-import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/core';
+import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2';
 
 // Angular 2 Test Bed
 import {

@@ -6,7 +6,7 @@ import {
   beforeEachProviders, inject, AsyncTestCompleter
 } from 'angular2/testing';
 
-import {bind} from 'angular2/core';
+import {bind} from 'angular2/angular2';
 import {injectAsync} from '../test-helpers/test-helpers';
 
 // Service related imports

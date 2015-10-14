@@ -1,4 +1,4 @@
-import {Pipe} from 'angular2/core';
+import {Pipe} from 'angular2/angular2';
 
 @Pipe({ name: 'initCaps' })
 export class InitCapsPipe {

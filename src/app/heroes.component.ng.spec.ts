@@ -1,5 +1,5 @@
 ///// Angular 2 Test Bed  ////
-import {bind} from 'angular2/core';
+import {bind} from 'angular2/angular2';
 
 import {
   beforeEach, xdescribe, describe, it, xit, // Jasmine wrappers

@@ -1,3 +1,3 @@
-import {FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/core';
+import {FORM_DIRECTIVES, CORE_DIRECTIVES} from 'angular2/angular2';
 
 export const COMMON_DIRECTIVES = [FORM_DIRECTIVES, CORE_DIRECTIVES];
