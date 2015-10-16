@@ -3,11 +3,10 @@
 // Angular 2 Test Bed
 import {
   beforeEach, xdescribe, describe, it, xit, // Jasmine wrappers
-  beforeEachProviders, inject, AsyncTestCompleter
+  beforeEachProviders, inject, injectAsync,
 } from 'angular2/testing';
 
 import {bind} from 'angular2/angular2';
-import {injectAsync} from '../test-helpers/test-helpers';
 
 // Service related imports
 import {HeroService} from './hero.service';
@@ -48,16 +47,6 @@ describe('HeroService (with angular DI)', () => {
       );
 
       it('refresh promise returns expected # of heroes when fulfilled',
-        inject([AsyncTestCompleter, HeroService],
-          (async: AsyncTestCompleter, service: HeroService) => {
-
-          service.refresh().then(heroes =>
-              expect(heroes.length).toEqual(heroData.length)
-            )
-            .catch(fail).then(() => async.done());
-        }));
-
-      it('refresh promise returns expected # of heroes when fulfilled (using injectAsync)',
         injectAsync([HeroService], (service: HeroService) => {
 
           return service.refresh().then(heroes =>

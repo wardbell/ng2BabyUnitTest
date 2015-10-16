@@ -1,9 +1,10 @@
 ///// Angular 2 Test Bed  ////
-import {bind} from 'angular2/angular2';
+import {bind, By} from 'angular2/angular2';
 
 import {
   beforeEach, xdescribe, describe, it, xit, // Jasmine wrappers
-  beforeEachProviders, By, DebugElement,
+  beforeEachProviders,
+  injectAsync,
   RootTestComponent as RTC,
   TestComponentBuilder as TCB
 } from 'angular2/testing';
@@ -12,7 +13,7 @@ import {
   expectSelectedHtml,
   expectViewChildHtml,
   expectViewChildClass,
-  injectAsync, injectTcb, tick} from '../test-helpers/test-helpers';
+  injectTcb, tick} from '../test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroesComponent} from './heroes.component';
@@ -48,11 +49,12 @@ describe('HeroesComponent (with Angular)', () => {
 
   it('can be created and has userName', injectTcb((tcb:TCB) => {
     let template = '';
-    return tcb
+    let p = tcb
       .overrideTemplate(HeroesComponent, template)
-      .createAsync(HeroesComponent)
+      .createAsync(HeroesComponent);
+      return p
       .then((rootTC: RTC) => {
-        hc = rootTC.componentInstance;
+        hc = rootTC.debugElement.componentInstance;
         expect(hc).toBeDefined();// proof of life
         expect(hc.userName).toEqual(mockUser.name);
       });
@@ -64,7 +66,7 @@ describe('HeroesComponent (with Angular)', () => {
       .overrideTemplate(HeroesComponent, template)
       .createAsync(HeroesComponent)
       .then((rootTC: RTC) => {
-        hc = rootTC.componentInstance;
+        hc = rootTC.debugElement.componentInstance;
 
         rootTC.detectChanges(); // trigger component property binding
         expectSelectedHtml(rootTC, 'h1').toMatch(hc.userName);
@@ -94,7 +96,7 @@ describe('HeroesComponent (with Angular)', () => {
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
         .then((rootTC: RTC) => {
-          hc = rootTC.componentInstance;
+          hc = rootTC.debugElement.componentInstance;
           let spy = <jasmine.Spy><any> heroService.refresh;
           hc.onInit(); // Angular framework calls when it creates the component
           expect(spy.calls.count()).toEqual(1);
@@ -107,7 +109,7 @@ describe('HeroesComponent (with Angular)', () => {
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
         .then((rootTC: RTC) => {
-          hc = rootTC.componentInstance;
+          hc = rootTC.debugElement.componentInstance;
           let spy = spyOn(hc, 'onInit').and.callThrough();
 
           expect(spy.calls.count()).toEqual(0);
@@ -134,14 +136,14 @@ describe('HeroesComponent (with Angular)', () => {
           return rootTC;
         })
         .then((rootTC: RTC) => {
-          hc = rootTC.componentInstance;
+          hc = rootTC.debugElement.componentInstance;
           // now heroes are available for binding
           expect(hc.heroes.length).toEqual(heroData.length);
 
           rootTC.detectChanges(); // trigger component property binding
 
           // confirm hero list is displayed by looking for a known hero
-          expect(rootTC.nativeElement.innerHTML).toMatch(heroData[0].name);
+          expect(rootTC.debugElement.nativeElement.innerHTML).toMatch(heroData[0].name);
         });
     }));
 
@@ -198,7 +200,7 @@ describe('HeroesComponent (with Angular)', () => {
         .overrideTemplate(HeroesComponent, template)
         .createAsync(HeroesComponent)
         .then((rootTC: RTC) => {
-          hc = rootTC.componentInstance;
+          hc = rootTC.debugElement.componentInstance;
           // trigger {{heroes}} binding
           rootTC.detectChanges();
           return rootTC; // wait for heroes to arrive
@@ -209,7 +211,7 @@ describe('HeroesComponent (with Angular)', () => {
           rootTC.detectChanges(); // trigger component property binding
 
           // confirm hero list is not displayed by looking for removed hero
-          expect(rootTC.nativeElement.innerHTML).not.toMatch(heroData[1].name);
+          expect(rootTC.debugElement.nativeElement.innerHTML).not.toMatch(heroData[1].name);
         });
     }));
   });
@@ -258,12 +260,12 @@ function injectHC(testFn: (hc: HeroesComponent, rootTC?: RTC) => void, withNgCla
     .overrideTemplate(HeroesComponent, template)
     .createAsync(HeroesComponent)
     .then((rootTC:RTC) => {
-      hc = rootTC.componentInstance;
+      hc = rootTC.debugElement.componentInstance;
       rootTC.detectChanges();// trigger {{heroes}} binding
       return rootTC;
     })
     .then((rootTC:RTC) => { // wait a tick until heroes are fetched
-
+console.error("WAS THIS FIXED??");
     // CRASHING HERE IF TEMPLATE HAS '[ng-class]="getSelectedClass(hero)"'
     // WITH EXCEPTION:
     //   "Expression 'getSelectedClass(hero) in null' has changed after it was checked."

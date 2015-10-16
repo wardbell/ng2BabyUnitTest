@@ -1,14 +1,13 @@
 ///// Boiler Plate ////
-import {bind, Component, Directive, EventEmitter, FORM_DIRECTIVES, View} from 'angular2/angular2';
+import {bind, By, Component, Directive, EventEmitter, FORM_DIRECTIVES} from 'angular2/angular2';
 
 // Angular 2 Test Bed
 import {
-  AsyncTestCompleter, beforeEachProviders, By, DebugElement, dispatchEvent,
-  inject, RootTestComponent as RTC,
-  beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
+beforeEachProviders, inject, injectAsync, RootTestComponent as RTC,
+beforeEach, ddescribe, xdescribe, describe, expect, iit, it, xit // Jasmine wrappers
 } from 'angular2/testing';
 
-import {injectAsync, injectTcb, tick} from '../test-helpers/test-helpers';
+import {dispatchEvent, DoneFn, injectTcb, tick} from '../test-helpers/test-helpers';
 
 ///// Testing this component ////
 import {HeroDetailComponent} from './hero-detail.component';
@@ -23,47 +22,40 @@ describe('HeroDetailComponent', () => {
       expect(hdc instanceof HeroDetailComponent).toEqual(true); // proof of life
     });
 
-    it('onDelete method should raise delete event',
-      inject([AsyncTestCompleter], (async: AsyncTestCompleter) => {
-      let done = async.done.bind(async);
+    it('onDelete method should raise delete event', (done: DoneFn) => {
       let hdc = new HeroDetailComponent();
 
       // Listen for the HeroComponent.delete EventEmitter's event
       hdc.delete.toRx().subscribe(() => {
         console.log('HeroComponent.delete event raised');
         done();  // it must have worked
-      }, (error:any) => {fail(error); done()});
+      }, (error: any) => { fail(error); done() });
 
       hdc.onDelete();
-    }));
+    });
 
-    it('onDelete method should raise delete event (w/ promise)', injectAsync(() => {
+    it('onDelete method should raise delete event (w/ promise)', (done: DoneFn) => {
 
       let hdc = new HeroDetailComponent();
 
       // Listen for the HeroComponent.delete EventEmitter's event
-      let p = hdc.delete.toRx().toPromise().then(() => {
-        console.log('HeroComponent.delete event raised in promise');
-      });
+      let p = hdc.delete.toRx()
+        .toPromise()
+        .then(() => {
+          console.log('HeroComponent.delete event raised in promise');
+        })
+        .then(fail).then(done);
 
-      hdc.delete.toRx().subscribe(() => {
-        console.log('HeroComponent.delete event raised in subscription')
-      })
+      hdc.delete.toRx()
+        .subscribe(() => {
+          console.log('HeroComponent.delete event raised in subscription')
+        });
 
       hdc.onDelete();
 
-      // toPromise() does not fulfill until emitter is completed.
+      // toPromise() does not fulfill until emitter is completed by `return()`
       hdc.delete.return();
-
-      return p;
-       // Returns promise with the last value emitted by HeroComponent.delete
-      // Must come AFTER `hdc.onDelete() else promise never resolves
-      // see https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/topromise.md
-      return hdc.delete.toRx().toPromise().then(() => {
-        console.log('HeroComponent.delete event raised in promise');
-      });
-
-    }));
+    });
 
     it('onUpdate method should modify hero', () => {
       let hdc = new HeroDetailComponent();
@@ -88,26 +80,29 @@ describe('HeroDetailComponent', () => {
         .overrideTemplate(HeroDetailComponent, template)
         .createAsync(HeroDetailComponent)
         .then((rootTC: RTC) => {
-          let hdc: HeroDetailComponent = rootTC.componentInstance;
+          let hdc: HeroDetailComponent = rootTC.debugElement.componentInstance;
 
-          // USE PROMISE WRAPPING AN OBSERVABLE UNTIL can get `toPromise` working
-          let p = new Promise<Hero>((resolve) => {
-            // Listen for the HeroComponent.delete EventEmitter's event with observable
-            hdc.delete.toRx().subscribe((hero:Hero) => {
-              console.log('Observable heard HeroComponent.delete event raised');
-              resolve(hero);
-            });
-          })
+          // // USE PROMISE WRAPPING AN OBSERVABLE UNTIL can get `toPromise` working
+          // let p = new Promise<Hero>((resolve) => {
+          //   // Listen for the HeroComponent.delete EventEmitter's event with observable
+          //   hdc.delete.toRx().subscribe((hero: Hero) => {
+          //     console.log('Observable heard HeroComponent.delete event raised');
+          //     resolve(hero);
+          //   });
+          // })
 
-          // Listen for the HeroComponent.delete EventEmitter's event with promise
-          // NOT WORKING. PROMISE NEVER RESOLVED
-          // p = <Promise<Hero>> hdc.delete.toRx().toPromise().then(hero => {
-          //   console.log('Promise heard HeroComponent.delete event raised');
-          //   return hero;
-          // });
+          //Listen for the HeroComponent.delete EventEmitter's event with promise
+          let p = <Promise<Hero>> hdc.delete.toRx().toPromise()
+          .then((hero:Hero) => {
+            console.log('Promise heard HeroComponent.delete event raised');
+          });
 
           // trigger the 'click' event on the HeroDetailComponent delete button
-          rootTC.query(By.css('button')).triggerEventHandler('click');
+          let el = rootTC.debugElement.query(By.css('button'));
+          el.triggerEventHandler('click', null);
+
+          // toPromise() does not fulfill until emitter is completed by `return()`
+          hdc.delete.return();
 
           return p;
         });
@@ -127,12 +122,13 @@ describe('HeroDetailComponent', () => {
         .createAsync(HeroDetailComponent)
         .then((rootTC: RTC) => {
 
-          let hdc: HeroDetailComponent = rootTC.componentInstance;
+          let hdc: HeroDetailComponent = rootTC.debugElement.componentInstance;
           hdc.hero = new Hero(42, 'Cat Woman');
           let origNameLength = hdc.hero.name.length;
 
           // trigger the 'click' event on the HeroDetailComponent update button
-          rootTC.query(By.css('#update')).triggerEventHandler('click');
+          rootTC.debugElement.query(By.css('#update'))
+            .triggerEventHandler('click', null);
 
           expect(hdc.hero.name.length).toBeGreaterThan(origNameLength);
         });
@@ -148,13 +144,13 @@ describe('HeroDetailComponent', () => {
         .createAsync(HeroDetailComponent)
         .then((rootTC: RTC) => {
 
-          hdc = rootTC.componentInstance;
+          hdc = rootTC.debugElement.componentInstance;
 
           hdc.hero = new Hero(42, 'Cat Woman');
           rootTC.detectChanges();
 
           // get the HTML element and change its value in the DOM
-          var input = rootTC.query(By.css('input')).nativeElement;
+          var input = rootTC.debugElement.query(By.css('input')).nativeElement;
           input.value = "Dog Man"
           dispatchEvent(input, 'change'); // event triggers Ng to update model
 
@@ -176,7 +172,7 @@ describe('HeroDetailComponent', () => {
     // 4. confirm that the change is preserved in HTML
     // Reveals 2-way binding bug in alpha-36, fixed in pull #3715 for alpha-37
 
-    xit('toggling heroes after modifying name preserves the change on screen (NG2 BUG)', injectTcb(tcb => {
+    it('toggling heroes after modifying name preserves the change on screen (NG2 BUG)', injectTcb(tcb => {
 
       let hdc: HeroDetailComponent;
       let hero1 = new Hero(1, 'Cat Woman');
@@ -190,13 +186,13 @@ describe('HeroDetailComponent', () => {
         .createAsync(HeroDetailComponent)
         .then((rtc: RTC) => {
           rootTC = rtc;
-          hdc = rootTC.componentInstance;
+          hdc = rootTC.debugElement.componentInstance;
 
           hdc.hero = hero1; // start with hero1
           rootTC.detectChanges();
 
           // get the HTML element and change its value in the DOM
-          input = rootTC.query(By.css('input')).nativeElement;
+          input = rootTC.debugElement.query(By.css('input')).nativeElement;
           input.value = "Dog Man"
           dispatchEvent(input, 'change'); // event triggers Ng to update model
         })
@@ -214,7 +210,7 @@ describe('HeroDetailComponent', () => {
           expect(hdc.hero.name).toEqual('Dog Man');
 
           // the view should reflect the same changed value
-          expect(input.value).toEqual('Dog Man'); // fails in alpha36; should be fixed in alpha37
+          expect(input.value).toEqual('Dog Man');
         });
     }));
   });
