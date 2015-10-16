@@ -161,7 +161,7 @@ describe('HeroService (beginning tests - 3 [async])', () => {
     service.refresh().then(heroes => {
         expect(heroes.length).toEqual(heroData.length);
 			})
-			.catch(fail).then(done);
+			.then(done, done.fail);
   });
 
 	it('service.heroes remains empty until fulfilled', () => {
@@ -201,7 +201,7 @@ describe('HeroService (beginning tests - 4 [beforeEach])', () => {
     service.refresh().then(heroes =>
         expect(heroes.length).toEqual(heroData.length)
       )
-      .catch(fail).then(done);
+      .then(done, done.fail);
   });
 
   it('service.heroes remains empty until fulfilled', () => {
@@ -225,7 +225,7 @@ describe('HeroService (beginning tests - 5 [refactored beforeEach])', () => {
 			service.refresh().then(() =>
 					expect(service.heroes.length).toEqual(heroData.length)
 				)
-				.catch(fail).then(done);
+				.then(done, done.fail);
 		});
 
 		it('service.heroes remains empty until fulfilled', () => {

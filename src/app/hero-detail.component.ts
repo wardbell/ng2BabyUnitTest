@@ -20,13 +20,7 @@ class DecoratorDirective {
   pipes: [InitCapsPipe]
 })
 export class HeroDetailComponent {
-  // TODO: REMOVE THIS CONSTRUCTOR. JUST HERE FOR toRx.ToPromise ISSUE
-  constructor() {
-    this.delete.toRx().toPromise()
-      .then(()=>{
-        console.log('delete')
-      })
-  }
+
   hero: Hero;
 
   delete = new EventEmitter();

@@ -49,10 +49,9 @@ describe('HeroesComponent (with Angular)', () => {
 
   it('can be created and has userName', injectTcb((tcb:TCB) => {
     let template = '';
-    let p = tcb
+    return  tcb
       .overrideTemplate(HeroesComponent, template)
-      .createAsync(HeroesComponent);
-      return p
+      .createAsync(HeroesComponent)
       .then((rootTC: RTC) => {
         hc = rootTC.debugElement.componentInstance;
         expect(hc).toBeDefined();// proof of life

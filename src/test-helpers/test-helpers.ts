@@ -3,12 +3,15 @@ import {By} from 'angular2/angular2'
 
 ///////// Should be in testing  /////////
 
-export type DoneFn = (done?:any) => void;
+export type DoneFn = {
+  fail: (err?:any) => void,
+  (done?:any): () => void
+}
 
 ///////// injectAsync extensions ///
 
-type ThenableTestFn = (...args:any[]) => PromiseLike<any>;
-type ThenableTcbTestFn = (tcb: TestComponentBuilder, ...args:any[]) => PromiseLike<any>;
+type PromiseLikeTestFn = (...args:any[]) => PromiseLike<any>;
+type PromiseLikeTcbTestFn = (tcb: TestComponentBuilder, ...args:any[]) => PromiseLike<any>;
 
 /** Run an async component test within Angular test bed using TestComponentBuilder
 // Example
@@ -27,11 +30,11 @@ type ThenableTcbTestFn = (tcb: TestComponentBuilder, ...args:any[]) => PromiseLi
 //    });
 */
 export function injectTcb(testFn: (tcb: TestComponentBuilder) => PromiseLike<any>): FunctionWithParamTokens;
-export function injectTcb(dependencies: any[], testFn: ThenableTcbTestFn): FunctionWithParamTokens;
-export function injectTcb(dependencies: any[] | ThenableTcbTestFn, testFn?: ThenableTcbTestFn) {
+export function injectTcb(dependencies: any[], testFn: PromiseLikeTcbTestFn): FunctionWithParamTokens;
+export function injectTcb(dependencies: any[] | PromiseLikeTcbTestFn, testFn?: PromiseLikeTcbTestFn) {
 
   if (typeof dependencies === 'function' ){
-    testFn = <ThenableTcbTestFn>dependencies;
+    testFn = <PromiseLikeTcbTestFn>dependencies;
     dependencies = [];
   }
 

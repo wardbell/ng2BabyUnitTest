@@ -98,7 +98,7 @@ describe('HeroesComponent (no Angular)', () => {
           let heroes = hc.heroes; // now the component has heroes to show
           expect(heroes.length).toEqual(heroData.length);
         })
-        .catch(fail).then(done);
+        .then(done, done.fail);
     });
 
     it('restores heroes after refresh called again', done => {
@@ -116,7 +116,7 @@ describe('HeroesComponent (no Angular)', () => {
           expect(heroes[0]).not.toEqual('Wotan'); // change reversed
           expect(heroes.length).toEqual(heroData.length); // orig num of heroes
         })
-        .catch(fail).then(done);
+        .then(done, done.fail);
     });
   });
 
@@ -148,7 +148,7 @@ describe('HeroesComponent (no Angular)', () => {
     //       that trick would fail if we reimplemented hc.heroes as a readonly property
     beforeEach(done => {
       hc.onInit(); // Angular framework calls when it creates the component
-      refreshPromise().catch(fail).then(done);
+      refreshPromise().then(done, done.fail);
     });
 
     it('removes the supplied hero (only) from the list', () => {
@@ -187,7 +187,7 @@ describe('HeroesComponent (no Angular)', () => {
       refreshPromise().then(() => {
         hc.onDelete(hero); // shouldn't fail
       })
-      .catch(fail).then(done);
+      .then(done, done.fail);
     });
 
     it('the new currentHero is the one after the removed hero', () => {
